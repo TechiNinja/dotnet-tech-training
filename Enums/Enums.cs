@@ -1,0 +1,66 @@
+﻿namespace SportsManagementApp.Enums
+{
+    public enum RoleType
+    {
+        Unknown = 0,
+        Admin = 1,
+        OperationsTeam = 2,
+        Organizer = 3,
+        Participant = 4,
+    }
+
+    public enum RequestStatus
+    {
+        Unknown = 0,
+        Pending = 1,
+        Approved = 2,
+        Rejected = 3,
+    }
+
+    public enum GenderType
+    {
+        Unknown = 0,
+        Male = 1,
+        Female = 2,
+        Mixed = 3,
+    }
+
+    public enum MatchFormat
+    {
+        Unknown = 0,
+        Singles = 1,
+        Doubles = 2,
+    }
+
+    public enum EventStatus
+    {
+        Unknown = 0,
+        Open = 1,
+        Upcoming = 2,
+        Live = 3,
+        Completed = 4,
+        Cancelled = 5
+    }
+
+    public enum CategoryStatus
+    {
+        Unknown = 0,
+        Active = 1,
+        Abandoned = 2,
+    }
+
+    public enum MatchStatus
+    {
+        Unknown = 0,
+        Upcoming = 1,
+        Live = 2,
+        Completed = 3,
+    }
+
+    public enum TournamentType
+    {
+        Unknown = 0,
+        Knockout = 1,
+        RoundRobin = 2,
+    }
+}
