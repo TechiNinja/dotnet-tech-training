@@ -1,7 +1,7 @@
 ﻿using SportsManagementApp.Enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace SportsManagementApp.Models
+namespace SportsManagementApp.Entities
 {
     public class EventRequest
     {
@@ -21,6 +21,7 @@ namespace SportsManagementApp.Models
         public User? Admin { get; set; }
         public int? OperationsReviewerId { get; set; }
         public User? OperationsReviewer { get; set; }
-        public DateTime ActionDate { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public DateTime? UpdatedDate { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace SportsManagementApp.Models
+﻿namespace SportsManagementApp.Entities
 {
     public class Sport
     {

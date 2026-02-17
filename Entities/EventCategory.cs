@@ -1,6 +1,6 @@
 ﻿using SportsManagementApp.Enums;
 
-namespace SportsManagementApp.Models
+namespace SportsManagementApp.Entities
 {
     public class EventCategory
     {

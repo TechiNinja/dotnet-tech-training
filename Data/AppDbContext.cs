@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SportsManagementApp.Models;
-using SportsManagementApp.Enums;
+using SportsManagementApp.Entities;
 using System;
 
 namespace SportsManagementApp.Data
@@ -25,13 +24,6 @@ namespace SportsManagementApp.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            modelBuilder.Entity<Role>().HasData(
-                new Role { Id = 1, RoleType = RoleType.Admin },
-                new Role { Id = 2, RoleType = RoleType.OperationsTeam },
-                new Role { Id = 3, RoleType = RoleType.Organizer },
-                new Role { Id = 4, RoleType = RoleType.Participant }
-            );
 
             modelBuilder.Entity<TeamMember>()
                 .HasOne(member => member.User)

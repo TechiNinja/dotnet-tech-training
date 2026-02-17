@@ -1,7 +1,7 @@
 ﻿using SportsManagementApp.Enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace SportsManagementApp.Models
+namespace SportsManagementApp.Entities
 {
     public class Event
     {

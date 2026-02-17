@@ -1,7 +1,7 @@
 ﻿using SportsManagementApp.Enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace SportsManagementApp.Models
+namespace SportsManagementApp.Entities
 {
     public class Match
     {
@@ -14,7 +14,6 @@ namespace SportsManagementApp.Models
         public int? SideAId { get; set; }
         public int? SideBId { get; set; }
         public MatchStatus Status { get; set; } = MatchStatus.Upcoming;
-        public int? TotalSets { get; set; } = 1;
         public int RoundNumber { get; set; }
         public int MatchNumber { get; set; }
         public int BracketPosition { get; set; }

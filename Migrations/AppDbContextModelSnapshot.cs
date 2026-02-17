@@ -22,7 +22,7 @@ namespace SportsManagementApp.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("SportsManagementApp.Models.Event", b =>
+            modelBuilder.Entity("SportsManagementApp.Entities.Event", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -77,7 +77,7 @@ namespace SportsManagementApp.Migrations
                     b.ToTable("Events");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Models.EventCategory", b =>
+            modelBuilder.Entity("SportsManagementApp.Entities.EventCategory", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -113,7 +113,7 @@ namespace SportsManagementApp.Migrations
                     b.ToTable("EventCategories");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Models.EventRequest", b =>
+            modelBuilder.Entity("SportsManagementApp.Entities.EventRequest", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -121,11 +121,11 @@ namespace SportsManagementApp.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("ActionDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("AdminId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateOnly>("EndDate")
                         .HasColumnType("date");
@@ -160,6 +160,9 @@ namespace SportsManagementApp.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AdminId");
@@ -171,7 +174,7 @@ namespace SportsManagementApp.Migrations
                     b.ToTable("EventRequests");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Models.Match", b =>
+            modelBuilder.Entity("SportsManagementApp.Entities.Match", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -211,9 +214,6 @@ namespace SportsManagementApp.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<int?>("TotalSets")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -224,7 +224,7 @@ namespace SportsManagementApp.Migrations
                     b.ToTable("Matches");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Models.MatchSet", b =>
+            modelBuilder.Entity("SportsManagementApp.Entities.MatchSet", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -234,9 +234,6 @@ namespace SportsManagementApp.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsCompleted")
-                        .HasColumnType("bit");
 
                     b.Property<int>("MatchId")
                         .HasColumnType("int");
@@ -250,6 +247,9 @@ namespace SportsManagementApp.Migrations
                     b.Property<int>("SetNumber")
                         .HasColumnType("int");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -260,7 +260,7 @@ namespace SportsManagementApp.Migrations
                     b.ToTable("MatchSets");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Models.ParticipantRegistration", b =>
+            modelBuilder.Entity("SportsManagementApp.Entities.ParticipantRegistration", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -295,7 +295,7 @@ namespace SportsManagementApp.Migrations
                     b.ToTable("ParticipantRegistrations");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Models.Result", b =>
+            modelBuilder.Entity("SportsManagementApp.Entities.Result", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -323,7 +323,7 @@ namespace SportsManagementApp.Migrations
                     b.ToTable("Results");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Models.Role", b =>
+            modelBuilder.Entity("SportsManagementApp.Entities.Role", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -334,8 +334,9 @@ namespace SportsManagementApp.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("RoleType")
-                        .HasColumnType("int");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -343,35 +344,9 @@ namespace SportsManagementApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Roles");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            RoleType = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            RoleType = 2
-                        },
-                        new
-                        {
-                            Id = 3,
-                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            RoleType = 3
-                        },
-                        new
-                        {
-                            Id = 4,
-                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            RoleType = 4
-                        });
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Models.Sport", b =>
+            modelBuilder.Entity("SportsManagementApp.Entities.Sport", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -394,7 +369,7 @@ namespace SportsManagementApp.Migrations
                     b.ToTable("Sports");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Models.Team", b =>
+            modelBuilder.Entity("SportsManagementApp.Entities.Team", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -423,7 +398,7 @@ namespace SportsManagementApp.Migrations
                     b.ToTable("Teams");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Models.TeamMember", b =>
+            modelBuilder.Entity("SportsManagementApp.Entities.TeamMember", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -452,7 +427,7 @@ namespace SportsManagementApp.Migrations
                     b.ToTable("TeamMembers");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Models.User", b =>
+            modelBuilder.Entity("SportsManagementApp.Entities.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -493,15 +468,15 @@ namespace SportsManagementApp.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Models.Event", b =>
+            modelBuilder.Entity("SportsManagementApp.Entities.Event", b =>
                 {
-                    b.HasOne("SportsManagementApp.Models.User", "Organizer")
+                    b.HasOne("SportsManagementApp.Entities.User", "Organizer")
                         .WithMany()
                         .HasForeignKey("OrganizerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SportsManagementApp.Models.Sport", "Sport")
+                    b.HasOne("SportsManagementApp.Entities.Sport", "Sport")
                         .WithMany("Events")
                         .HasForeignKey("SportId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -512,9 +487,9 @@ namespace SportsManagementApp.Migrations
                     b.Navigation("Sport");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Models.EventCategory", b =>
+            modelBuilder.Entity("SportsManagementApp.Entities.EventCategory", b =>
                 {
-                    b.HasOne("SportsManagementApp.Models.Event", "Event")
+                    b.HasOne("SportsManagementApp.Entities.Event", "Event")
                         .WithMany("Categories")
                         .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -523,20 +498,20 @@ namespace SportsManagementApp.Migrations
                     b.Navigation("Event");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Models.EventRequest", b =>
+            modelBuilder.Entity("SportsManagementApp.Entities.EventRequest", b =>
                 {
-                    b.HasOne("SportsManagementApp.Models.User", "Admin")
+                    b.HasOne("SportsManagementApp.Entities.User", "Admin")
                         .WithMany()
                         .HasForeignKey("AdminId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SportsManagementApp.Models.User", "OperationsReviewer")
+                    b.HasOne("SportsManagementApp.Entities.User", "OperationsReviewer")
                         .WithMany()
                         .HasForeignKey("OperationsReviewerId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("SportsManagementApp.Models.Sport", "Sport")
+                    b.HasOne("SportsManagementApp.Entities.Sport", "Sport")
                         .WithMany()
                         .HasForeignKey("SportId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -549,9 +524,9 @@ namespace SportsManagementApp.Migrations
                     b.Navigation("Sport");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Models.Match", b =>
+            modelBuilder.Entity("SportsManagementApp.Entities.Match", b =>
                 {
-                    b.HasOne("SportsManagementApp.Models.EventCategory", "EventCategory")
+                    b.HasOne("SportsManagementApp.Entities.EventCategory", "EventCategory")
                         .WithMany("Matches")
                         .HasForeignKey("EventCategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -560,9 +535,9 @@ namespace SportsManagementApp.Migrations
                     b.Navigation("EventCategory");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Models.MatchSet", b =>
+            modelBuilder.Entity("SportsManagementApp.Entities.MatchSet", b =>
                 {
-                    b.HasOne("SportsManagementApp.Models.Match", "Match")
+                    b.HasOne("SportsManagementApp.Entities.Match", "Match")
                         .WithMany("MatchSets")
                         .HasForeignKey("MatchId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -571,21 +546,21 @@ namespace SportsManagementApp.Migrations
                     b.Navigation("Match");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Models.ParticipantRegistration", b =>
+            modelBuilder.Entity("SportsManagementApp.Entities.ParticipantRegistration", b =>
                 {
-                    b.HasOne("SportsManagementApp.Models.EventCategory", "EventCategory")
+                    b.HasOne("SportsManagementApp.Entities.EventCategory", "EventCategory")
                         .WithMany("EventRegistrations")
                         .HasForeignKey("EventCategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("SportsManagementApp.Models.Event", "Event")
+                    b.HasOne("SportsManagementApp.Entities.Event", "Event")
                         .WithMany("Registrations")
                         .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("SportsManagementApp.Models.User", "User")
+                    b.HasOne("SportsManagementApp.Entities.User", "User")
                         .WithMany("Registrations")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -598,20 +573,20 @@ namespace SportsManagementApp.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Models.Result", b =>
+            modelBuilder.Entity("SportsManagementApp.Entities.Result", b =>
                 {
-                    b.HasOne("SportsManagementApp.Models.Match", "Match")
+                    b.HasOne("SportsManagementApp.Entities.Match", "Match")
                         .WithOne("Result")
-                        .HasForeignKey("SportsManagementApp.Models.Result", "MatchId")
+                        .HasForeignKey("SportsManagementApp.Entities.Result", "MatchId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Match");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Models.Team", b =>
+            modelBuilder.Entity("SportsManagementApp.Entities.Team", b =>
                 {
-                    b.HasOne("SportsManagementApp.Models.EventCategory", "EventCategory")
+                    b.HasOne("SportsManagementApp.Entities.EventCategory", "EventCategory")
                         .WithMany("Teams")
                         .HasForeignKey("EventCategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -620,15 +595,15 @@ namespace SportsManagementApp.Migrations
                     b.Navigation("EventCategory");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Models.TeamMember", b =>
+            modelBuilder.Entity("SportsManagementApp.Entities.TeamMember", b =>
                 {
-                    b.HasOne("SportsManagementApp.Models.Team", "Team")
+                    b.HasOne("SportsManagementApp.Entities.Team", "Team")
                         .WithMany("Members")
                         .HasForeignKey("TeamId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SportsManagementApp.Models.User", "User")
+                    b.HasOne("SportsManagementApp.Entities.User", "User")
                         .WithMany("TeamMembers")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -639,9 +614,9 @@ namespace SportsManagementApp.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Models.User", b =>
+            modelBuilder.Entity("SportsManagementApp.Entities.User", b =>
                 {
-                    b.HasOne("SportsManagementApp.Models.Role", "Role")
+                    b.HasOne("SportsManagementApp.Entities.Role", "Role")
                         .WithMany("Users")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -650,14 +625,14 @@ namespace SportsManagementApp.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Models.Event", b =>
+            modelBuilder.Entity("SportsManagementApp.Entities.Event", b =>
                 {
                     b.Navigation("Categories");
 
                     b.Navigation("Registrations");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Models.EventCategory", b =>
+            modelBuilder.Entity("SportsManagementApp.Entities.EventCategory", b =>
                 {
                     b.Navigation("EventRegistrations");
 
@@ -666,29 +641,29 @@ namespace SportsManagementApp.Migrations
                     b.Navigation("Teams");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Models.Match", b =>
+            modelBuilder.Entity("SportsManagementApp.Entities.Match", b =>
                 {
                     b.Navigation("MatchSets");
 
                     b.Navigation("Result");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Models.Role", b =>
+            modelBuilder.Entity("SportsManagementApp.Entities.Role", b =>
                 {
                     b.Navigation("Users");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Models.Sport", b =>
+            modelBuilder.Entity("SportsManagementApp.Entities.Sport", b =>
                 {
                     b.Navigation("Events");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Models.Team", b =>
+            modelBuilder.Entity("SportsManagementApp.Entities.Team", b =>
                 {
                     b.Navigation("Members");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Models.User", b =>
+            modelBuilder.Entity("SportsManagementApp.Entities.User", b =>
                 {
                     b.Navigation("Registrations");
 

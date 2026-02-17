@@ -1,14 +1,5 @@
 ﻿namespace SportsManagementApp.Enums
 {
-    public enum RoleType
-    {
-        Unknown = 0,
-        Admin = 1,
-        OperationsTeam = 2,
-        Organizer = 3,
-        Participant = 4,
-    }
-
     public enum RequestStatus
     {
         Unknown = 0,
@@ -62,5 +53,14 @@
         Unknown = 0,
         Knockout = 1,
         RoundRobin = 2,
+    }
+
+    public enum SetStatus
+    {
+        Unknown = 0,
+        NotStarted = 1,
+        Live = 2,
+        Completed = 3,
+        Cancelled = 4,
     }
 }
