@@ -1,10 +1,12 @@
-﻿namespace SportsManagementApp.Entities
+﻿using SportsManagementApp.Enums;
+
+namespace SportsManagementApp.Data.Entities
 {
-    public class Sport
+    public class Role
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
-        public ICollection<Event> Events { get; set; } = new List<Event>();
+        public ICollection<User> Users { get; set; } = new List<User>();
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
     }

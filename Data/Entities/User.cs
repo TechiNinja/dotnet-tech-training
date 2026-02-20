@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SportsManagementApp.Entities
+namespace SportsManagementApp.Data.Entities
 {
     public class User
     {

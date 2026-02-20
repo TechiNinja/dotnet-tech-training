@@ -1,4 +1,4 @@
-﻿namespace SportsManagementApp.Entities
+﻿namespace SportsManagementApp.Data.Entities
 {
     public class TeamMember
     {
