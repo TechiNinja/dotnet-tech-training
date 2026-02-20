@@ -18,13 +18,15 @@ namespace SportsManagementApp.Services
         {
             var name = dto.Name.Trim();
 
-            if (string.IsNullOrWhiteSpace(name)){
+            if (string.IsNullOrWhiteSpace(name))
+            {
                 throw new Exception(StringConstant.sportsNameRequired);
             }
 
-            
+
             var existing = await _sportRepository.GetSportByName(name);
-            if (existing != null){
+            if (existing != null)
+            {
                 throw new Exception(StringConstant.sportsExist);
             }
 
@@ -37,16 +39,13 @@ namespace SportsManagementApp.Services
             return await _sportRepository.AddSport(sport);
         }
 
-        public async Task<IEnumerable<Sport>> GetAllSports()
+        public async Task<IEnumerable<Sport>> SearchSports(int? id, string? name)
         {
-            return await _sportRepository.GetAllSports();
+            name = string.IsNullOrWhiteSpace(name) ? null : name.Trim();
+
+            return await _sportRepository.SearchSports(id, name);
         }
 
-        public async Task<Sport?> GetSportById(int id)
-        {
-            return await _sportRepository.GetSportById(id);
-        }
 
-      
     }
 }

@@ -5,10 +5,8 @@ using SportsManagementApp.Enums;
 namespace SportsManagementApp.Services;
 public interface IEventRequestService
 {
-    Task<EventRequest> RaiseEventRequest(CreateEventRequestDto dto, int adminId);
-    Task<IEnumerable<EventRequestResponseDto>> GetAllEventRequest();
-    Task<EventRequestResponseDto?> GetEventRequestById(int id);
-    Task<IEnumerable<EventRequestResponseDto>> GetEventRequestByStatus(RequestStatus status);
-    Task<EventRequest> WithdrawlEventRequest(int id);
-    Task<EventRequest> EditEventRequest(int id ,EditEventRequestDto dto);
+    Task<EventRequestResponseDto> RaiseEventRequest(CreateEventRequestDto dto, int adminId);
+    Task<IEnumerable<EventRequestResponseDto>> SearchEventRequests(int? id, RequestStatus? status);
+    Task<EventRequestResponseDto> WithdrawlEventRequest(int id);
+    Task<EventRequestResponseDto> EditEventRequest(int id ,EditEventRequestDto dto);
 }

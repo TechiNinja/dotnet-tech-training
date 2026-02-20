@@ -20,14 +20,20 @@ namespace SportsManagementApp.Repositories.SportsRepository
             return sport;
         }
 
-        public async Task<List<Sport>> GetAllSports()
+        public async Task<List<Sport>> SearchSports(int? id, string? name)
         {
-            return await _context.Sports.ToListAsync();
-        }
+            var query = _context.Sports.AsNoTracking().AsQueryable();
 
-        public async Task<Sport?> GetSportById(int id)
-        {
-            return await _context.Sports.FirstOrDefaultAsync(s => s.Id == id);
+            if (id.HasValue)
+                query = query.Where(s => s.Id == id.Value);
+
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                var n = name.Trim().ToLower();
+                query = query.Where(s => s.Name.ToLower() == n);
+            }
+
+            return await query.ToListAsync();
         }
 
         public async Task<Sport?> GetSportByName(string name)
@@ -41,5 +47,6 @@ namespace SportsManagementApp.Repositories.SportsRepository
             return await _context.Sports.AnyAsync(s => s.Id == id);
         }
 
-      
-    }}
+
+    }
+}

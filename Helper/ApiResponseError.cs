@@ -1,6 +1,6 @@
 namespace SportsManagementApp.Helper;
 
-    public class ApiResponseError<T>
+    public class ApiResponseError
     {
         public string Message { get; set; } = null!;
        

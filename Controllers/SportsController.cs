@@ -19,14 +19,14 @@ namespace SportsManagementApp.Controllers
 
         [HttpPost]
         [ProducesResponseType(typeof(ApiResponseSuccess<Sport>), StatusCodes.Status201Created)]
-        [ProducesResponseType(typeof(ApiResponseError<string>), StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<Sport>> Create(CreateSportDto dto)
+        [ProducesResponseType(typeof(ApiResponseError), StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<Sport>> CreateSports(CreateSportDto dto)
         {
             try
             {
                 var result = await _sportService.CreateSport(dto);
 
-                return CreatedAtAction(nameof(GetById), new { id = result.Id }, new ApiResponseSuccess<Sport>
+                return CreatedAtAction(nameof(CreateSports), new { id = result.Id }, new ApiResponseSuccess<Sport>
                 {
                     Message = StringConstant.sportsCreated,
                     Data = result
@@ -34,79 +34,37 @@ namespace SportsManagementApp.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ApiResponseError<string>
+                return BadRequest(new ApiResponseError
                 {
                     Message = ex.InnerException?.Message ?? ex.Message
                 });
             }
         }
 
-        [HttpGet]
-        [ProducesResponseType(typeof(ApiResponseSuccess<Sport>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ApiResponseError<string>), StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<IEnumerable<Sport>>> GetAll()
+        [HttpGet()]
+        [ProducesResponseType(typeof(ApiResponseSuccess<IEnumerable<Sport>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponseError), StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<IEnumerable<Sport>>> SearchSports([FromQuery] int? id, [FromQuery] string? name)
         {
             try
             {
-                var result = await _sportService.GetAllSports();
-
-                if(result == null)
-                {
-                    return Ok(new ApiResponseSuccess<IEnumerable<Sport>>
-                    {
-                        Message = StringConstant.sportNotFound,
-                        Data = result
-                    });
-                }
+                var result = await _sportService.SearchSports(id, name);
 
                 return Ok(new ApiResponseSuccess<IEnumerable<Sport>>
                 {
-                    Message = StringConstant.sportsFetchSuccess,
+                    Message = result.Any() ? StringConstant.sportsFetchSuccess : StringConstant.sportNotFound,
                     Data = result
                 });
             }
             catch (Exception ex)
             {
-                return BadRequest(new ApiResponseError<string>
+                return BadRequest(new ApiResponseError
                 {
                     Message = ex.InnerException?.Message ?? ex.Message
                 });
             }
         }
 
-        [HttpGet("{id:int}")]
-        [ProducesResponseType(typeof(ApiResponseSuccess<Sport>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ApiResponseError<string>), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(ApiResponseError<string>), StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<Sport>> GetById(int id)
-        {
-            try
-            {
-                var result = await _sportService.GetSportById(id);
 
-                if (result == null)
-                {
-                    return NotFound(new ApiResponseError<string>
-                    {
-                        Message = StringConstant.sportNotFound
-                    });
-                }
-
-                return Ok(new ApiResponseSuccess<Sport>
-                {
-                    Message = StringConstant.sportsFetchSuccess,
-                    Data = result
-                });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new ApiResponseError<string>
-                {
-                    Message = ex.InnerException?.Message ?? ex.Message
-                });
-            }
-        }
-
-       
     }
 }

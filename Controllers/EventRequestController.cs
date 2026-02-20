@@ -19,151 +19,78 @@ namespace SportsManagementApp.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(ApiResponseSuccess<EventRequest>), StatusCodes.Status201Created)]
-        [ProducesResponseType(typeof(ApiResponseError<string>), StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<EventRequest>> RaiseEventRequest(CreateEventRequestDto dto)
+        [ProducesResponseType(typeof(ApiResponseSuccess<EventRequestResponseDto>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ApiResponseError), StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<EventRequestResponseDto>> RaiseEventRequest(CreateEventRequestDto dto)
         {
             try
             {
                 int adminId = 1;
                 var result = await _eventRequestService.RaiseEventRequest(dto, adminId);
 
-                var response = new ApiResponseSuccess<EventRequest>
+                var response = new ApiResponseSuccess<EventRequestResponseDto>
                 {
                     Message = StringConstant.eventCreated,
                     Data = result
                 };
 
-                return CreatedAtAction(nameof(GetEventRequestById), new { id = result.Id }, response);
+
+                return CreatedAtAction(nameof(RaiseEventRequest), new { id = result.Id }, response);
             }
             catch (Exception ex)
             {
-                return BadRequest(new ApiResponseError<string>
+                return BadRequest(new ApiResponseError
                 {
                     Message = ex.InnerException?.Message ?? ex.Message
                 });
             }
         }
 
+
+
         [HttpGet]
-        [ProducesResponseType(typeof(ApiResponseSuccess<EventRequestResponseDto>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ApiResponseError<string>), StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<IEnumerable<EventRequestResponseDto>>> GetAllEventRequest()
+        [ProducesResponseType(typeof(ApiResponseSuccess<IEnumerable<EventRequestResponseDto>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponseError), StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<IEnumerable<EventRequestResponseDto>>> GetEventSearch(
+    [FromQuery] int? id,
+    [FromQuery] RequestStatus? status)
         {
             try
             {
-                var result = await _eventRequestService.GetAllEventRequest();
-
-                if(result == null)
-                {
-                    return Ok(new ApiResponseSuccess<IEnumerable<EventRequestResponseDto>>
-                    {
-                        Message = StringConstant.noEventFound,
-                        Data = result
-                    });
-                }
+                var result = await _eventRequestService.SearchEventRequests(id, status);
 
                 return Ok(new ApiResponseSuccess<IEnumerable<EventRequestResponseDto>>
                 {
-                    Message = StringConstant.eventRequestSuccess,
+                    Message = result.Any() ? StringConstant.eventRequestSuccess : StringConstant.noEventFound,
                     Data = result
                 });
             }
             catch (Exception ex)
             {
-                return BadRequest(new ApiResponseError<string>
-                {
-                    Message = ex.Message
-                });
+                return BadRequest(new ApiResponseError { Message = ex.Message });
             }
         }
 
-        [HttpGet("{id:int}")]
-        [ProducesResponseType(typeof(ApiResponseSuccess<EventRequestResponseDto>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ApiResponseError<string>), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(ApiResponseError<string>), StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<EventRequestResponseDto>> GetEventRequestById(int id)
-        {
-            try
-            {
-                var result = await _eventRequestService.GetEventRequestById(id);
-
-                if (result == null)
-                {
-                    return NotFound(new ApiResponseError<string>
-                    {
-                        Message = StringConstant.noRequestFound,
-                    });
-                }
-
-                return Ok(new ApiResponseSuccess<EventRequestResponseDto>
-                {
-                    Message = StringConstant.eventRequestSuccess,
-                    Data = result
-                });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new ApiResponseError<string>
-                {
-                  
-                    Message = ex.Message
-                });
-            }
-        }
-
-        [HttpGet("status/{status}")]
-        [ProducesResponseType(typeof(ApiResponseSuccess<EventRequestResponseDto>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ApiResponseError<string>), StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<IEnumerable<EventRequestResponseDto>>> GetEventRequestByStatus(RequestStatus status)
-        {
-            try
-            {
-                var result = await _eventRequestService.GetEventRequestByStatus(status);
-
-                 if(result == null)
-                {
-                    return Ok(new ApiResponseSuccess<IEnumerable<EventRequestResponseDto>>
-                    {
-                        Message = StringConstant.noEventFound,
-                        Data = result
-                    });
-                }
-                
-                return Ok(new ApiResponseSuccess<IEnumerable<EventRequestResponseDto>>
-                {
-                    Message = StringConstant.eventRequestSuccess,
-                    Data = result
-                });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new ApiResponseError<string>
-                {
-                    Message = ex.Message
-                });
-            }
-        }
 
         [HttpPut("{id:int}")]
-        [ProducesResponseType(typeof(ApiResponseSuccess<EventRequest>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ApiResponseError<string>), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(ApiResponseError<string>), StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<EventRequest>> EditEventRequest(int id, EditEventRequestDto dto)
+        [ProducesResponseType(typeof(ApiResponseSuccess<EventRequestResponseDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponseError), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponseError), StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<EventRequestResponseDto>> EditEventRequest(int id, EditEventRequestDto dto)
         {
             try
             {
                 var result = await _eventRequestService.EditEventRequest(id, dto);
 
-                 if(result == null)
+                if (result == null)
                 {
-                    return NotFound(new ApiResponseError<string>
+                    return NotFound(new ApiResponseError
                     {
                         Message = StringConstant.noEventFound,
                     });
                 }
 
-                return Ok(new ApiResponseSuccess<EventRequest>
+                return Ok(new ApiResponseSuccess<EventRequestResponseDto>
                 {
                     Message = StringConstant.eventUpdated,
                     Data = result
@@ -171,7 +98,7 @@ namespace SportsManagementApp.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ApiResponseError<string>
+                return BadRequest(new ApiResponseError
                 {
                     Message = ex.Message
                 });
@@ -179,24 +106,24 @@ namespace SportsManagementApp.Controllers
         }
 
         [HttpPatch("{id:int}/withdraw")]
-        [ProducesResponseType(typeof(ApiResponseSuccess<EventRequest>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ApiResponseError<string>), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ApiResponseError<string>), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<EventRequest>> WithdrawEventRequest(int id)
+        [ProducesResponseType(typeof(ApiResponseSuccess<EventRequestResponseDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponseError), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponseError), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<EventRequestResponseDto>> WithdrawEventRequest(int id)
         {
             try
             {
                 var result = await _eventRequestService.WithdrawlEventRequest(id);
 
-                if(result == null)
+                if (result == null)
                 {
-                    return NotFound(new ApiResponseError<string>
+                    return NotFound(new ApiResponseError
                     {
                         Message = StringConstant.noRequestFound,
                     });
                 }
 
-                return Ok(new ApiResponseSuccess<EventRequest>
+                return Ok(new ApiResponseSuccess<EventRequestResponseDto>
                 {
                     Message = StringConstant.eventRequestWithdrawl,
                     Data = result
@@ -204,7 +131,7 @@ namespace SportsManagementApp.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ApiResponseError<string>
+                return BadRequest(new ApiResponseError
                 {
                     Message = ex.Message
                 });

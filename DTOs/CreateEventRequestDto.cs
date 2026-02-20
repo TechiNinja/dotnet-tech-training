@@ -8,8 +8,6 @@ namespace SportsManagementApp.DTOs
     {
         [Required, MaxLength(100)]
         public string EventName { get; set; } = null!;
-
-        [Range(1, 6, ErrorMessage = StringConstant.sportsIdGreaterThanZero)]
         public int SportId { get; set; }
 
         [Required, MaxLength(100)]
