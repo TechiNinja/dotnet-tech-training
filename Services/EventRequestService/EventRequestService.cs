@@ -73,17 +73,17 @@ public class EventRequestService : IEventRequestService
         return request;
     }
 
-    public async Task<IEnumerable<EventRequest>> GetAllEventRequest()
+    public async Task<IEnumerable<EventRequestResponseDto>> GetAllEventRequest()
     {
         return await _eventRequestRepository.GetAllEventRequest();
     }
 
-    public async Task<EventRequest?> GetEventRequestById(int id)
+    public async Task<EventRequestResponseDto?> GetEventRequestById(int id)
     {
         return await _eventRequestRepository.GetEventRequestById(id);
     }
 
-    public async Task<IEnumerable<EventRequest>> GetEventRequestByStatus(RequestStatus status)
+    public async Task<IEnumerable<EventRequestResponseDto>> GetEventRequestByStatus(RequestStatus status)
     {
         return await _eventRequestRepository.GetEventRequestByStatus(status);
     }
@@ -106,7 +106,7 @@ public class EventRequestService : IEventRequestService
             throw new Exception(StringConstant.GenderTypeRequired);
         }
 
-        var request = await _eventRequestRepository.GetEventRequestById(id);
+        var request = await _eventRequestRepository.GetEventRequestEntityById(id);
 
         if (request == null) {
             throw new Exception(StringConstant.noRequestFound);
@@ -131,7 +131,7 @@ public class EventRequestService : IEventRequestService
 
     public async Task<EventRequest> WithdrawlEventRequest(int id)
     {
-        var request = await _eventRequestRepository.GetEventRequestById(id);
+        var request = await _eventRequestRepository.GetEventRequestEntityById(id);
 
         if (request == null) {
             throw new Exception(StringConstant.noRequestFound);

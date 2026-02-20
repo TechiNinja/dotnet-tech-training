@@ -21,29 +21,100 @@ public class EventRequestRepository : IEventRequestRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task<List<EventRequest>> GetAllEventRequest()
+   public async Task<List<EventRequestResponseDto>> GetAllEventRequest()
+{
+    return await _context.EventRequests
+        .Select(e => new EventRequestResponseDto
         {
-            var eventRequests = await _context.EventRequests.ToListAsync();
-            return eventRequests;
-        }
+            Id = e.Id,
+            EventName = e.EventName,
+            SportId = e.SportId,
+            SportsName = e.Sport != null ? e.Sport.Name : "",
 
-    public async Task<EventRequest?> GetEventRequestById(int id)
-    {
-        var eventRequest = await _context.EventRequests.FirstOrDefaultAsync(
-            x => x.Id == id
-        );
+            Gender = e.Gender,
+            Format = e.Format,
 
-        return eventRequest;
-    }
+            RequestedVenue = e.RequestedVenue,
+            LogisticsRequirements = e.LogisticsRequirements,
 
-    public async Task<List<EventRequest>> GetEventRequestByStatus(RequestStatus status)
-    {
-        var eventRequest = await _context.EventRequests.Where(
-            x => x.Status == status
-        ).ToListAsync();
+            StartDate = e.StartDate,
+            EndDate = e.EndDate,
 
-        return eventRequest;
-    }
+            Status = e.Status,
+            Remarks = e.Remarks,
+
+            AdminId = e.AdminId,
+            OperationsReviewerId = e.OperationsReviewerId,
+
+            CreatedDate = e.CreatedDate,
+            UpdatedDate = e.UpdatedDate
+        })
+        .ToListAsync();
+}
+
+public async Task<EventRequestResponseDto?> GetEventRequestById(int id)
+{
+    return await _context.EventRequests
+        .Where(e => e.Id == id)
+        .Select(e => new EventRequestResponseDto
+        {
+            Id = e.Id,
+            EventName = e.EventName,
+            SportId = e.SportId,
+            SportsName = e.Sport != null ? e.Sport.Name : "",
+
+            Gender = e.Gender,
+            Format = e.Format,
+
+            RequestedVenue = e.RequestedVenue,
+            LogisticsRequirements = e.LogisticsRequirements,
+
+            StartDate = e.StartDate,
+            EndDate = e.EndDate,
+
+            Status = e.Status,
+            Remarks = e.Remarks,
+
+            AdminId = e.AdminId,
+            OperationsReviewerId = e.OperationsReviewerId,
+
+            CreatedDate = e.CreatedDate,
+            UpdatedDate = e.UpdatedDate
+        })
+        .FirstOrDefaultAsync();
+}
+
+public async Task<List<EventRequestResponseDto>> GetEventRequestByStatus(RequestStatus status)
+{
+    return await _context.EventRequests
+        .Where(e => e.Status == status)
+        .Select(e => new EventRequestResponseDto
+        {
+            Id = e.Id,
+            EventName = e.EventName,
+            SportId = e.SportId,
+            SportsName = e.Sport != null ? e.Sport.Name : "",
+
+            Gender = e.Gender,
+            Format = e.Format,
+
+            RequestedVenue = e.RequestedVenue,
+            LogisticsRequirements = e.LogisticsRequirements,
+
+            StartDate = e.StartDate,
+            EndDate = e.EndDate,
+
+            Status = e.Status,
+            Remarks = e.Remarks,
+
+            AdminId = e.AdminId,
+            OperationsReviewerId = e.OperationsReviewerId,
+
+            CreatedDate = e.CreatedDate,
+            UpdatedDate = e.UpdatedDate
+        })
+        .ToListAsync();
+}
 
     public async Task<EventRequest> UpdateEventRequest(EventRequest request)
     {
@@ -51,6 +122,24 @@ public class EventRequestRepository : IEventRequestRepository
         await _context.SaveChangesAsync();
         return request;
     }   
+
+        public async Task<EventRequest?> GetEventRequestEntityById(int id)
+        {
+        var eventRequest = await _context.EventRequests.FirstOrDefaultAsync(
+            x => x.Id == id
+        );
+
+        return eventRequest;
+    }
+
+    public async Task<List<EventRequest>> GetEventRequestEntityByStatus(RequestStatus status)
+    {
+        var eventRequest = await _context.EventRequests.Where(
+            x => x.Status == status
+        ).ToListAsync();
+
+        return eventRequest;
+    }
 
     public async Task<bool> EventRequestExist(CreateEventRequestDto dto)
     {

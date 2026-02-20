@@ -46,9 +46,9 @@ namespace SportsManagementApp.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(ApiResponseSuccess<EventRequest>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponseSuccess<EventRequestResponseDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponseError<string>), StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<IEnumerable<EventRequest>>> GetAllEventRequest()
+        public async Task<ActionResult<IEnumerable<EventRequestResponseDto>>> GetAllEventRequest()
         {
             try
             {
@@ -56,14 +56,14 @@ namespace SportsManagementApp.Controllers
 
                 if(result == null)
                 {
-                    return Ok(new ApiResponseSuccess<IEnumerable<EventRequest>>
+                    return Ok(new ApiResponseSuccess<IEnumerable<EventRequestResponseDto>>
                     {
                         Message = StringConstant.noEventFound,
                         Data = result
                     });
                 }
 
-                return Ok(new ApiResponseSuccess<IEnumerable<EventRequest>>
+                return Ok(new ApiResponseSuccess<IEnumerable<EventRequestResponseDto>>
                 {
                     Message = StringConstant.eventRequestSuccess,
                     Data = result
@@ -79,10 +79,10 @@ namespace SportsManagementApp.Controllers
         }
 
         [HttpGet("{id:int}")]
-        [ProducesResponseType(typeof(ApiResponseSuccess<EventRequest>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponseSuccess<EventRequestResponseDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponseError<string>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponseError<string>), StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<EventRequest>> GetEventRequestById(int id)
+        public async Task<ActionResult<EventRequestResponseDto>> GetEventRequestById(int id)
         {
             try
             {
@@ -96,7 +96,7 @@ namespace SportsManagementApp.Controllers
                     });
                 }
 
-                return Ok(new ApiResponseSuccess<EventRequest>
+                return Ok(new ApiResponseSuccess<EventRequestResponseDto>
                 {
                     Message = StringConstant.eventRequestSuccess,
                     Data = result
@@ -113,9 +113,9 @@ namespace SportsManagementApp.Controllers
         }
 
         [HttpGet("status/{status}")]
-        [ProducesResponseType(typeof(ApiResponseSuccess<EventRequest>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponseSuccess<EventRequestResponseDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponseError<string>), StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<IEnumerable<EventRequest>>> GetEventRequestByStatus(RequestStatus status)
+        public async Task<ActionResult<IEnumerable<EventRequestResponseDto>>> GetEventRequestByStatus(RequestStatus status)
         {
             try
             {
@@ -123,14 +123,14 @@ namespace SportsManagementApp.Controllers
 
                  if(result == null)
                 {
-                    return Ok(new ApiResponseSuccess<IEnumerable<EventRequest>>
+                    return Ok(new ApiResponseSuccess<IEnumerable<EventRequestResponseDto>>
                     {
                         Message = StringConstant.noEventFound,
                         Data = result
                     });
                 }
                 
-                return Ok(new ApiResponseSuccess<IEnumerable<EventRequest>>
+                return Ok(new ApiResponseSuccess<IEnumerable<EventRequestResponseDto>>
                 {
                     Message = StringConstant.eventRequestSuccess,
                     Data = result
