@@ -1,26 +1,37 @@
 using Microsoft.EntityFrameworkCore;
 using SportsManagementApp.Data;
+using SportsManagementApp.Extensions;
+using SportsManagementApp.Middleware;
+using SportsManagementApp.StringConstants;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
-
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-);
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        sqlOptions => sqlOptions.EnableRetryOnFailure(3)
+    ));
+
+builder.Services.AddCors(options =>
+    options.AddPolicy(AppConstants.ReactNativeCorsPolicy, policy =>
+        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
+
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerDocs();
+builder.Services.AddApplicationServices();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+app.UseGlobalExceptionHandler();
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    c.SwaggerEndpoint(AppConstants.SwaggerEndpoint, AppConstants.SwaggerDisplayName);
+    c.RoutePrefix = string.Empty;
+});
 
 app.UseHttpsRedirection();
-app.UseAuthentication();
+app.UseCors(AppConstants.ReactNativeCorsPolicy);
 app.MapControllers();
 app.Run();
