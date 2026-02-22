@@ -45,7 +45,7 @@ namespace SportsManagementApp.Services.Implementations
             return user;
         }
 
-        public async Task<User?> UpdateUserAsync(int userId, UpdateUserDto updateUser)
+        public async Task<UserResponseDto?> UpdateUserAsync(int userId, UpdateUserDto updateUser)
         {
             var user = await _userRepository.GetUserEntityByIdAsync(userId);
             if (user == null) return null;
@@ -68,7 +68,15 @@ namespace SportsManagementApp.Services.Implementations
             user.UpdatedAt = DateTime.UtcNow;
 
             await _userRepository.UpdateUserAsync(user);
-            return user;
+            return new UserResponseDto
+            {
+                Id = user.Id,
+                FullName = user.FullName,
+                Email = user.Email,
+                RoleId = user.RoleId,
+                RoleName = user.Role?.Name ?? string.Empty,
+                IsActive = user.IsActive
+            };
         }
     }
 }

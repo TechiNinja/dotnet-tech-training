@@ -9,6 +9,6 @@ namespace SportsManagementApp.Services.Interfaces
         Task<List<LoginResponseDto>> GetUsersAsync();
         Task<LoginResponseDto?> GetUserByIdAsync(int userId);
         Task<User> CreateUserAsync(CreateUserDto createUser);
-        Task<User?> UpdateUserAsync(int userId, UpdateUserDto updateUser);
+        Task<UserResponseDto?> UpdateUserAsync(int userId, UpdateUserDto updateUser);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using SportsManagementApp.Data;
 using SportsManagementApp.Data.DTOs.Participant;
 using SportsManagementApp.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace SportsManagementApp.Repositories.Implementations
 {
