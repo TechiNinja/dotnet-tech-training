@@ -17,7 +17,10 @@ namespace SportsManagementApp.Repositories.Implementations
         public async Task<List<MyEventsDto>> GetUserEventsAsync(int userId)
         {
             return await _context.ParticipantRegistrations
-                .Where(registration => registration.UserId == userId && registration.EventCategory != null && registration.EventCategory.Event != null)
+                .Where(registration => registration.UserId == userId
+                      && registration.EventCategory != null
+                      && registration.EventCategory.Event != null)
+                .Include(registration => registration.EventCategory)
                 .Select(registration => new MyEventsDto
                 {
                     EventId = registration.EventCategory!.EventId,

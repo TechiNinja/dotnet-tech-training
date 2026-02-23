@@ -38,9 +38,9 @@ namespace SportsManagementApp.Controllers
                 var role = await _roleService.CreateRoleAsync(createRole);
                 return Ok(role);
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                return StatusCode(500, exception.Message);
+                return Problem("An error occurred while creating role");
             }
         }
     }

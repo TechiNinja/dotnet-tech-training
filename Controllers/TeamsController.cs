@@ -18,7 +18,7 @@ namespace SportsManagementApp.Controllers
         }
 
         [HttpGet("{userId}")]
-        public async Task<IActionResult> GetMyTeam(int userId)
+        public async Task<IActionResult> GetUserTeam(int userId)
         {
             var teams = await _teamssService.GetUserTeamsAsync(userId);
 

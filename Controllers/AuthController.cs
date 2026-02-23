@@ -29,9 +29,9 @@ namespace SportsManagementApp.Controllers
 
                 return Ok(result);
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                return StatusCode(500, exception.Message);
+                return Problem("An error occurred while logging in");
             }
         }
 
@@ -43,9 +43,9 @@ namespace SportsManagementApp.Controllers
                 var result = await _authService.RegisterAsync(registerRequest);
                 return Ok(result);
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                return StatusCode(500, exception.Message);
+                return Problem("An error occurred whlie registering user");
             }
         }
     }

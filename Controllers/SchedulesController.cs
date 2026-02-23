@@ -18,7 +18,7 @@ namespace SportsManagementApp.Controllers
         }
 
         [HttpGet("{userId}")]
-        public async Task<IActionResult> GetMySchedule(int userId)
+        public async Task<IActionResult> GetUserSchedule(int userId)
         {
             var schedule = await _schedulesService.GetUserSchedulesAsync(userId);
 

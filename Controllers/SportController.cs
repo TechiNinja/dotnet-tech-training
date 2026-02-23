@@ -27,9 +27,9 @@ namespace SportsManagementApp.Controllers
                 var sport = await _sportsService.CreateSportAsync(createSport);
                 return Ok(sport);
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                return StatusCode(500, exception.Message);
+                return Problem("An error occurred whlie creating sport");
             }
         }
 
@@ -49,9 +49,9 @@ namespace SportsManagementApp.Controllers
                 var sport = await _sportsService.UpdateSportAsync(id, updateSport);
                 return Ok(sport);
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                return StatusCode(500, exception.Message);
+                return Problem("An error occurred while updating sport");
             }
         }
     }
