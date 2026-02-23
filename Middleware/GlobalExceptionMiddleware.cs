@@ -1,3 +1,4 @@
+using SportsManagementApp.Exceptions;
 using SportsManagementApp.StringConstants;
 using System.Net;
 using System.Text.Json;
@@ -33,11 +34,12 @@ namespace SportsManagementApp.Middleware
         {
             var (statusCode, message) = ex switch
             {
-                ArgumentNullException       => (HttpStatusCode.BadRequest,          AppConstants.RequiredValueMissing),
-                ArgumentException           => (HttpStatusCode.BadRequest,          ex.Message),
-                InvalidOperationException   => (HttpStatusCode.UnprocessableEntity, ex.Message),
-                UnauthorizedAccessException => (HttpStatusCode.Unauthorized,        AppConstants.UnauthorizedAccess),
-                _                           => (HttpStatusCode.InternalServerError, AppConstants.UnexpectedError)
+                NotFoundException            => (HttpStatusCode.NotFound,            ex.Message),
+                ConflictException            => (HttpStatusCode.Conflict,            ex.Message),
+                BadRequestException          => (HttpStatusCode.BadRequest,          ex.Message),
+                UnprocessableEntityException => (HttpStatusCode.UnprocessableEntity, ex.Message),
+                UnauthorizedAccessException  => (HttpStatusCode.Unauthorized,        AppConstants.UnauthorizedAccess),
+                _                            => (HttpStatusCode.InternalServerError, AppConstants.UnexpectedError)
             };
 
             context.Response.ContentType = "application/json";

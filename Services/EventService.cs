@@ -2,6 +2,7 @@ using SportsManagementApp.DTOs.Request;
 using SportsManagementApp.DTOs.Response;
 using SportsManagementApp.Entities;
 using SportsManagementApp.Enums;
+using SportsManagementApp.Exceptions;
 using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services.Interfaces;
 using SportsManagementApp.StringConstants;
@@ -10,9 +11,9 @@ namespace SportsManagementApp.Services
 {
     public class EventService : IEventService
     {
-        private readonly IEventRepository         _eventRepo;
-        private readonly IEventRequestRepository  _requestRepo;
-        private readonly IUserRepository          _userRepo;
+        private readonly IEventRepository        _eventRepo;
+        private readonly IEventRequestRepository _requestRepo;
+        private readonly IUserRepository         _userRepo;
 
         private const int OrganizerRoleId = 2;
 
@@ -26,28 +27,27 @@ namespace SportsManagementApp.Services
             _userRepo    = userRepo;
         }
 
-        public async Task<ServiceResult<EventResponse>> CreateEventFromRequestAsync(
-            CreateEventRequest request)
+        public async Task<EventResponse> CreateEventFromRequestAsync(CreateEventRequest request)
         {
             var eventRequest = await _requestRepo.GetByIdAsync(request.EventRequestId);
 
             if (eventRequest is null)
-                return ServiceResult<EventResponse>.NotFound(
+                throw new NotFoundException(
                     string.Format(AppConstants.EventRequestNotFound, request.EventRequestId));
 
             if (eventRequest.Status != RequestStatus.Approved)
-                return ServiceResult<EventResponse>.UnprocessableEntity(
+                throw new UnprocessableEntityException(
                     string.Format(AppConstants.EventRequestNotApproved, eventRequest.Status));
 
             bool duplicate = await _eventRepo.ExistsByNameSportDateAsync(
                 eventRequest.EventName, eventRequest.SportId, eventRequest.StartDate);
 
             if (duplicate)
-                return ServiceResult<EventResponse>.Conflict(
+                throw new ConflictException(
                     string.Format(AppConstants.EventAlreadyExists, eventRequest.EventName, eventRequest.StartDate));
 
             if (request.RegistrationDeadline >= eventRequest.StartDate)
-                return ServiceResult<EventResponse>.BadRequest(AppConstants.RegistrationDeadlineInvalid);
+                throw new BadRequestException(AppConstants.RegistrationDeadlineInvalid);
 
             var newEvent = new Event
             {
@@ -67,34 +67,33 @@ namespace SportsManagementApp.Services
             await _eventRepo.SaveChangesAsync();
 
             var created = await _eventRepo.GetByIdAsync(newEvent.Id, includeCategories: true);
-            return ServiceResult<EventResponse>.Success(MapToResponse(created!), 201);
+            return MapToResponse(created!);
         }
 
-        public async Task<ServiceResult<EventResponse>> AssignOrganizerAsync(
-            int eventId, AssignOrganizerRequest request)
+        public async Task<EventResponse> AssignOrganizerAsync(int eventId, AssignOrganizerRequest request)
         {
             var eventEntity = await _eventRepo.GetByIdAsync(eventId, includeCategories: true);
 
             if (eventEntity is null)
-                return ServiceResult<EventResponse>.NotFound(
+                throw new NotFoundException(
                     string.Format(AppConstants.EventNotFound, eventId));
 
             if (eventEntity.Status is EventStatus.Completed or EventStatus.Cancelled)
-                return ServiceResult<EventResponse>.UnprocessableEntity(
+                throw new UnprocessableEntityException(
                     string.Format(AppConstants.EventNotAssignable, eventEntity.Status));
 
             var organizer = await _userRepo.GetByIdWithRoleAsync(request.OrganizerId);
 
             if (organizer is null)
-                return ServiceResult<EventResponse>.NotFound(
+                throw new NotFoundException(
                     string.Format(AppConstants.UserNotFound, request.OrganizerId));
 
             if (!organizer.IsActive)
-                return ServiceResult<EventResponse>.UnprocessableEntity(
+                throw new UnprocessableEntityException(
                     string.Format(AppConstants.UserInactive, organizer.FullName));
 
             if (organizer.RoleId != OrganizerRoleId)
-                return ServiceResult<EventResponse>.UnprocessableEntity(
+                throw new UnprocessableEntityException(
                     string.Format(AppConstants.UserNotOrganizer, organizer.FullName));
 
             eventEntity.OrganizerId = organizer.Id;
@@ -104,29 +103,28 @@ namespace SportsManagementApp.Services
             _eventRepo.Update(eventEntity);
             await _eventRepo.SaveChangesAsync();
 
-            return ServiceResult<EventResponse>.Success(MapToResponse(eventEntity));
+            return MapToResponse(eventEntity);
         }
 
-        public async Task<ServiceResult<EventResponse>> ConfigureEventAsync(
-            int eventId, EventConfigurationRequest request)
+        public async Task<EventResponse> ConfigureEventAsync(int eventId, EventConfigurationRequest request)
         {
             var eventEntity = await _eventRepo.GetByIdAsync(eventId, includeCategories: true);
 
             if (eventEntity is null)
-                return ServiceResult<EventResponse>.NotFound(
+                throw new NotFoundException(
                     string.Format(AppConstants.EventNotFound, eventId));
 
             if (eventEntity.Status is EventStatus.Completed or EventStatus.Cancelled)
-                return ServiceResult<EventResponse>.UnprocessableEntity(
+                throw new UnprocessableEntityException(
                     string.Format(AppConstants.EventNotConfigurable, eventEntity.Status));
 
             if (request.Rules is not null)
             {
                 if (request.Rules.StartDate >= request.Rules.EndDate)
-                    return ServiceResult<EventResponse>.BadRequest(AppConstants.StartDateBeforeEndDate);
+                    throw new BadRequestException(AppConstants.StartDateBeforeEndDate);
 
                 if (request.Rules.RegistrationDeadline >= request.Rules.StartDate)
-                    return ServiceResult<EventResponse>.BadRequest(AppConstants.DeadlineBeforeStartDate);
+                    throw new BadRequestException(AppConstants.DeadlineBeforeStartDate);
 
                 eventEntity.StartDate            = request.Rules.StartDate;
                 eventEntity.EndDate              = request.Rules.EndDate;
@@ -142,7 +140,7 @@ namespace SportsManagementApp.Services
                     .FirstOrDefault(g => g.Count() > 1);
 
                 if (duplicate is not null)
-                    return ServiceResult<EventResponse>.BadRequest(
+                    throw new BadRequestException(
                         string.Format(AppConstants.DuplicateCategory, duplicate.Key.Format, duplicate.Key.Gender));
 
                 foreach (var cat in request.Categories)
@@ -167,10 +165,10 @@ namespace SportsManagementApp.Services
             if (request.TeamLimits is not null)
             {
                 if (request.TeamLimits.MaxTeamsPerCategory < 2)
-                    return ServiceResult<EventResponse>.BadRequest(AppConstants.MaxTeamsMinError);
+                    throw new BadRequestException(AppConstants.MaxTeamsMinError);
 
                 if (request.TeamLimits.MaxMembersPerTeam < 1)
-                    return ServiceResult<EventResponse>.BadRequest(AppConstants.MaxMembersMinError);
+                    throw new BadRequestException(AppConstants.MaxMembersMinError);
             }
 
             eventEntity.UpdatedAt = DateTime.UtcNow;
@@ -178,25 +176,24 @@ namespace SportsManagementApp.Services
             _eventRepo.Update(eventEntity);
             await _eventRepo.SaveChangesAsync();
 
-            return ServiceResult<EventResponse>.Success(MapToResponse(eventEntity));
+            return MapToResponse(eventEntity);
         }
 
-        public async Task<ServiceResult<EventResponse>> GetByIdAsync(int eventId)
+        public async Task<EventResponse> GetByIdAsync(int eventId)
         {
             var eventEntity = await _eventRepo.GetByIdAsync(eventId, includeCategories: true);
 
             if (eventEntity is null)
-                return ServiceResult<EventResponse>.NotFound(
+                throw new NotFoundException(
                     string.Format(AppConstants.EventNotFound, eventId));
 
-            return ServiceResult<EventResponse>.Success(MapToResponse(eventEntity));
+            return MapToResponse(eventEntity);
         }
 
-        public async Task<ServiceResult<List<EventResponse>>> GetAllAsync()
+        public async Task<List<EventResponse>> GetAllAsync()
         {
             var events = await _eventRepo.GetAllAsync();
-            return ServiceResult<List<EventResponse>>.Success(
-                events.Select(MapToResponse).ToList());
+            return events.Select(MapToResponse).ToList();
         }
 
         private static EventResponse MapToResponse(Event e) => new()
