@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SportsManagementApp.Constants;
 using SportsManagementApp.Data.DTOs.UserManagement;
 using SportsManagementApp.Services.Interfaces;
 
@@ -18,12 +19,11 @@ namespace SportsManagementApp.Controllers
             _userService = userService;
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = RoleConstants.Admin)]
         [HttpGet]
         public async Task<IActionResult> GetUsers()
         {
-            var users = await _userService.GetUsersAsync();
-            return Ok(users);
+            return Ok(await _userService.GetUsersAsync());
         }
 
         [HttpGet("{id}")]
@@ -39,7 +39,7 @@ namespace SportsManagementApp.Controllers
             return Ok(user);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = RoleConstants.Admin)]
         [HttpPost]
         public async Task<IActionResult> CreateUser(CreateUserDto createUser)
         {
@@ -51,21 +51,14 @@ namespace SportsManagementApp.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id, UpdateUserDto updateUser)
         {
-            try
+            var result = await _userService.UpdateUserAsync(id, updateUser);
+            
+            if (result == null)
             {
-                var user = await _userService.UpdateUserAsync(id, updateUser);
-
-                if (user == null)
-                {
-                    return NotFound("User not found");
-                }
-
-                return Ok(user);
+                return NotFound("User not found");
             }
-            catch (Exception exception)
-            {
-                return BadRequest(exception.Message);
-            }
+
+            return Ok(result);
         }
     }
 }

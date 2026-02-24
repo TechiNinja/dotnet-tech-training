@@ -13,9 +13,9 @@ namespace SportsManagementApp.Services.Implementations
             _eventsRepository = eventsRepository;
         }
 
-        public Task<List<MyEventsDto>> GetUserEventsAsync(int userId)
+        public async Task<List<MyEventsDto>> GetUserEventsAsync(int userId)
         {
-            return _eventsRepository.GetUserEventsAsync(userId);
+            return await _eventsRepository.GetUserEventsAsync(userId);
         }
     }
 }

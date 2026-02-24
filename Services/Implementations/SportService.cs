@@ -21,14 +21,14 @@ namespace SportsManagementApp.Services.Implementations
                 throw new Exception("Sport Name is required");
             }
 
-            var exists = await _sportRepository.SportExistsAsync(createSport.Name);
+            var exists = await _sportRepository.SportExistsAsync(createSport.Name.Trim());
 
             if (exists)
             {
                 throw new Exception("Sport already exists");
             }
 
-            return await _sportRepository.CreateSportAsync(createSport.Name);
+            return await _sportRepository.CreateSportAsync(createSport.Name.Trim());
         }
 
         public async Task<IEnumerable<Sport>> GetSportsAsync()
@@ -50,7 +50,7 @@ namespace SportsManagementApp.Services.Implementations
                 throw new Exception("Sport not found");
             }
 
-            var exists = await _sportRepository.SportExistsAsync(updateSport.Name);
+            var exists = await _sportRepository.SportExistsAsync(updateSport.Name.Trim());
 
             if (exists && sport.Name.ToLower() != updateSport.Name.ToLower())
             {

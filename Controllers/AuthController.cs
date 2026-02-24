@@ -18,35 +18,21 @@ namespace SportsManagementApp.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginRequestDto loginRequest)
         {
-            try
-            {
-                var result = await _authService.LoginAsync(loginRequest);
+            var result = await _authService.LoginAsync(loginRequest);
 
-                if (result == null)
-                {
-                    return Unauthorized("Invalid email or password");
-                }
-
-                return Ok(result);
-            }
-            catch (Exception)
+            if (result == null)
             {
-                return Problem("An error occurred while logging in");
+                return Unauthorized("Invalid email or password");
             }
+
+            return Ok(result);
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterRequestDto registerRequest)
         {
-            try
-            {
-                var result = await _authService.RegisterAsync(registerRequest);
-                return Ok(result);
-            }
-            catch (Exception)
-            {
-                return Problem("An error occurred whlie registering user");
-            }
+            var result = await _authService.RegisterAsync(registerRequest);
+            return Ok(result);
         }
     }
 }

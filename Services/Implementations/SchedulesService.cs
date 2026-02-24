@@ -6,16 +6,16 @@ namespace SportsManagementApp.Services.Implementations
 {
     public class SchedulesService: ISchedulesService
     {
-        private readonly ISchedulesRepository _participantRepository;
+        private readonly ISchedulesRepository _schedulesRepository;
 
-        public SchedulesService(ISchedulesRepository participantRepository)
+        public SchedulesService(ISchedulesRepository schedulesRepository)
         {
-            _participantRepository = participantRepository;
+            _schedulesRepository = schedulesRepository;
         }
 
-        public Task<List<MyScheduleDto>> GetUserSchedulesAsync(int userId)
+        public async Task<List<MyScheduleDto>> GetUserSchedulesAsync(int userId)
         {
-            return _participantRepository.GetUserScheduleAsync(userId);
+            return await _schedulesRepository.GetUserScheduleAsync(userId);
         }
     }
 }

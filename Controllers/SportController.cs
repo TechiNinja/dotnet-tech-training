@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SportsManagementApp.Constants;
 using SportsManagementApp.Data.DTOs.SportManagement;
 using SportsManagementApp.Services.Interfaces;
 
@@ -18,7 +19,7 @@ namespace SportsManagementApp.Controllers
             _sportsService = sportsService;
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = RoleConstants.Admin)]
         [HttpPost]
         public async Task<IActionResult> CreateSport([FromBody] CreateSportDto createSport)
         {
@@ -40,7 +41,7 @@ namespace SportsManagementApp.Controllers
             return Ok(sports);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = RoleConstants.Admin)]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateSport(int id, [FromBody] UpdateSportDto updateSport)
         {

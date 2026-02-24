@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using SportsManagementApp.Data.DTOs.Auth;
 using SportsManagementApp.Data.DTOs.UserManagement;
 using SportsManagementApp.Data.Entities;
@@ -10,38 +11,35 @@ namespace SportsManagementApp.Services.Implementations
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
-        private readonly PasswordHasher<User> _passwordHasher;
+        private readonly IMapper _mapper;
+        private readonly PasswordHasher<User> _passwordHasher = new();
 
-        public UserService(IUserRepository userRepository)
+        public UserService(IUserRepository userRepository, IMapper mapper)
         {
             _userRepository = userRepository;
-            _passwordHasher = new PasswordHasher<User>();
+            _mapper = mapper;
         }
 
-        public Task<List<LoginResponseDto>> GetUsersAsync()
+        public async Task<List<LoginResponseDto>> GetUsersAsync()
         {
-            return _userRepository.GetUsersAsync();
+            var users = await _userRepository.GetUsersWithRoleAsync();
+            return _mapper.Map<List<LoginResponseDto>>(users);
         }
 
-        public Task<LoginResponseDto?> GetUserByIdAsync(int userId)
+        public async Task<LoginResponseDto?> GetUserByIdAsync(int userId)
         {
-            return _userRepository.GetUserByIdAsync(userId);
+            var user = await _userRepository.GetUserEntityByIdAsync(userId);
+            return _mapper.Map<LoginResponseDto?>(user);
         }
 
         public async Task<User> CreateUserAsync(CreateUserDto createUser)
         {
-            var user = new User
-            {
-                FullName = createUser.FullName,
-                Email = createUser.Email,
-                RoleId = createUser.RoleId,
-                IsActive = true,
-                CreatedAt = DateTime.UtcNow
-            };
-
+            var user = _mapper.Map<User>(createUser);
+            user.CreatedAt = DateTime.UtcNow;
+            user.IsActive = true;
             user.PasswordHash = _passwordHasher.HashPassword(user, createUser.Password);
 
-            await _userRepository.AddUserAsync(user);
+            await _userRepository.AddAsync(user);
             return user;
         }
 
@@ -67,16 +65,8 @@ namespace SportsManagementApp.Services.Implementations
 
             user.UpdatedAt = DateTime.UtcNow;
 
-            await _userRepository.UpdateUserAsync(user);
-            return new UserResponseDto
-            {
-                Id = user.Id,
-                FullName = user.FullName,
-                Email = user.Email,
-                RoleId = user.RoleId,
-                RoleName = user.Role?.Name ?? string.Empty,
-                IsActive = user.IsActive
-            };
+            await _userRepository.UpdateAsync(user);
+            return _mapper.Map<UserResponseDto>(user);
         }
     }
 }

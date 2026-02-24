@@ -1,74 +1,23 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SportsManagementApp.Data;
-using SportsManagementApp.Data.DTOs.Auth;
 using SportsManagementApp.Data.Entities;
 using SportsManagementApp.Repositories.Interfaces;
 
 namespace SportsManagementApp.Repositories.Implementations
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository : GenericRepository<User>, IUserRepository
     {
-        private readonly AppDbContext _context;
+        public UserRepository(AppDbContext context) : base(context) { }
 
-        public UserRepository(AppDbContext context)
+        public async Task<List<User>> GetUsersWithRoleAsync()
         {
-            _context = context;
-        }
-
-        public async Task<List<LoginResponseDto>> GetUsersAsync()
-        {
-            return await _context.Users
-                .Include(user => user.Role)
-                .Select(user => new LoginResponseDto
-                {
-                    Id = user.Id,
-                    FullName = user.FullName,
-                    Email = user.Email,
-                    Role = user.Role!.Name ?? "N/A"
-                })
-                .ToListAsync();
-        }
-
-        public async Task<LoginResponseDto?> GetUserByIdAsync(int id)
-        {
-            var user = await _context.Users
-                .Include(user => user.Role)
-                .FirstOrDefaultAsync(user => user.Id == id);
-
-            if (user == null) return null;
-
-            return new LoginResponseDto
-            {
-                Id = user.Id,
-                FullName = user.FullName,
-                Email = user.Email,
-                Role = user.Role?.Name ?? "N/A"
-            };
+            return await _dbSet.Include(user => user.Role).ToListAsync();
         }
 
         public async Task<User?> GetUserEntityByIdAsync(int userId)
         {
-            return await _context.Users
-                .Include(user => user.Role)
-                .FirstOrDefaultAsync(user => user.Id == userId);
-        }
-
-        public async Task AddUserAsync(User user)
-        {
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task UpdateUserAsync(User user)
-        {
-            _context.Users.Update(user);
-            await _context.SaveChangesAsync();
-        }
-        public async Task<User> CreateUserAsync(User user)
-        {
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-            return user;
+            return await _dbSet.Include(user => user.Role)
+                               .FirstOrDefaultAsync(user => user.Id == userId);
         }
     }
 }

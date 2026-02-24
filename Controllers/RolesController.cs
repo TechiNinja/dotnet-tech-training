@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SportsManagementApp.Constants;
 using SportsManagementApp.Data.DTOs.RoleManagement;
 using SportsManagementApp.Services.Interfaces;
 
@@ -21,27 +22,15 @@ namespace SportsManagementApp.Controllers
         [HttpGet]
         public async Task<IActionResult> GetRoles()
         {
-            var roles = await _roleService.GetRolesAsync();
-            return Ok(roles.Select(role => new
-            {
-                role.Id,
-                role.Name,
-            }));
+            return Ok(await _roleService.GetRolesAsync());
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = RoleConstants.Admin)]
         [HttpPost]
         public async Task<IActionResult> CreateRole([FromBody] CreateRoleDto createRole)
         {
-            try
-            {
-                var role = await _roleService.CreateRoleAsync(createRole);
-                return Ok(role);
-            }
-            catch (Exception)
-            {
-                return Problem("An error occurred while creating role");
-            }
+            var role = await _roleService.CreateRoleAsync(createRole);
+            return Ok(role);
         }
     }
 }

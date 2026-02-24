@@ -12,9 +12,9 @@ namespace SportsManagementApp.Services.Implementations
         {
             _teamsRepository = teamsRepository;
         }
-        public Task<List<MyTeamDto>> GetUserTeamsAsync(int userId)
+        public async Task<List<MyTeamDto>> GetUserTeamsAsync(int userId)
         {
-            return _teamsRepository.GetUserTeamsAsync(userId);
+            return await _teamsRepository.GetUserTeamsAsync(userId);
         }
     }
 }

@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using SportsManagementApp.Constants;
 using SportsManagementApp.Data.DTOs.Auth;
 using SportsManagementApp.Data.Entities;
 using SportsManagementApp.Repositories.Interfaces;
@@ -16,13 +18,15 @@ namespace SportsManagementApp.Services.Implementations
         private readonly IRoleRepository _roleRepository;
         private readonly IConfiguration _configuration;
         private readonly PasswordHasher<User> _passwordHasher;
+        private readonly IMapper _mapper;
 
-        public AuthService(IAuthRepository authRepository, IConfiguration configuration, IRoleRepository roleRepository)
+        public AuthService(IAuthRepository authRepository, IConfiguration configuration, IRoleRepository roleRepository, IMapper mapper)
         {
             _authRepository = authRepository;
             _roleRepository = roleRepository;
             _configuration = configuration;
             _passwordHasher = new PasswordHasher<User>();
+            _mapper = mapper;
         }
 
         public async Task<LoginResponseDto?> LoginAsync(LoginRequestDto loginRequest)
@@ -53,14 +57,10 @@ namespace SportsManagementApp.Services.Implementations
 
             var token = GenerateJwtToken(user);
 
-            return new LoginResponseDto
-            {
-                Id = user.Id,
-                FullName = user.FullName,
-                Email = user.Email,
-                Role = user.Role.Name,
-                Token = token
-            };
+            var response = _mapper.Map<LoginResponseDto>(user);
+            response.Token = token;
+
+            return response;
         }
 
         public async Task<LoginResponseDto> RegisterAsync(RegisterRequestDto registerRequest)
@@ -70,21 +70,17 @@ namespace SportsManagementApp.Services.Implementations
                 throw new Exception("User already exists");
             }
 
-            var participantRole = await _roleRepository.GetRoleByTypeAsync("Participant");
+            var participantRole = await _roleRepository.GetRoleByTypeAsync(RoleConstants.Participant);
 
             if (participantRole == null)
             {
                 throw new Exception("Participant Role not found");
             }
 
-            var user = new User
-            {
-                FullName = registerRequest.FullName,
-                Email = registerRequest.Email,
-                RoleId = participantRole.Id,
-                IsActive = true,
-                CreatedAt = DateTime.UtcNow
-            };
+            var user = _mapper.Map<User>(registerRequest);
+            user.RoleId = participantRole.Id;
+            user.IsActive = true;
+            user.CreatedAt = DateTime.UtcNow;
 
             user.PasswordHash = _passwordHasher.HashPassword(user, registerRequest.Password);
 
@@ -92,32 +88,28 @@ namespace SportsManagementApp.Services.Implementations
 
             var token = GenerateJwtToken(user);
 
-            return new LoginResponseDto
-            {
-                Id = user.Id,
-                FullName = user.FullName,
-                Email = user.Email,
-                Role = "Participant",
-                Token = token
-            };
+            var response = _mapper.Map<LoginResponseDto>(user);
+            response.Token = token;
+
+            return response;
         }
 
         private string GenerateJwtToken(User user)
         {
-            var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"] ?? throw new Exception("JWT Key missing"));
+            var key = Encoding.UTF8.GetBytes(_configuration[JwtConstant.Key] ?? throw new Exception("JWT Key missing"));
 
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.Role?.Name ?? "Participant")
+                new Claim(ClaimTypes.Role, user.Role!.Name)
             };
 
             var creds = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
+                issuer: _configuration[JwtConstant.Issuer],
+                audience: _configuration[JwtConstant.Audience],
                 claims: claims,
                 expires: DateTime.UtcNow.AddDays(7),
                 signingCredentials: creds
