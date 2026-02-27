@@ -1,3 +1,4 @@
+using SportsManagementApp.Mappings;
 using SportsManagementApp.Repositories;
 using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services;
@@ -9,11 +10,18 @@ namespace SportsManagementApp.Extensions
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
-            services.AddScoped<IEventRepository, EventRepository>();
-            services.AddScoped<IEventRequestRepository, EventRequestRepository>();
-            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IEventRepository,         EventRepository>();
+            services.AddScoped<IEventRequestRepository,  EventRequestRepository>();
+            services.AddScoped<IEventCategoryRepository, EventCategoryRepository>();
+            services.AddScoped<IMatchRepository,         MatchRepository>();
+            services.AddScoped<IUserRepository,          UserRepository>();
 
-            services.AddScoped<IEventService, EventService>();
+            services.AddScoped<IEventService,    EventService>();
+            services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<IMatchService,    MatchService>();
+
+            services.AddAutoMapper(typeof(MappingProfile));
+
             return services;
         }
     }

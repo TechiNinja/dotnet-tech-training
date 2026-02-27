@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SportsManagementApp.Data;
 
@@ -11,9 +12,11 @@ using SportsManagementApp.Data;
 namespace SportsManagementApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260225144932_UpdateEventEntities")]
+    partial class UpdateEventEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,9 +51,6 @@ namespace SportsManagementApp.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int>("MaxParticipantsCount")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -69,9 +69,6 @@ namespace SportsManagementApp.Migrations
                         .HasColumnType("date");
 
                     b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TournamentType")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -110,6 +107,9 @@ namespace SportsManagementApp.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TournamentType")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -227,9 +227,6 @@ namespace SportsManagementApp.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TotalSets")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")

@@ -1,4 +1,5 @@
-﻿namespace SportsManagementApp.Enums
+﻿
+namespace SportsManagementApp.Enums
 {
     public enum RequestStatus
     {
@@ -13,7 +14,8 @@
         Unknown = 0,
         Male = 1,
         Female = 2,
-        Mixed = 3,
+        Both = 3,
+        Mixed = 4,
     }
 
     public enum MatchFormat
@@ -21,6 +23,7 @@
         Unknown = 0,
         Singles = 1,
         Doubles = 2,
+        Both = 3,
     }
 
     public enum EventStatus

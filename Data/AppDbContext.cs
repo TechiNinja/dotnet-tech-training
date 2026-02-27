@@ -76,6 +76,16 @@ namespace SportsManagementApp.Data
                 .WithOne(set => set.Match)
                 .HasForeignKey(set => set.MatchId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Event>()
+                .HasOne(e => e.EventRequest)
+                .WithOne(r => r.Event)
+                .HasForeignKey<Event>(e => e.EventRequestId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Event>()
+                .HasIndex(e => e.EventRequestId)
+                .IsUnique();
         }
     }
 }

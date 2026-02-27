@@ -1,3 +1,4 @@
+using AutoMapper;
 using SportsManagementApp.DTOs.Request;
 using SportsManagementApp.DTOs.Response;
 using SportsManagementApp.Entities;
@@ -14,87 +15,142 @@ namespace SportsManagementApp.Services
         private readonly IEventRepository        _eventRepo;
         private readonly IEventRequestRepository _requestRepo;
         private readonly IUserRepository         _userRepo;
-
-        private const int OrganizerRoleId = 2;
+        private readonly IMapper                 _mapper;
 
         public EventService(
             IEventRepository        eventRepo,
             IEventRequestRepository requestRepo,
-            IUserRepository         userRepo)
+            IUserRepository         userRepo,
+            IMapper                 mapper)
         {
             _eventRepo   = eventRepo;
             _requestRepo = requestRepo;
             _userRepo    = userRepo;
+            _mapper      = mapper;
         }
 
-        public async Task<EventResponse> CreateEventFromRequestAsync(CreateEventRequest request)
+        public async Task<IEnumerable<EventResponse>> GetAllAsync(EventFilterRequest filter)
         {
-            var eventRequest = await _requestRepo.GetByIdAsync(request.EventRequestId);
+            if (!string.IsNullOrWhiteSpace(filter.Status) &&
+                !Enum.TryParse<EventStatus>(filter.Status, true, out _))
+                throw new BadRequestException(string.Format(AppConstants.InvalidEventStatus, filter.Status));
 
-            if (eventRequest is null)
-                throw new NotFoundException(
-                    string.Format(AppConstants.EventRequestNotFound, request.EventRequestId));
+            if (filter.Id.HasValue)
+            {
+                var single = await _eventRepo.GetByIdWithDetailsAsync(filter.Id.Value)
+                    ?? throw new NotFoundException(string.Format(AppConstants.EventNotFound, filter.Id));
+                return new[] { _mapper.Map<EventResponse>(single) };
+            }
+
+            var events = await _eventRepo.GetAllWithCategoriesAsync(filter.Status, filter.Name, filter.SportId);
+            return _mapper.Map<IEnumerable<EventResponse>>(events);
+        }
+
+        public async Task<EventResponse> GetByIdAsync(int eventId)
+        {
+            var eventEntity = await _eventRepo.GetByIdWithDetailsAsync(eventId)
+                ?? throw new NotFoundException(string.Format(AppConstants.EventNotFound, eventId));
+
+            return _mapper.Map<EventResponse>(eventEntity);
+        }
+
+        public async Task<EventRequestPreFillResponse> GetEventRequestForPreFillAsync(int requestId)
+        {
+            var eventRequest = await _requestRepo.GetByIdWithDetailsAsync(requestId)
+                ?? throw new NotFoundException(string.Format(AppConstants.EventRequestNotFound, requestId));
 
             if (eventRequest.Status != RequestStatus.Approved)
                 throw new UnprocessableEntityException(
                     string.Format(AppConstants.EventRequestNotApproved, eventRequest.Status));
 
-            bool duplicate = await _eventRepo.ExistsByNameSportDateAsync(
-                eventRequest.EventName, eventRequest.SportId, eventRequest.StartDate);
+            bool eventAlreadyCreated = await _eventRepo.ExistsByRequestIdAsync(requestId);
 
-            if (duplicate)
-                throw new ConflictException(
-                    string.Format(AppConstants.EventAlreadyExists, eventRequest.EventName, eventRequest.StartDate));
+            return new EventRequestPreFillResponse
+            {
+                Id                   = eventRequest.Id,
+                SportName            = eventRequest.Sport?.Name ?? string.Empty,
+                Gender               = eventRequest.Gender.ToString(),
+                Format               = eventRequest.Format.ToString(),
+                RequestedVenue       = eventRequest.RequestedVenue,
+                StartDate            = eventRequest.StartDate,
+                EndDate              = eventRequest.EndDate,
+                Status               = eventRequest.Status.ToString(),
+                IsEventAlreadyCreated = eventAlreadyCreated,
+
+                Name                 = eventRequest.EventName,
+                Description          = null,
+                RegistrationDeadline = null,
+            };
+        }
+
+        public async Task<EventResponse> CreateEventFromRequestAsync(CreateEventRequest request)
+        {
+            var eventRequest = await _requestRepo.GetByIdWithDetailsAsync(request.EventRequestId)
+                ?? throw new NotFoundException(string.Format(AppConstants.EventRequestNotFound, request.EventRequestId));
+
+            if (eventRequest.Status != RequestStatus.Approved)
+                throw new UnprocessableEntityException(
+                    string.Format(AppConstants.EventRequestNotApproved, eventRequest.Status));
+
+            if (await _eventRepo.ExistsByRequestIdAsync(request.EventRequestId))
+                throw new ConflictException(string.Format(AppConstants.EventAlreadyExists, request.EventRequestId));
 
             if (request.RegistrationDeadline >= eventRequest.StartDate)
                 throw new BadRequestException(AppConstants.RegistrationDeadlineInvalid);
 
             var newEvent = new Event
             {
-                Name                 = eventRequest.EventName,
+                EventRequestId       = request.EventRequestId,
+                Name                 = !string.IsNullOrWhiteSpace(request.Name) ? request.Name : eventRequest.EventName,
                 SportId              = eventRequest.SportId,
-                StartDate            = eventRequest.StartDate,
-                EndDate              = eventRequest.EndDate,
-                EventVenue           = request.EventVenue,
+                StartDate            = eventRequest.StartDate,    
+                EndDate              = eventRequest.EndDate,        
+                EventVenue           = eventRequest.RequestedVenue, 
                 RegistrationDeadline = request.RegistrationDeadline,
+                MaxParticipantsCount = request.MaxParticipantsCount,
                 Description          = request.Description,
                 Status               = EventStatus.Upcoming,
                 OrganizerId          = eventRequest.AdminId,
+                TournamentType       = TournamentType.Knockout,
                 CreatedAt            = DateTime.UtcNow
             };
+
+            newEvent.Categories = GenerateCategories(eventRequest.Gender, eventRequest.Format);
 
             await _eventRepo.AddAsync(newEvent);
             await _eventRepo.SaveChangesAsync();
 
-            var created = await _eventRepo.GetByIdAsync(newEvent.Id, includeCategories: true);
-            return MapToResponse(created!);
+            var created = await _eventRepo.GetByIdWithDetailsAsync(newEvent.Id);
+            return _mapper.Map<EventResponse>(created!);
+        }
+
+        public async Task<IEnumerable<EventCategoryResponse>> GetCategoriesByEventIdAsync(int eventId)
+        {
+            var eventEntity = await _eventRepo.GetByIdWithDetailsAsync(eventId)
+                ?? throw new NotFoundException(string.Format(AppConstants.EventNotFound, eventId));
+
+            return _mapper.Map<IEnumerable<EventCategoryResponse>>(eventEntity.Categories);
         }
 
         public async Task<EventResponse> AssignOrganizerAsync(int eventId, AssignOrganizerRequest request)
         {
-            var eventEntity = await _eventRepo.GetByIdAsync(eventId, includeCategories: true);
+            var eventEntity = await _eventRepo.GetByIdWithDetailsAsync(eventId)
+                ?? throw new NotFoundException(string.Format(AppConstants.EventNotFound, eventId));
 
-            if (eventEntity is null)
-                throw new NotFoundException(
-                    string.Format(AppConstants.EventNotFound, eventId));
+            if (eventEntity.Status == EventStatus.Completed)
+                throw new UnprocessableEntityException(AppConstants.EventCompleted);
 
-            if (eventEntity.Status is EventStatus.Completed or EventStatus.Cancelled)
-                throw new UnprocessableEntityException(
-                    string.Format(AppConstants.EventNotAssignable, eventEntity.Status));
+            if (eventEntity.Status == EventStatus.Cancelled)
+                throw new UnprocessableEntityException(AppConstants.EventCancelled);
 
-            var organizer = await _userRepo.GetByIdWithRoleAsync(request.OrganizerId);
-
-            if (organizer is null)
-                throw new NotFoundException(
-                    string.Format(AppConstants.UserNotFound, request.OrganizerId));
+            var organizer = await _userRepo.GetByIdWithRoleAsync(request.OrganizerId)
+                ?? throw new NotFoundException(string.Format(AppConstants.UserNotFound, request.OrganizerId));
 
             if (!organizer.IsActive)
-                throw new UnprocessableEntityException(
-                    string.Format(AppConstants.UserInactive, organizer.FullName));
+                throw new UnprocessableEntityException(string.Format(AppConstants.UserInactive, organizer.FullName));
 
-            if (organizer.RoleId != OrganizerRoleId)
-                throw new UnprocessableEntityException(
-                    string.Format(AppConstants.UserNotOrganizer, organizer.FullName));
+            if (organizer.RoleId != AppConstants.OrganizerRoleId)
+                throw new UnprocessableEntityException(string.Format(AppConstants.UserNotOrganizer, organizer.FullName));
 
             eventEntity.OrganizerId = organizer.Id;
             eventEntity.Organizer   = organizer;
@@ -103,122 +159,49 @@ namespace SportsManagementApp.Services
             _eventRepo.Update(eventEntity);
             await _eventRepo.SaveChangesAsync();
 
-            return MapToResponse(eventEntity);
+            return _mapper.Map<EventResponse>(eventEntity);
         }
 
-        public async Task<EventResponse> ConfigureEventAsync(int eventId, EventConfigurationRequest request)
+        private static List<EventCategory> GenerateCategories(GenderType gender, MatchFormat format)
         {
-            var eventEntity = await _eventRepo.GetByIdAsync(eventId, includeCategories: true);
+            var categories = new List<EventCategory>();
+            var now        = DateTime.UtcNow;
 
-            if (eventEntity is null)
-                throw new NotFoundException(
-                    string.Format(AppConstants.EventNotFound, eventId));
-
-            if (eventEntity.Status is EventStatus.Completed or EventStatus.Cancelled)
-                throw new UnprocessableEntityException(
-                    string.Format(AppConstants.EventNotConfigurable, eventEntity.Status));
-
-            if (request.Rules is not null)
+            if (gender == GenderType.Mixed)
             {
-                if (request.Rules.StartDate >= request.Rules.EndDate)
-                    throw new BadRequestException(AppConstants.StartDateBeforeEndDate);
-
-                if (request.Rules.RegistrationDeadline >= request.Rules.StartDate)
-                    throw new BadRequestException(AppConstants.DeadlineBeforeStartDate);
-
-                eventEntity.StartDate            = request.Rules.StartDate;
-                eventEntity.EndDate              = request.Rules.EndDate;
-                eventEntity.RegistrationDeadline = request.Rules.RegistrationDeadline;
-                eventEntity.EventVenue           = request.Rules.EventVenue;
-                eventEntity.Description          = request.Rules.Description;
+                categories.Add(MakeCategory(GenderType.Mixed, MatchFormat.Singles, now));
+                return categories;
             }
 
-            if (request.Categories.Any())
+            var genders = gender switch
             {
-                var duplicate = request.Categories
-                    .GroupBy(c => new { c.Format, c.Gender })
-                    .FirstOrDefault(g => g.Count() > 1);
+                GenderType.Male   => new[] { GenderType.Male },
+                GenderType.Female => new[] { GenderType.Female },
+                GenderType.Both   => new[] { GenderType.Male, GenderType.Female },
+                _                 => Array.Empty<GenderType>()
+            };
 
-                if (duplicate is not null)
-                    throw new BadRequestException(
-                        string.Format(AppConstants.DuplicateCategory, duplicate.Key.Format, duplicate.Key.Gender));
-
-                foreach (var cat in request.Categories)
-                {
-                    bool exists = eventEntity.Categories.Any(
-                        c => c.Format == cat.Format && c.Gender == cat.Gender);
-
-                    if (exists) continue;
-
-                    eventEntity.Categories.Add(new EventCategory
-                    {
-                        Format         = cat.Format,
-                        Gender         = cat.Gender,
-                        TournamentType = cat.TournamentType,
-                        Status         = CategoryStatus.Active,
-                        EventId        = eventEntity.Id,
-                        CreatedAt      = DateTime.UtcNow
-                    });
-                }
-            }
-
-            if (request.TeamLimits is not null)
+            var formats = format switch
             {
-                if (request.TeamLimits.MaxTeamsPerCategory < 2)
-                    throw new BadRequestException(AppConstants.MaxTeamsMinError);
+                MatchFormat.Singles => new[] { MatchFormat.Singles },
+                MatchFormat.Doubles => new[] { MatchFormat.Doubles },
+                MatchFormat.Both    => new[] { MatchFormat.Singles, MatchFormat.Doubles },
+                _                   => Array.Empty<MatchFormat>()
+            };
 
-                if (request.TeamLimits.MaxMembersPerTeam < 1)
-                    throw new BadRequestException(AppConstants.MaxMembersMinError);
-            }
+            foreach (var g in genders)
+                foreach (var f in formats)
+                    categories.Add(MakeCategory(g, f, now));
 
-            eventEntity.UpdatedAt = DateTime.UtcNow;
-
-            _eventRepo.Update(eventEntity);
-            await _eventRepo.SaveChangesAsync();
-
-            return MapToResponse(eventEntity);
+            return categories;
         }
 
-        public async Task<EventResponse> GetByIdAsync(int eventId)
+        private static EventCategory MakeCategory(GenderType gender, MatchFormat format, DateTime now) => new()
         {
-            var eventEntity = await _eventRepo.GetByIdAsync(eventId, includeCategories: true);
-
-            if (eventEntity is null)
-                throw new NotFoundException(
-                    string.Format(AppConstants.EventNotFound, eventId));
-
-            return MapToResponse(eventEntity);
-        }
-
-        public async Task<List<EventResponse>> GetAllAsync()
-        {
-            var events = await _eventRepo.GetAllAsync();
-            return events.Select(MapToResponse).ToList();
-        }
-
-        private static EventResponse MapToResponse(Event e) => new()
-        {
-            Id                   = e.Id,
-            Name                 = e.Name,
-            SportName            = e.Sport?.Name ?? string.Empty,
-            StartDate            = e.StartDate,
-            EndDate              = e.EndDate,
-            EventVenue           = e.EventVenue,
-            RegistrationDeadline = e.RegistrationDeadline,
-            OrganizerName        = e.Organizer?.FullName,
-            Status               = e.Status.ToString(),
-            Description          = e.Description,
-            CreatedAt            = e.CreatedAt,
-            UpdatedAt            = e.UpdatedAt,
-            Categories           = e.Categories.Select(c => new EventCategoryResponse
-            {
-                Id             = c.Id,
-                Format         = c.Format.ToString(),
-                Gender         = c.Gender.ToString(),
-                TournamentType = c.TournamentType.ToString(),
-                Status         = c.Status.ToString(),
-                CreatedAt      = c.CreatedAt
-            }).ToList()
+            Gender    = gender,
+            Format    = format,
+            Status    = CategoryStatus.Active,
+            CreatedAt = now
         };
     }
 }

@@ -10,6 +10,10 @@ namespace SportsManagementApp.Entities
         public string Name { get; set; } = string.Empty;
         public int SportId { get; set; }
         public Sport? Sport { get; set; }
+        public int EventRequestId { get; set; }
+        public EventRequest EventRequest { get; set; } = null!;
+        public int MaxParticipantsCount { get; set; }
+        public TournamentType TournamentType { get; set; } = TournamentType.Knockout;
         public DateOnly StartDate { get; set; }
         public DateOnly EndDate { get; set; }
         [Required, MaxLength(200)]

@@ -1,0 +1,14 @@
+namespace SportsManagementApp.DTOs.Response
+{
+    public class MatchSetResponse
+    {
+        public int       Id        { get; set; }
+        public int       MatchId   { get; set; }
+        public int       SetNumber { get; set; }
+        public int       ScoreA    { get; set; }
+        public int       ScoreB    { get; set; }
+        public string    Status    { get; set; } = string.Empty;
+        public DateTime  CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+    }
+}

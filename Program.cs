@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using NSwag.AspNetCore;
 using SportsManagementApp.Data;
 using SportsManagementApp.Extensions;
 using SportsManagementApp.Middleware;
@@ -18,20 +19,28 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerDocs();
+builder.Services.AddOpenApiDocument(config =>
+{
+    config.Title       = AppConstants.SwaggerTitle;
+    config.Description = AppConstants.SwaggerDescription;
+    config.Version     = "v1";
+});
 builder.Services.AddApplicationServices();
 
 var app = builder.Build();
 
 app.UseGlobalExceptionHandler();
-app.UseSwagger();
-app.UseSwaggerUI(c =>
+
+app.UseOpenApi();
+app.UseSwaggerUi(settings =>
 {
-    c.SwaggerEndpoint(AppConstants.SwaggerEndpoint, AppConstants.SwaggerDisplayName);
-    c.RoutePrefix = string.Empty;
+    settings.Path = string.Empty;
+    settings.DocumentPath = "/swagger/v1/swagger.json";
 });
 
 app.UseHttpsRedirection();
 app.UseCors(AppConstants.ReactNativeCorsPolicy);
+app.UseAuthorization();
 app.MapControllers();
+
 app.Run();

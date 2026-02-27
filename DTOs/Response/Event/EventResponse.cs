@@ -1,3 +1,5 @@
+using SportsManagementApp.DTOs.Response;
+
 namespace SportsManagementApp.DTOs.Response
 {
     public class EventResponse
@@ -9,21 +11,13 @@ namespace SportsManagementApp.DTOs.Response
         public DateOnly EndDate { get; set; }
         public string EventVenue { get; set; } = string.Empty;
         public DateOnly RegistrationDeadline { get; set; }
+        public int MaxParticipantsCount { get; set; }
+        public string TournamentType { get; set; } = string.Empty;
         public string? OrganizerName { get; set; }
         public string Status { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public List<EventCategoryResponse> Categories { get; set; } = new();
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
-    }
-
-    public class EventCategoryResponse
-    {
-        public int Id { get; set; }
-        public string Format { get; set; } = string.Empty;
-        public string Gender { get; set; } = string.Empty;
-        public string TournamentType { get; set; } = string.Empty;
-        public string Status { get; set; } = string.Empty;
-        public DateTime CreatedAt { get; set; }
     }
 }
