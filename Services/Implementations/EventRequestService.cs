@@ -57,20 +57,8 @@ public class EventRequestService : IEventRequestService
             throw new Exception(StringConstant.eventExist);
         }
 
-        var request = new EventRequest
-        {
-            EventName = dto.EventName.Trim(),
-            SportId = dto.SportId,
-            RequestedVenue = dto.RequestedVenue.Trim(),
-            LogisticsRequirements = dto.LogisticsRequirements,
-            Format = dto.Format,
-            Gender = dto.Gender,
-            StartDate = dto.StartDate,
-            EndDate = dto.EndDate,
-            Status = RequestStatus.Pending,
-            AdminId = adminId,
-            CreatedDate = DateTime.UtcNow
-        };
+        var request = _mapper.Map<EventRequest>(dto);
+        request.AdminId = adminId;
 
         await _eventRequestRepository.AddAsync(request);
         await _eventRequestRepository.SaveChangesAsync();
@@ -120,13 +108,7 @@ public class EventRequestService : IEventRequestService
             throw new Exception(StringConstant.eventRequestModifyNotAllowed);
         }
 
-        request.EventName = dto.EventName.Trim();
-        request.RequestedVenue = dto.RequestedVenue.Trim();
-        request.LogisticsRequirements = dto.LogisticsRequirements;
-        request.Format = dto.Format;
-        request.Gender = dto.Gender;
-        request.StartDate = dto.StartDate;
-        request.EndDate = dto.EndDate;
+        _mapper.Map(dto, request);
 
         _eventRequestRepository.Update(request);
         await _eventRequestRepository.SaveChangesAsync();

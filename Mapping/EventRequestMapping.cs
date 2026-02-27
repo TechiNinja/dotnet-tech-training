@@ -1,5 +1,7 @@
 using AutoMapper;
+using SportsManagementApp.DTOs;
 using SportsManagementApp.Entities;
+using SportsManagementApp.Enums;
 
 public class EventRequestMapping : Profile
 {
@@ -7,5 +9,21 @@ public class EventRequestMapping : Profile
     {
         CreateMap<EventRequest, EventRequestResponseDto>()
             .ForMember(dest => dest.SportsName, opt => opt.MapFrom(src => src.Sport.Name));
-    }
+
+        CreateMap<CreateEventRequestDto, EventRequest>()
+            .ForMember(dest => dest.EventName,
+                opt => opt.MapFrom(src => src.EventName.Trim()))
+            .ForMember(dest => dest.RequestedVenue,
+                    opt => opt.MapFrom(src => src.RequestedVenue.Trim()))
+            .ForMember(dest => dest.CreatedDate,
+                opt => opt.MapFrom(_ => DateTime.UtcNow))
+            .ForMember(dest => dest.Status,
+                opt => opt.MapFrom(_ => RequestStatus.Pending));
+
+        CreateMap<EditEventRequestDto, EventRequest>()
+            .ForMember(dest => dest.EventName,
+                opt => opt.MapFrom(src => src.EventName.Trim()))
+            .ForMember(dest => dest.RequestedVenue,
+                opt => opt.MapFrom(src => src.RequestedVenue.Trim()));
+        }
 }
