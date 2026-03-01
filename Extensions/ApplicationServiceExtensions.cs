@@ -14,7 +14,6 @@ namespace SportsManagementApp.Extensions
             services.AddScoped<ISchedulesService, SchedulesService>();
             services.AddScoped<ITeamsService, TeamsService>();
             services.AddScoped<IEventsService, EventsService>();
-            services.AddScoped<ICategoryTeamService, CategoryTeamService>();
             services.AddScoped<IParticipantRegistrationService, ParticipantRegistrationService>();
 
             return services;
