@@ -7,7 +7,7 @@ using SportsManagementApp.StringConstants;
 namespace SportsManagementApp.Controllers
 {
     [ApiController]
-    [Route("api/v1/events")]
+    [Route("api/events")]
     [Produces("application/json")]
     [Tags(AppConstants.TagEvents)]
     public class EventsController : ControllerBase

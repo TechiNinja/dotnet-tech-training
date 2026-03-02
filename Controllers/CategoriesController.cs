@@ -7,7 +7,7 @@ using SportsManagementApp.StringConstants;
 namespace SportsManagementApp.Controllers
 {
     [ApiController]
-    [Route("api/v1/categories")]
+    [Route("api/categories")]
     [Produces("application/json")]
     [Tags(AppConstants.TagCategories)]
     public class CategoriesController : ControllerBase
@@ -26,10 +26,8 @@ namespace SportsManagementApp.Controllers
             return Ok(result);
         }
 
-
         [HttpPost("{catId:int}/fixtures/generate")]
         [ProducesResponseType(typeof(IEnumerable<FixtureResponse>), 201)]
-        [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(409)]
         [ProducesResponseType(422)]
@@ -41,13 +39,13 @@ namespace SportsManagementApp.Controllers
 
         [HttpGet("{catId:int}/fixtures")]
         [ProducesResponseType(typeof(IEnumerable<FixtureResponse>), 200)]
+        [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetFixtures(int catId, [FromQuery] string? status = null)
         {
             var result = await _categoryService.GetFixturesAsync(catId, status);
             return Ok(result);
         }
-
 
         [HttpDelete("{catId:int}/fixtures")]
         [ProducesResponseType(200)]
@@ -58,15 +56,17 @@ namespace SportsManagementApp.Controllers
             return Ok(new { message = AppConstants.FixturesDeleted });
         }
 
-        [HttpPost("{catId:int}/fixtures/publish")]
-        [ProducesResponseType(200)]
+        [HttpPatch("{catId:int}/fixtures/schedule")]
+        [ProducesResponseType(typeof(IEnumerable<FixtureResponse>), 200)]
+        [ProducesResponseType(400)]
         [ProducesResponseType(404)]
+        [ProducesResponseType(409)]
         [ProducesResponseType(422)]
-        public async Task<IActionResult> PublishSchedule(int catId)
+        public async Task<IActionResult> BulkSchedule(int catId, [FromBody] BulkScheduleRequest request)
         {
-            await _categoryService.PublishScheduleAsync(catId);
-            return Ok(new { message = AppConstants.SchedulePublished });
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            var result = await _categoryService.BulkScheduleAsync(catId, request);
+            return Ok(result);
         }
-
     }
 }

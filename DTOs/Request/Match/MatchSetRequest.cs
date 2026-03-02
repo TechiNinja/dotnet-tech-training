@@ -12,5 +12,7 @@ namespace SportsManagementApp.DTOs.Request
         [Required]
         [Range(0, int.MaxValue, ErrorMessage = AppConstants.ScoreValidate)]
         public int ScoreB { get; set; }
+
+        public bool IsCompleted { get; set; } = false;
     }
 }

@@ -68,10 +68,10 @@ namespace SportsManagementApp.Services
             return MapFixtures(matches, category);
         }
 
-        public async Task<FixtureResponse> GetFixtureByIdAsync(int fixtureId)
+        public async Task<FixtureResponse> GetMatchByIdAsync(int matchId)
         {
-            var match = await _matchRepo.GetByIdWithSetsAndResultAsync(fixtureId)
-                ?? throw new NotFoundException(string.Format(AppConstants.MatchNotFound, fixtureId));
+            var match = await _matchRepo.GetByIdWithSetsAndResultAsync(matchId)
+                ?? throw new NotFoundException(string.Format(AppConstants.MatchNotFound, matchId));
 
             var category = await _categoryRepo.GetByIdWithDetailsAsync(match.EventCategoryId)
                 ?? throw new NotFoundException(string.Format(AppConstants.CategoryNotFound, match.EventCategoryId));
@@ -86,62 +86,38 @@ namespace SportsManagementApp.Services
             await _matchRepo.SaveChangesAsync();
         }
 
-        public async Task<FixtureResponse> UpdateScheduleAsync(int fixtureId, ScheduleUpdateRequest request)
-        {
-            var match = await _matchRepo.GetByIdWithSetsAndResultAsync(fixtureId)
-                ?? throw new NotFoundException(string.Format(AppConstants.MatchNotFound, fixtureId));
-
-            
-            var category = await _categoryRepo.GetByIdWithDetailsAsync(match.EventCategoryId)
-                ?? throw new NotFoundException(string.Format(AppConstants.CategoryNotFound, match.EventCategoryId));
-
-            if (category.Status == CategoryStatus.Abandoned)
-                throw new UnprocessableEntityException(AppConstants.ScheduleAlreadyPublished);
-            
-            if (match.Status == MatchStatus.Completed)
-                throw new UnprocessableEntityException(AppConstants.MatchAlreadyCompleted);
-
-            if (category.Status == CategoryStatus.Abandoned)
-                throw new UnprocessableEntityException(AppConstants.CategoryScheduleLocked);
-
-            if (await _matchRepo.HasOverlapAsync(match.EventCategoryId, request.MatchDateTime, fixtureId))
-                throw new ConflictException(AppConstants.ScheduleTimeOverlap);
-
-            match.MatchDateTime = request.MatchDateTime;
-            match.MatchVenue    = category.Event?.EventVenue ?? string.Empty;
-            match.UpdatedAt     = DateTime.UtcNow;
-
-            _matchRepo.Update(match);
-            await _matchRepo.SaveChangesAsync();
-
-            return MapFixtures(new[] { match }, category).First();
-        }
-
-        public async Task PublishScheduleAsync(int catId)
+        public async Task<IEnumerable<FixtureResponse>> BulkScheduleAsync(int catId, BulkScheduleRequest request)
         {
             var category = await _categoryRepo.GetByIdWithDetailsAsync(catId)
                 ?? throw new NotFoundException(string.Format(AppConstants.CategoryNotFound, catId));
 
-            if (category.Status == CategoryStatus.Abandoned)
-                throw new UnprocessableEntityException(AppConstants.ScheduleAlreadyPublished);
+            foreach (var item in request.Schedules)
+            {
+                var match = await _matchRepo.GetByIdWithSetsAndResultAsync(item.MatchId)
+                    ?? throw new NotFoundException(string.Format(AppConstants.MatchNotFound, item.MatchId));
 
-            if (!category.Matches.Any())
-                throw new UnprocessableEntityException(AppConstants.NoFixturesToPublish);
+                if (match.EventCategoryId != catId)
+                    throw new BadRequestException(string.Format(AppConstants.MatchNotFound, item.MatchId));
 
-            bool anyUnscheduled = category.Matches
-                .Where(m => m.SideAId != null && m.SideBId != null)
-                .Any(m => m.MatchDateTime == default);
+                if (match.Status == MatchStatus.Completed)
+                    throw new UnprocessableEntityException(string.Format(AppConstants.MatchAlreadyCompleted, item.MatchId));
 
-            if (anyUnscheduled)
-                throw new UnprocessableEntityException(AppConstants.ScheduleNotPublishable);
+                if (await _matchRepo.HasOverlapAsync(catId, item.MatchDateTime, item.MatchId))
+                    throw new ConflictException(AppConstants.ScheduleTimeOverlap);
 
-            category.Status    = CategoryStatus.Abandoned;
-            category.UpdatedAt = DateTime.UtcNow;
+                match.MatchDateTime = item.MatchDateTime;
+                match.MatchVenue    = category.Event?.EventVenue ?? string.Empty;
+                match.UpdatedAt     = DateTime.UtcNow;
 
-            _categoryRepo.Update(category);
-            await _categoryRepo.SaveChangesAsync();
+                _matchRepo.Update(match);
+            }
+
+            await _matchRepo.SaveChangesAsync();
+
+            var updated = await _matchRepo.GetByCategoryAsync(catId, null);
+            return MapFixtures(updated, category);
         }
-        
+
         private List<Match> GenerateSinglesFixtures(EventCategory category)
         {
             var participants = category.EventRegistrations.ToList();
@@ -174,9 +150,9 @@ namespace SportsManagementApp.Services
 
         private static List<Match> GenerateKnockout(List<int?> sideIds, int catId)
         {
-            var matches       = new List<Match>();
-            var matchNumber   = 1;
-            var bracketPos    = 1;
+            var matches     = new List<Match>();
+            var matchNumber = 1;
+            var bracketPos  = 1;
 
             int totalSlots = NextPowerOfTwo(sideIds.Count);
             while (sideIds.Count < totalSlots)
@@ -292,7 +268,7 @@ namespace SportsManagementApp.Services
 
             return matches.Select(m =>
             {
-                var response    = _mapper.Map<FixtureResponse>(m);
+                var response       = _mapper.Map<FixtureResponse>(m);
                 response.SideAName = ResolveSideName(m.SideAId, category.Format, teamNames, userNames);
                 response.SideBName = ResolveSideName(m.SideBId, category.Format, teamNames, userNames);
                 return response;

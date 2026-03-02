@@ -59,9 +59,9 @@ namespace SportsManagementApp.Repositories
             _context.Matches.RemoveRange(matches);
         }
 
-        public async Task<MatchSet?> GetSetByIdAsync(int matchId, int setId) =>
+        public async Task<MatchSet?> GetSetBySetNumberAsync(int matchId, int setNumber) =>
             await _context.MatchSets
-                .FirstOrDefaultAsync(s => s.Id == setId && s.MatchId == matchId);
+                .FirstOrDefaultAsync(s => s.MatchId == matchId && s.SetNumber == setNumber);
 
         public void UpdateSet(MatchSet set)
         {
