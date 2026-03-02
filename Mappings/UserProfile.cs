@@ -22,6 +22,10 @@ namespace SportsManagementApp.Mappings
             CreateMap<User, LoginResponseDto>()
                 .ForMember(dest => dest.Role,
                     opt => opt.MapFrom(src => src.Role!.Name));
+
+            CreateMap<RegisterRequestDto, User>()
+                .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())
+                .ForMember(dest => dest.Role, opt => opt.Ignore());
         }
     }
 }

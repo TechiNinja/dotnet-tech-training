@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SportsManagementApp.Data.DTOs;
 using SportsManagementApp.Enums;
@@ -7,6 +9,7 @@ namespace SportsManagementApp.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize(Roles = "Admin")]
 public class EventRequestsController : ControllerBase
 {
     private readonly IEventRequestService _eventRequestService;
@@ -22,7 +25,11 @@ public class EventRequestsController : ControllerBase
     {
         try
         {
-            int adminId = 1;
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+    if (!int.TryParse(userId, out int adminId))
+        return Unauthorized("Invalid user.");
+
             var result = await _eventRequestService.RaiseEventRequest(dto, adminId);
 
             return CreatedAtAction(nameof(RaiseEventRequest), new { id = result.Id }, result);
