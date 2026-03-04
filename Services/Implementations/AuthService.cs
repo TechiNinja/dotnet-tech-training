@@ -81,7 +81,6 @@ namespace SportsManagementApp.Services.Implementations
             user.RoleId = participantRole.Id;
             user.IsActive = true;
             user.CreatedAt = DateTime.UtcNow;
-
             user.PasswordHash = _passwordHasher.HashPassword(user, registerRequest.Password);
 
             await _authRepository.AddUserAsync(user);

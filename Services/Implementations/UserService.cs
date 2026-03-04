@@ -20,19 +20,19 @@ namespace SportsManagementApp.Services.Implementations
             _mapper = mapper;
         }
 
-        public async Task<List<LoginResponseDto>> GetUsersAsync()
+        public async Task<List<UserResponseDto>> GetUsersAsync()
         {
             var users = await _userRepository.GetUsersWithRoleAsync();
-            return _mapper.Map<List<LoginResponseDto>>(users);
+            return _mapper.Map<List<UserResponseDto>>(users);
         }
 
-        public async Task<LoginResponseDto?> GetUserByIdAsync(int userId)
+        public async Task<UserResponseDto?> GetUserByIdAsync(int userId)
         {
             var user = await _userRepository.GetUserEntityByIdAsync(userId);
-            return _mapper.Map<LoginResponseDto?>(user);
+            return _mapper.Map<UserResponseDto?>(user);
         }
 
-        public async Task<User> CreateUserAsync(CreateUserDto createUser)
+        public async Task<UserResponseDto> CreateUserAsync(CreateUserDto createUser)
         {
             var user = _mapper.Map<User>(createUser);
             user.CreatedAt = DateTime.UtcNow;
@@ -40,7 +40,7 @@ namespace SportsManagementApp.Services.Implementations
             user.PasswordHash = _passwordHasher.HashPassword(user, createUser.Password);
 
             await _userRepository.AddAsync(user);
-            return user;
+            return _mapper.Map<UserResponseDto>(user);
         }
 
         public async Task<UserResponseDto?> UpdateUserAsync(int userId, UpdateUserDto updateUser)
@@ -48,20 +48,10 @@ namespace SportsManagementApp.Services.Implementations
             var user = await _userRepository.GetUserEntityByIdAsync(userId);
             if (user == null) return null;
 
-            if (!string.IsNullOrWhiteSpace(updateUser.FullName))
-                user.FullName = updateUser.FullName;
-
-            if (!string.IsNullOrWhiteSpace(updateUser.Email))
-                user.Email = updateUser.Email;
+            _mapper.Map(updateUser, user);
 
             if (!string.IsNullOrWhiteSpace(updateUser.Password))
                 user.PasswordHash = _passwordHasher.HashPassword(user, updateUser.Password);
-
-            if (updateUser.RoleId.HasValue)
-                user.RoleId = updateUser.RoleId.Value;
-
-            if (updateUser.IsActive.HasValue)
-                user.IsActive = updateUser.IsActive.Value;
 
             user.UpdatedAt = DateTime.UtcNow;
 
