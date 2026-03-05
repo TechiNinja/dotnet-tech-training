@@ -9,15 +9,19 @@ namespace SportsManagementApp.Mappings
     {
         public UserProfile()
         {
-            CreateMap<User, LoginResponseDto>()
-                .ForMember(dest => dest.Role,
-                opt => opt.MapFrom(src => src.Role != null ? src.Role.Name : string.Empty));
-
             CreateMap<User, UserResponseDto>()
                 .ForMember(dest => dest.RoleName,
-                opt => opt.MapFrom(src => src.Role != null ? src.Role.Name : string.Empty));
+                    opt => opt.MapFrom(src => src.Role!.Name));
 
             CreateMap<CreateUserDto, User>();
+
+            CreateMap<UpdateUserDto, User>()
+                .ForAllMembers(opt =>
+                    opt.Condition((src, dest, srcMember) => srcMember != null));
+
+            CreateMap<User, LoginResponseDto>()
+                .ForMember(dest => dest.Role,
+                    opt => opt.MapFrom(src => src.Role!.Name));
         }
     }
 }

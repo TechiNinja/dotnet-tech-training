@@ -1,18 +1,14 @@
-﻿using SportsManagementApp.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using SportsManagementApp.Data;
 using SportsManagementApp.Data.DTOs.Participant;
+using SportsManagementApp.Data.Entities;
 using SportsManagementApp.Repositories.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 namespace SportsManagementApp.Repositories.Implementations
 {
-    public class TeamsRepository: ITeamsRepository
+    public class TeamsRepository: GenericRepository<Team>, ITeamsRepository
     {
-        private readonly AppDbContext _context;
-
-        public TeamsRepository(AppDbContext context)
-        {
-            _context = context;
-        }
+        public TeamsRepository(AppDbContext context): base(context) { }
 
         public async Task<List<MyTeamDto>> GetUserTeamsAsync(int userId)
         {
@@ -31,6 +27,14 @@ namespace SportsManagementApp.Repositories.Implementations
                             ? member.Team.EventCategory.Event.Name
                             : "N/A",
                 })
+                .ToListAsync();
+        }
+
+        public async Task<List<Team>> GetTeamsByCategoryAsync(int categoryId)
+        {
+            return await _dbSet.Include(team => team.Members)
+                .ThenInclude(member => member.User)
+                .Where(team => team.EventCategoryId == categoryId)
                 .ToListAsync();
         }
     }
