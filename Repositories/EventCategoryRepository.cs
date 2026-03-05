@@ -22,6 +22,5 @@ namespace SportsManagementApp.Repositories
                 .Include(c => c.Matches)
                     .ThenInclude(m => m.Result)
                 .FirstOrDefaultAsync(c => c.Id == catId);
-
     }
 }

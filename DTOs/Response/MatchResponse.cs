@@ -11,4 +11,17 @@ namespace SportsManagementApp.DTOs.Response
         public DateTime  CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
     }
+
+    public class MatchResultResponse
+    {
+        public int      Id        { get; set; }
+        public int?     WinnerId  { get; set; }
+        public DateTime CreatedAt { get; set; }
+    }
+
+    public class SetUpdateResponse
+    {
+        public MatchSetResponse     Set    { get; set; } = null!;
+        public MatchResultResponse? Result { get; set; }
+    }
 }

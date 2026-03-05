@@ -1,4 +1,3 @@
-﻿
 namespace SportsManagementApp.Enums
 {
     public enum RequestStatus

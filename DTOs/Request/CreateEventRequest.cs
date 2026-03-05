@@ -1,5 +1,5 @@
-using SportsManagementApp.StringConstants;
 using System.ComponentModel.DataAnnotations;
+using SportsManagementApp.StringConstants;
 
 namespace SportsManagementApp.DTOs.Request
 {
@@ -8,7 +8,7 @@ namespace SportsManagementApp.DTOs.Request
         [Required(ErrorMessage = AppConstants.EventRequestIdRequired)]
         public int EventRequestId { get; set; }
 
-        [Required] 
+        [Required]
         [MaxLength(100, ErrorMessage = AppConstants.EventNameTooLong)]
         public string? Name { get; set; }
 

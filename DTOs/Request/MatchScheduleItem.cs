@@ -3,12 +3,6 @@ using SportsManagementApp.StringConstants;
 
 namespace SportsManagementApp.DTOs.Request
 {
-    public class BulkScheduleRequest
-    {
-        [Required]
-        public List<MatchScheduleItem> Schedules { get; set; } = new();
-    }
-
     public class MatchScheduleItem
     {
         [Required]

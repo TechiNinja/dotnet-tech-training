@@ -9,35 +9,35 @@ namespace SportsManagementApp.Mappings
         public MappingProfile()
         {
             CreateMap<Event, EventResponse>()
-                .ForMember(dest => dest.SportName,       opt => opt.MapFrom(src => src.Sport != null ? src.Sport.Name : string.Empty))
-                .ForMember(dest => dest.OrganizerName,   opt => opt.MapFrom(src => src.Organizer != null ? src.Organizer.FullName : null))
-                .ForMember(dest => dest.Status,          opt => opt.MapFrom(src => src.Status.ToString()))
-                .ForMember(dest => dest.TournamentType,  opt => opt.MapFrom(src => src.TournamentType.ToString()))
-                .ForMember(dest => dest.Categories,      opt => opt.MapFrom(src => src.Categories));
+                .ForMember(d => d.SportName,      opt => opt.MapFrom(s => s.Sport != null ? s.Sport.Name : string.Empty))
+                .ForMember(d => d.OrganizerName,  opt => opt.MapFrom(s => s.Organizer != null ? s.Organizer.FullName : null))
+                .ForMember(d => d.Status,         opt => opt.MapFrom(s => s.Status.ToString()))
+                .ForMember(d => d.TournamentType, opt => opt.MapFrom(s => s.TournamentType.ToString()))
+                .ForMember(d => d.Categories,     opt => opt.MapFrom(s => s.Categories));
 
             CreateMap<EventCategory, EventCategoryResponse>()
-                .ForMember(dest => dest.Gender,  opt => opt.MapFrom(src => src.Gender.ToString()))
-                .ForMember(dest => dest.Format,  opt => opt.MapFrom(src => src.Format.ToString()))
-                .ForMember(dest => dest.Status,  opt => opt.MapFrom(src => src.Status.ToString()));
+                .ForMember(d => d.Gender, opt => opt.MapFrom(s => s.Gender.ToString()))
+                .ForMember(d => d.Format, opt => opt.MapFrom(s => s.Format.ToString()))
+                .ForMember(d => d.Status, opt => opt.MapFrom(s => s.Status.ToString()));
 
             CreateMap<EventCategory, CategoryResponse>()
-                .ForMember(dest => dest.Gender,              opt => opt.MapFrom(src => src.Gender.ToString()))
-                .ForMember(dest => dest.Format,              opt => opt.MapFrom(src => src.Format.ToString()))
-                .ForMember(dest => dest.Status,              opt => opt.MapFrom(src => src.Status.ToString()))
-                .ForMember(dest => dest.EventName,           opt => opt.MapFrom(src => src.Event != null ? src.Event.Name : string.Empty))
-                .ForMember(dest => dest.TournamentType,      opt => opt.MapFrom(src => src.Event != null ? src.Event.TournamentType.ToString() : string.Empty))
-                .ForMember(dest => dest.MaxParticipantsCount,opt => opt.MapFrom(src => src.Event != null ? src.Event.MaxParticipantsCount : 0));
+                .ForMember(d => d.Gender,               opt => opt.MapFrom(s => s.Gender.ToString()))
+                .ForMember(d => d.Format,               opt => opt.MapFrom(s => s.Format.ToString()))
+                .ForMember(d => d.Status,               opt => opt.MapFrom(s => s.Status.ToString()))
+                .ForMember(d => d.EventName,            opt => opt.MapFrom(s => s.Event != null ? s.Event.Name : string.Empty))
+                .ForMember(d => d.TournamentType,       opt => opt.MapFrom(s => s.Event != null ? s.Event.TournamentType.ToString() : string.Empty))
+                .ForMember(d => d.MaxParticipantsCount, opt => opt.MapFrom(s => s.Event != null ? s.Event.MaxParticipantsCount : 0));
 
             CreateMap<Match, FixtureResponse>()
-                .ForMember(dest => dest.Status,       opt => opt.MapFrom(src => src.Status.ToString()))
-                .ForMember(dest => dest.IsBye,        opt => opt.MapFrom(src => src.SideAId == null || src.SideBId == null))
-                .ForMember(dest => dest.SideAName,    opt => opt.MapFrom(src => string.Empty))
-                .ForMember(dest => dest.SideBName,    opt => opt.MapFrom(src => string.Empty))
-                .ForMember(dest => dest.Sets,         opt => opt.MapFrom(src => src.MatchSets))
-                .ForMember(dest => dest.Result,       opt => opt.MapFrom(src => src.Result));
+                .ForMember(d => d.Status,    opt => opt.MapFrom(s => s.Status.ToString()))
+                .ForMember(d => d.IsBye,     opt => opt.MapFrom(s => s.SideAId == null || s.SideBId == null))
+                .ForMember(d => d.SideAName, opt => opt.MapFrom(_ => string.Empty))
+                .ForMember(d => d.SideBName, opt => opt.MapFrom(_ => string.Empty))
+                .ForMember(d => d.Sets,      opt => opt.MapFrom(s => s.MatchSets))
+                .ForMember(d => d.Result,    opt => opt.MapFrom(s => s.Result));
 
             CreateMap<MatchSet, MatchSetResponse>()
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+                .ForMember(d => d.Status, opt => opt.MapFrom(s => s.Status.ToString()));
 
             CreateMap<Result, MatchResultResponse>();
         }

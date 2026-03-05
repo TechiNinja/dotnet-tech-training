@@ -21,50 +21,67 @@ namespace SportsManagementApp.Services
             _mapper    = mapper;
         }
 
-        public async Task<MatchSetResponse> UpdateSetAsync(int matchId, MatchSetRequest request)
+        public async Task<SetUpdateResponse> UpdateSetAsync(int matchId, MatchSetRequest request)
         {
             var match = await _matchRepo.GetByIdWithSetsAndResultAsync(matchId)
                 ?? throw new NotFoundException(string.Format(AppConstants.MatchNotFound, matchId));
 
             if (match.Status == MatchStatus.Completed)
-                throw new UnprocessableEntityException(string.Format(AppConstants.MatchAlreadyCompleted, matchId));
+                throw new UnprocessableEntityException(
+                    string.Format(AppConstants.MatchAlreadyCompleted, matchId));
 
             var liveSet = match.MatchSets.FirstOrDefault(s => s.Status == SetStatus.Live);
 
-            if (liveSet != null)
+            var updatedSet = liveSet != null
+                ? await ApplyScoreToLiveSetAsync(liveSet, request)
+                : await CreateNextSetAsync(match, request);
+
+            match = await _matchRepo.GetByIdWithSetsAndResultAsync(matchId)
+                ?? throw new NotFoundException(string.Format(AppConstants.MatchNotFound, matchId));
+
+            MatchResultResponse? result = null;
+            if (AllSetsCompleted(match))
+                result = await SubmitResultAsync(matchId);
+
+            return new SetUpdateResponse
             {
-                liveSet.ScoreA    = request.ScoreA;
-                liveSet.ScoreB    = request.ScoreB;
-                liveSet.UpdatedAt = DateTime.UtcNow;
+                Set    = _mapper.Map<MatchSetResponse>(updatedSet),
+                Result = result
+            };
+        }
 
-                if (request.IsCompleted)
-                    liveSet.Status = SetStatus.Completed;
+        public async Task<IEnumerable<MatchSetResponse>> GetSetsAsync(int matchId)
+        {
+            if (!await _matchRepo.ExistsAsync(m => m.Id == matchId))
+                throw new NotFoundException(string.Format(AppConstants.MatchNotFound, matchId));
 
-                _matchRepo.UpdateSet(liveSet);
-                await _matchRepo.SaveChangesAsync();
+            return await _matchRepo.GetSetsProjectedAsync(matchId);
+        }
 
-                return _mapper.Map<MatchSetResponse>(liveSet);
-            }
+        private static bool AllSetsCompleted(Match match)
+        {
+            if (!match.MatchSets.Any()) return false;
+            if (match.MatchSets.Any(s => s.Status == SetStatus.Live)) return false;
+            if (match.TotalSets > 0 &&
+                match.MatchSets.Count(s => s.Status == SetStatus.Completed) < match.TotalSets)
+                return false;
+            return true;
+        }
 
-            if (match.TotalSets == 0)
-            {
-                if (match.MatchSets.Any())
-                    throw new ConflictException(string.Format(AppConstants.MatchSetAlreadyExists, 1, matchId));
-            }
-            else
-            {
-                if (match.MatchSets.Count >= match.TotalSets)
-                    throw new UnprocessableEntityException(string.Format(AppConstants.MaxSetsReached, match.TotalSets));
+        private async Task<MatchSet> ApplyScoreToLiveSetAsync(MatchSet liveSet, MatchSetRequest request)
+        {
+            liveSet.ScoreA    = request.ScoreA;
+            liveSet.ScoreB    = request.ScoreB;
+            liveSet.UpdatedAt = DateTime.UtcNow;
+            if (request.IsCompleted) liveSet.Status = SetStatus.Completed;
+            _matchRepo.UpdateSet(liveSet);
+            await _matchRepo.SaveChangesAsync();
+            return liveSet;
+        }
 
-                int nextSetNumber = match.MatchSets.Count + 1;
-                if (nextSetNumber > 1)
-                {
-                    var previousSet = match.MatchSets.FirstOrDefault(s => s.SetNumber == nextSetNumber - 1);
-                    if (previousSet != null && previousSet.Status != SetStatus.Completed)
-                        throw new UnprocessableEntityException(
-                            string.Format(AppConstants.PreviousSetNotCompleted, nextSetNumber - 1, nextSetNumber));
-                }
-            }
+        private async Task<MatchSet> CreateNextSetAsync(Match match, MatchSetRequest request)
+        {
+            ValidateNewSetAllowed(match);
 
             int setNumber = match.MatchSets.Any()
                 ? match.MatchSets.Max(s => s.SetNumber) + 1
@@ -72,7 +89,7 @@ namespace SportsManagementApp.Services
 
             var newSet = new MatchSet
             {
-                MatchId   = matchId,
+                MatchId   = match.Id,
                 SetNumber = setNumber,
                 ScoreA    = request.ScoreA,
                 ScoreB    = request.ScoreB,
@@ -89,19 +106,54 @@ namespace SportsManagementApp.Services
 
             match.MatchSets.Add(newSet);
             await _matchRepo.SaveChangesAsync();
-
-            return _mapper.Map<MatchSetResponse>(newSet);
+            return newSet;
         }
 
-        public async Task<IEnumerable<MatchSetResponse>> GetSetsAsync(int matchId)
+        private static void ValidateNewSetAllowed(Match match)
         {
-            var match = await _matchRepo.GetByIdWithSetsAndResultAsync(matchId)
-                ?? throw new NotFoundException(string.Format(AppConstants.MatchNotFound, matchId));
+            if (match.TotalSets == 0)
+            {
+                if (match.MatchSets.Any())
+                    throw new ConflictException(
+                        string.Format(AppConstants.MatchSetAlreadyExists, 1, match.Id));
+                return;
+            }
 
-            return _mapper.Map<IEnumerable<MatchSetResponse>>(match.MatchSets.OrderBy(s => s.SetNumber));
+            if (match.MatchSets.Count >= match.TotalSets)
+                throw new UnprocessableEntityException(
+                    string.Format(AppConstants.MaxSetsReached, match.TotalSets));
+
+            int next = match.MatchSets.Count + 1;
+            if (next > 1)
+            {
+                var prev = match.MatchSets.FirstOrDefault(s => s.SetNumber == next - 1);
+                if (prev != null && prev.Status != SetStatus.Completed)
+                    throw new UnprocessableEntityException(
+                        string.Format(AppConstants.PreviousSetNotCompleted, next - 1, next));
+            }
         }
 
-        public async Task<MatchResultResponse> SubmitResultAsync(int matchId)
+        private static void ValidateSetsForResult(Match match)
+        {
+            if (!match.MatchSets.Any())
+                throw new UnprocessableEntityException(AppConstants.NoScoreSubmitted);
+            if (match.MatchSets.Any(s => s.Status == SetStatus.Live))
+                throw new UnprocessableEntityException(AppConstants.AllSetsNotCompleted);
+            if (match.TotalSets > 0 &&
+                match.MatchSets.Count(s => s.Status == SetStatus.Completed) < match.TotalSets)
+                throw new UnprocessableEntityException(AppConstants.AllSetsNotCompleted);
+        }
+
+        private static int? DetermineWinner(Match match)
+        {
+            int sideAWins = match.MatchSets.Count(s => s.ScoreA > s.ScoreB);
+            int sideBWins = match.MatchSets.Count(s => s.ScoreB > s.ScoreA);
+            if (sideAWins == sideBWins)
+                throw new UnprocessableEntityException(AppConstants.DrawNotAllowed);
+            return sideAWins > sideBWins ? match.SideAId : match.SideBId;
+        }
+
+        private async Task<MatchResultResponse> SubmitResultAsync(int matchId)
         {
             var match = await _matchRepo.GetByIdWithSetsAndResultAsync(matchId)
                 ?? throw new NotFoundException(string.Format(AppConstants.MatchNotFound, matchId));
@@ -109,26 +161,9 @@ namespace SportsManagementApp.Services
             if (match.Status == MatchStatus.Completed)
                 throw new ConflictException(string.Format(AppConstants.MatchAlreadyCompleted, matchId));
 
-            if (!match.MatchSets.Any())
-                throw new UnprocessableEntityException(AppConstants.NoScoreSubmitted);
+            ValidateSetsForResult(match);
 
-            if (match.MatchSets.Any(s => s.Status == SetStatus.Live))
-                throw new UnprocessableEntityException(AppConstants.AllSetsNotCompleted);
-
-            if (match.TotalSets > 0)
-            {
-                int completedSets = match.MatchSets.Count(s => s.Status == SetStatus.Completed);
-                if (completedSets < match.TotalSets)
-                    throw new UnprocessableEntityException(AppConstants.AllSetsNotCompleted);
-            }
-
-            int sideAWins = match.MatchSets.Count(s => s.ScoreA > s.ScoreB);
-            int sideBWins = match.MatchSets.Count(s => s.ScoreB > s.ScoreA);
-
-            if (sideAWins == sideBWins)
-                throw new UnprocessableEntityException(AppConstants.DrawNotAllowed);
-
-            int? winnerId = sideAWins > sideBWins ? match.SideAId : match.SideBId;
+            int? winnerId = DetermineWinner(match);
 
             var result = new Result
             {
@@ -142,22 +177,33 @@ namespace SportsManagementApp.Services
 
             match.Status    = MatchStatus.Completed;
             match.UpdatedAt = DateTime.UtcNow;
-
             _matchRepo.Update(match);
+
+            await AdvanceWinnerAsync(match, winnerId);
+
             await _matchRepo.SaveChangesAsync();
 
             return _mapper.Map<MatchResultResponse>(result);
         }
 
-        public async Task<MatchResultResponse> GetResultAsync(int matchId)
+        private async Task AdvanceWinnerAsync(Match completedMatch, int? winnerId)
         {
-            var match = await _matchRepo.GetByIdWithSetsAndResultAsync(matchId)
-                ?? throw new NotFoundException(string.Format(AppConstants.MatchNotFound, matchId));
+            var nextBracketPos = (completedMatch.BracketPosition + 1) / 2;
 
-            if (match.Result == null)
-                throw new NotFoundException(string.Format(AppConstants.MatchNotFound, matchId));
+            var nextMatch = await _matchRepo.GetByRoundAndBracketAsync(
+                completedMatch.EventCategoryId,
+                completedMatch.RoundNumber + 1,
+                nextBracketPos);
 
-            return _mapper.Map<MatchResultResponse>(match.Result);
+            if (nextMatch == null) return;
+
+            if (completedMatch.BracketPosition % 2 != 0)
+                nextMatch.SideAId = winnerId;
+            else
+                nextMatch.SideBId = winnerId;
+
+            nextMatch.UpdatedAt = DateTime.UtcNow;
+            _matchRepo.Update(nextMatch);
         }
     }
 }

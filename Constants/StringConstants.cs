@@ -2,27 +2,21 @@ namespace SportsManagementApp.StringConstants
 {
     public static class AppConstants
     {
-        public const string AdminRole            = "Admin";
-        public const string OrganizerRole        = "Organizer";
-        public const string UserRole             = "User";
-        public const int    OrganizerRoleId      = 2;
-        public const string ApiVersion           = "v1";
-        public const string ApiPrefix            = "api/v1";
-        public const string ReactNativeCorsPolicy = "ReactNativePolicy";
-        public const string SwaggerTitle         = "Sports Management API";
-        public const string SwaggerDescription   = "Backend API for the Sports Management React Native app.";
-        public const string SwaggerEndpoint      = "/swagger/v1/swagger.json";
-        public const string SwaggerDisplayName   = "Sports Management API v1";
-        public const string TagEvents            = "Events";
-        public const string TagCategories        = "Categories";
-        public const string TagMatches           = "Matches";
-        public const string EventCreated         = "Event created successfully.";
-        public const string OrganizerAssigned    = "Organizer assigned successfully.";
-        public const string FixturesGenerated    = "Fixtures generated successfully.";
-        public const string FixturesDeleted      = "All fixtures deleted successfully.";
-        public const string ScheduleUpdated      = "Match schedule updated successfully.";
-        public const string SetScoreSubmitted    = "Set score submitted successfully.";
-        public const string ResultSubmitted      = "Match result submitted successfully.";
+        public const int    OrganizerRoleId        = 2;
+        public const int    ScheduleOverlapMinutes = 60;
+        public const string ReactNativeCorsPolicy  = "ReactNativePolicy";
+        public const string SwaggerTitle           = "Sports Management API";
+        public const string SwaggerDescription     = "Backend API for the Sports Management React Native app.";
+        public const string TagEvents              = "Events";
+        public const string TagCategories          = "Categories";
+        public const string TagMatches             = "Matches";
+        public const string EventCreated           = "Event created successfully.";
+        public const string OrganizerAssigned      = "Organizer assigned successfully.";
+        public const string FixturesGenerated      = "Fixtures generated successfully.";
+        public const string FixturesDeleted        = "All fixtures deleted successfully.";
+        public const string ScheduleUpdated        = "Match schedule updated successfully.";
+        public const string SetScoreSubmitted      = "Set score submitted successfully.";
+        public const string ResultSubmitted        = "Match result submitted successfully.";
         public const string EventRequestIdRequired        = "EventRequestId is required.";
         public const string EventNameTooLong              = "Event name cannot exceed 100 characters.";
         public const string RegistrationDeadlineRequired  = "Registration deadline is required.";
@@ -31,6 +25,7 @@ namespace SportsManagementApp.StringConstants
         public const string MaxParticipantsRange          = "MaxParticipantsCount must be between 2 and 10000.";
         public const string MatchDateTimeRequired         = "MatchDateTime is required.";
         public const string ScoreValidate                 = "Score must be 0 or greater.";
+        public const string RequiredValueMissing          = "A required value was missing.";
         public const string SetNotFound                   = "Set #{0} not found for match #{1}.";
         public const string SetNotLive                    = "Set #{0} is not Live. Only Live sets can be updated.";
         public const string SetAlreadyCompleted           = "Set #{0} is already completed and cannot be modified.";
@@ -62,7 +57,6 @@ namespace SportsManagementApp.StringConstants
         public const string UserNotFound                  = "User #{0} not found.";
         public const string UserInactive                  = "User '{0}' is inactive and cannot be assigned as organizer.";
         public const string UserNotOrganizer              = "User '{0}' does not hold the Organizer role.";
-        public const string RequiredValueMissing = "A required value was missing.";
         public const string UnexpectedError               = "An unexpected error occurred.";
         public const string UnauthorizedAccess            = "Unauthorized access.";
         public const string Unauthorized                  = "Unauthorized.";
