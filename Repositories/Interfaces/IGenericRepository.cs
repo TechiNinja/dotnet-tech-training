@@ -8,6 +8,7 @@ namespace SportsManagementApp.Repositories.Interfaces
         Task<List<T>> GetAllAsync();
         Task AddAsync(T entity);
         Task UpdateAsync(T entity);
+        Task<int> SaveChangesAsync();
         Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate);
     }
 }

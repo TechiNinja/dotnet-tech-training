@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SportsManagementApp.Data.Entities;
+using SportsManagementApp.Entities;
 using System;
 
 namespace SportsManagementApp.Data
@@ -7,7 +8,6 @@ namespace SportsManagementApp.Data
     public class AppDbContext : DbContext
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
-
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Sport> Sports { get; set; }
@@ -20,6 +20,8 @@ namespace SportsManagementApp.Data
         public DbSet<Match> Matches { get; set; }
         public DbSet<MatchSet> MatchSets { get; set; }
         public DbSet<Result> Results { get; set; }
+
+        public DbSet<Notification> Notifications {get; set;}
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

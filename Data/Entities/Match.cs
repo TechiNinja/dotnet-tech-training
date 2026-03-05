@@ -14,6 +14,7 @@ namespace SportsManagementApp.Data.Entities
         public int? SideAId { get; set; }
         public int? SideBId { get; set; }
         public MatchStatus Status { get; set; } = MatchStatus.Upcoming;
+        public int TotalSets {get;set;}
         public int RoundNumber { get; set; }
         public int MatchNumber { get; set; }
         public int BracketPosition { get; set; }

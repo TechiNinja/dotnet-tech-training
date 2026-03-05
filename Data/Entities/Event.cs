@@ -21,6 +21,8 @@ namespace SportsManagementApp.Data.Entities
         public string Description { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
+        public int EventRquestId {get; set;}
+        public EventRequest? EventRequest {get; set;}
         public ICollection<EventCategory> Categories { get; set; } = new List<EventCategory>();
     }
 }

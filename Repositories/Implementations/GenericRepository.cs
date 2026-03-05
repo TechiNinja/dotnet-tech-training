@@ -38,6 +38,11 @@ namespace SportsManagementApp.Repositories.Implementations
             await _context.SaveChangesAsync();
         }
 
+        public async Task<int> SaveChangesAsync()
+    {
+        return await _context.SaveChangesAsync();
+    }
+
         public async Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate)
         {
             return await _dbSet.AnyAsync(predicate);

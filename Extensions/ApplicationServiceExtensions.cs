@@ -1,4 +1,5 @@
-﻿using SportsManagementApp.Services.Implementations;
+﻿using SportsManagementApp.Services.EventRequestService.Implementations;
+using SportsManagementApp.Services.Implementations;
 using SportsManagementApp.Services.Interfaces;
 
 namespace SportsManagementApp.Extensions
@@ -15,6 +16,8 @@ namespace SportsManagementApp.Extensions
             services.AddScoped<ITeamsService, TeamsService>();
             services.AddScoped<IEventsService, EventsService>();
             services.AddScoped<IParticipantRegistrationService, ParticipantRegistrationService>();
+            services.AddScoped<IEventRequestService, EventRequestService>();
+         
 
             return services;
         }

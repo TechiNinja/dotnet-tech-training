@@ -7,6 +7,7 @@ namespace SportsManagementApp.Extensions
     {
         public static IServiceCollection AddRepositories(this IServiceCollection services)
         {
+            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IAuthRepository, AuthRepository>();
             services.AddScoped<IRoleRepository, RolesRepository>();
             services.AddScoped<ISportRepository, SportRepository>();
@@ -15,6 +16,7 @@ namespace SportsManagementApp.Extensions
             services.AddScoped<ITeamsRepository, TeamsRepository>();
             services.AddScoped<IEventsRepository, EventsRepository>();
             services.AddScoped<IParticipantRegistrationRepository, ParticipantRegistrationRepository>();
+            services.AddScoped<IEventRequestRepository, EventRequestRepository>();
 
             return services;
         }
