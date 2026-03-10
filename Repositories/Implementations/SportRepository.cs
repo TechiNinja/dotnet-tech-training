@@ -7,9 +7,9 @@ using System.Linq.Expressions;
 
 namespace SportsManagementApp.Repositories.Implementations
 {
-    public class SportRepository: GenericRepository<Sport>, ISportRepository
+    public class SportRepository : GenericRepository<Sport>, ISportRepository
     {
-        public SportRepository(AppDbContext context): base(context) { }
+        public SportRepository(AppDbContext context) : base(context) { }
 
         public async Task<bool> SportExistsAsync(string name)
         {
@@ -28,16 +28,9 @@ namespace SportsManagementApp.Repositories.Implementations
             return sport;
         }
 
-        public async Task<List<SportResponseDto>> GetSportsAsync(Expression<Func<Sport, bool>> predicate)
+        public async Task<List<SportResponseDto>> GetSportsAsync(Expression<Func<Sport, bool>> predicate, Expression<Func<Sport, SportResponseDto>> projection)
         {
-            return await _dbSet
-                .Where(predicate)
-                .Select(sport => new SportResponseDto
-                {
-                    Id = sport.Id,
-                    Name = sport.Name
-                })
-                .ToListAsync();
+            return await GetAllAsync(predicate, projection);
         }
 
         public async Task<Sport?> GetSportByIdAsync(int id)

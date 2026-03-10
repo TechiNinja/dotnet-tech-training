@@ -1,14 +1,12 @@
-﻿using SportsManagementApp.Data.DTOs.Participant;
-using SportsManagementApp.Data.DTOs.TeamManagement;
+﻿using SportsManagementApp.Data.DTOs.TeamManagement;
 using SportsManagementApp.Data.Entities;
-using SportsManagementApp.Data.Filters;
-using System.Collections;
+using System.Linq.Expressions;
 
 namespace SportsManagementApp.Repositories.Interfaces
 {
-    public interface ITeamsRepository: IGenericRepository<Team>
+    public interface ITeamsRepository : IGenericRepository<Team>
     {
         Task AddTeamAsync(Team team);
-        Task<List<TeamResponseDto>> GetTeamsByFilterAsync(TeamFilterDto filter);
+        Task<List<TeamResponseDto>> GetTeamsByFilterAsync(Expression<Func<Team, bool>> predicate, Expression<Func<Team, TeamResponseDto>> projection);
     }
 }

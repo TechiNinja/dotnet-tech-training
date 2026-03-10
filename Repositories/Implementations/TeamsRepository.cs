@@ -1,9 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SportsManagementApp.Data;
+﻿using SportsManagementApp.Data;
 using SportsManagementApp.Data.DTOs.TeamManagement;
 using SportsManagementApp.Data.Entities;
-using SportsManagementApp.Data.Filters;
 using SportsManagementApp.Repositories.Interfaces;
+using System.Linq.Expressions;
 
 namespace SportsManagementApp.Repositories.Implementations
 {
@@ -11,29 +10,9 @@ namespace SportsManagementApp.Repositories.Implementations
     {
         public TeamsRepository(AppDbContext context) : base(context) { }
 
-        public async Task<List<TeamResponseDto>> GetTeamsByFilterAsync(TeamFilterDto filter)
+        public async Task<List<TeamResponseDto>> GetTeamsByFilterAsync(Expression<Func<Team, bool>> predicate, Expression<Func<Team, TeamResponseDto>> projection)
         {
-            var query = _dbSet.Include(team => team.Members)
-                              .ThenInclude(m => m.User)
-                              .AsQueryable();
-
-            if (filter.UserId.HasValue)
-                query = query.Where(team => team.Members.Any(m => m.UserId == filter.UserId.Value));
-
-            if (filter.CategoryId.HasValue)
-                query = query.Where(team => team.EventCategoryId == filter.CategoryId.Value);
-
-            return await query
-                .Select(team => new TeamResponseDto
-                {
-                    Id = team.Id,
-                    Name = team.Name,
-                    EventCategoryId = team.EventCategoryId,
-                    Members = team.Members
-                                 .Select(m => m.User != null ? m.User.FullName : "N/A")
-                                 .ToList()
-                })
-                .ToListAsync();
+            return await GetAllAsync(predicate, projection);
         }
 
         public async Task AddTeamAsync(Team team)

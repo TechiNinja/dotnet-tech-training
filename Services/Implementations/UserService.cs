@@ -4,6 +4,8 @@ using SportsManagementApp.Data.DTOs.Auth;
 using SportsManagementApp.Data.DTOs.UserManagement;
 using SportsManagementApp.Data.Entities;
 using SportsManagementApp.Data.Filters;
+using SportsManagementApp.Data.Predicates;
+using SportsManagementApp.Data.Projections;
 using SportsManagementApp.Exceptions;
 using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services.Interfaces;
@@ -30,7 +32,10 @@ namespace SportsManagementApp.Services.Implementations
 
         public async Task<List<UserResponseDto>> GetUsersByFilterAsync(UserFilterDto filter)
         {
-            return await _userRepository.GetUsersByFilterAsync(filter);
+            return await _userRepository.GetUsersByFilterAsync(
+                UserPredicateBuilder.Build(filter),
+                UserProjectionBuilder.Build()
+            );
         }
 
         public async Task<UserResponseDto?> GetUserByIdAsync(int userId)
@@ -41,8 +46,10 @@ namespace SportsManagementApp.Services.Implementations
 
         public async Task<UserResponseDto> CreateUserAsync(CreateUserDto createUser)
         {
-            var existingUser = await _userRepository
-                .GetUsersByFilterAsync(new UserFilterDto { SearchTerm = createUser.Email });
+            var existingUser = await _userRepository.GetUsersByFilterAsync(
+                UserPredicateBuilder.Build(new UserFilterDto { SearchTerm = createUser.Email }),
+                UserProjectionBuilder.Build()
+            );
 
             if (existingUser.Any(user => user.Email.Equals(createUser.Email, StringComparison.OrdinalIgnoreCase)))
                 throw new ConflictException("User with this email already exists");
@@ -53,7 +60,7 @@ namespace SportsManagementApp.Services.Implementations
             user.PasswordHash = _passwordHasher.HashPassword(user, createUser.Password);
 
             await _userRepository.AddAsync(user);
-            var savedUser = await _userRepository.GetUserDtoByIdAsync(user.Id);
+            var savedUser = await _userRepository.GetUserDtoByIdAsync(user.Id, UserProjectionBuilder.Build());
             return savedUser!;
         }
 
@@ -72,7 +79,7 @@ namespace SportsManagementApp.Services.Implementations
 
             await _userRepository.UpdateAsync(user);
 
-            var updatedUserDto = await _userRepository.GetUserDtoByIdAsync(user.Id);
+            var updatedUserDto = await _userRepository.GetUserDtoByIdAsync(user.Id, UserProjectionBuilder.Build());
             return updatedUserDto!;
         }
     }

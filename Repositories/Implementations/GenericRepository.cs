@@ -26,6 +26,14 @@ namespace SportsManagementApp.Repositories.Implementations
             return await _dbSet.ToListAsync();
         }
 
+        public async Task<List<TDto>> GetAllAsync<TDto>(Expression<Func<T, bool>> predicate, Expression<Func<T, TDto>> projection)
+        {
+            return await _dbSet
+                .Where(predicate)
+                .Select(projection)
+                .ToListAsync();
+        }
+
         public async Task AddAsync(T entity)
         {
             _dbSet.Add(entity);
@@ -39,13 +47,13 @@ namespace SportsManagementApp.Repositories.Implementations
         }
 
         public async Task<int> SaveChangesAsync()
-    {
-        return await _context.SaveChangesAsync();
-    }
+        {
+            return await _context.SaveChangesAsync();
+        }
 
         public async Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate)
         {
             return await _dbSet.AnyAsync(predicate);
         }
-     }
+    }
 }

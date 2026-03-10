@@ -2,13 +2,14 @@
 using SportsManagementApp.Data.Entities;
 using SportsManagementApp.Data.Filters;
 using SportsManagementApp.Data.Predicates;
+using SportsManagementApp.Data.Projections;
 using SportsManagementApp.Exceptions;
 using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services.Interfaces;
 
 namespace SportsManagementApp.Services.Implementations
 {
-    public class SportService: ISportService
+    public class SportService : ISportService
     {
         private readonly ISportRepository _sportRepository;
 
@@ -36,8 +37,10 @@ namespace SportsManagementApp.Services.Implementations
 
         public async Task<List<SportResponseDto>> GetSportsAsync(SportFilterDto filter)
         {
-            var predicate = SportPredicateBuilder.Build(filter);
-            return await _sportRepository.GetSportsAsync(predicate);
+            return await _sportRepository.GetSportsAsync(
+                SportPredicateBuilder.Build(filter),
+                SportProjectionBuilder.Build()
+            );
         }
 
         public async Task<Sport> UpdateSportAsync(int id, UpdateSportDto updateSport)

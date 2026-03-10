@@ -2,10 +2,8 @@
 using SportsManagementApp.Data;
 using SportsManagementApp.Data.DTOs.UserManagement;
 using SportsManagementApp.Data.Entities;
-using SportsManagementApp.Data.Filters;
-using SportsManagementApp.Data.Predicates;
-using SportsManagementApp.Data.Projections;
 using SportsManagementApp.Repositories.Interfaces;
+using System.Linq.Expressions;
 
 namespace SportsManagementApp.Repositories.Implementations
 {
@@ -26,23 +24,17 @@ namespace SportsManagementApp.Repositories.Implementations
                 .FirstOrDefaultAsync(user => user.Id == userId);
         }
 
-        public async Task<UserResponseDto?> GetUserDtoByIdAsync(int userId)
+        public async Task<UserResponseDto?> GetUserDtoByIdAsync(int userId, Expression<Func<User, UserResponseDto>> projection)
         {
             return await _dbSet
                 .Where(user => user.Id == userId)
-                .Select(UserProjectionBuilder.Build())
+                .Select(projection)
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<List<UserResponseDto>> GetUsersByFilterAsync(UserFilterDto filter)
+        public async Task<List<UserResponseDto>> GetUsersByFilterAsync(Expression<Func<User, bool>> predicate, Expression<Func<User, UserResponseDto>> projection)
         {
-            var predicate = UserPredicateBuilder.Build(filter);
-
-            return await _dbSet
-                .Include(user => user.Role)
-                .Where(predicate)
-                .Select(UserProjectionBuilder.Build())
-                .ToListAsync();
+            return await GetAllAsync(predicate, projection);
         }
     }
 }
