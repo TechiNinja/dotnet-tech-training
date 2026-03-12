@@ -14,8 +14,10 @@ public class EventRequestResponseDto
     public DateOnly EndDate { get; set; }
     public RequestStatus Status { get; set; }
     public string Remarks { get; set; } = string.Empty;
-    public int AdminId { get; set; }      
+    public int AdminId { get; set; }    
+    public string AdminName {get;set;}  = string.Empty;
     public int? OperationsReviewerId { get; set; } 
+    public string? OperationsReviewerName { get; set; } = string.Empty;
     public DateTime CreatedDate { get; set; }
     public DateTime? UpdatedDate { get; set; }
 }

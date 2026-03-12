@@ -11,7 +11,7 @@ namespace SportsManagementApp.Repositories.Implementations
 
         public async Task<List<Role>> GetRolesAsync()
         {
-            return await GetAllAsync();
+            return await _dbSet.ToListAsync();
         }
 
         public async Task<Role?> GetRoleByTypeAsync(string roleName)

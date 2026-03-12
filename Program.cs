@@ -8,6 +8,8 @@ using System.Text.Json.Serialization;
 using SportsManagementApp.Middlewares;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Models;
+using SportsManagementApp.Common.Middleware;
+using SportsManagementApp.Hubs;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -79,8 +81,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddAuthorization();
+builder.Services.AddSignalR();
+
+builder.Services.AddScoped<ExceptionHandlingMiddleware>();
 
 var app = builder.Build();
+
 
 if (app.Environment.IsDevelopment())
 {
@@ -88,9 +94,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// await DataSeeder.SeedAdminAsync(app.Services);
+
+app.UseRouting(); 
 app.UseHttpsRedirection();
 app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.MapControllers();
+app.MapHub<NotificationHub>("/hubs/notifications");
 app.Run();

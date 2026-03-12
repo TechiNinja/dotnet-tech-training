@@ -1,7 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using SportsManagementApp.Data;
+using SportsManagementApp.Data.DTOs;
 using SportsManagementApp.Data.Entities;
-using SportsManagementApp.Enums;
+using SportsManagementApp.Data.Filters;
+using SportsManagementApp.Data.Predicates;
+using SportsManagementApp.Data.Projections;
 using SportsManagementApp.Repositories.Interfaces;
 
 namespace SportsManagementApp.Repositories.Implementations;
@@ -9,27 +12,34 @@ namespace SportsManagementApp.Repositories.Implementations;
 public class EventRequestRepository : GenericRepository<EventRequest>, IEventRequestRepository
 {
     public EventRequestRepository(AppDbContext context) : base(context) { }
-    public async Task<EventRequest?> GetEventRequestById(int id)
+
+    public async Task<EventRequest?> GetEventRequestByIdAsync(int id)
     {
         return await _context.EventRequests
             .Include(e => e.Sport)
-            .FirstOrDefaultAsync(x => x.Id == id);
+            .Include(e => e.OperationsReviewer)
+            .Include(e => e.Admin)
+            .FirstOrDefaultAsync(e => e.Id == id);
     }
 
-    public async Task<IEnumerable<EventRequest>> Search(int? id, RequestStatus? status)
+    public async Task<EventRequestResponseDto?> GetEventRequestDtoByIdAsync(int id)
     {
-        var query = _context.EventRequests
-            .Include(e => e.Sport)
-            .AsQueryable();
+        return await _context.EventRequests
+            .AsNoTracking()
+            .Where(e => e.Id == id)
+            .Select(EventRequestProjectionBuilder.Build())
+            .FirstOrDefaultAsync();
+    }
 
-        if (id.HasValue){
-            query = query.Where(e => e.Id == id.Value);
-        }
+    public async Task<List<EventRequestResponseDto>> GetEventRequestsByFilterAsync(EventRequestFilterDto filter)
+    {
+        var predicate = EventRequestPredicateBuilder.Build(filter);
 
-        if (status.HasValue){
-            query = query.Where(e => e.Status == status.Value);
-        }
-
-        return await query.ToListAsync();
+        return await _context.EventRequests
+            .AsNoTracking()
+            .Where(predicate)
+            .OrderByDescending(e => e.CreatedDate)
+            .Select(EventRequestProjectionBuilder.Build())
+            .ToListAsync();
     }
 }

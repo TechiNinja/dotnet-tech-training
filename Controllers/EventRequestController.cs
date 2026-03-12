@@ -1,95 +1,80 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SportsManagementApp.Common.Exceptions;
+using SportsManagementApp.Common.Helper;
 using SportsManagementApp.Data.DTOs;
+using SportsManagementApp.Data.Filters;
 using SportsManagementApp.Enums;
+using SportsManagementApp.Extensions;
 using SportsManagementApp.Services.Interfaces;
 
 namespace SportsManagementApp.Controllers;
 
-[Route("api/[controller]")]
 [ApiController]
-[Authorize(Roles = "Admin")]
+[Route("api/event-requests")]
+[Authorize]
 public class EventRequestsController : ControllerBase
 {
     private readonly IEventRequestService _eventRequestService;
+
     public EventRequestsController(IEventRequestService eventRequestService)
     {
         _eventRequestService = eventRequestService;
     }
 
+
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     [ProducesResponseType(typeof(EventRequestResponseDto), StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<EventRequestResponseDto>> RaiseEventRequest(CreateEventRequestDto dto)
+    public async Task<ActionResult<EventRequestResponseDto>> RaiseEventRequest([FromBody] CreateEventRequestDto dto)
     {
-        try
-        {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var adminId = User.GetUserId();
+        var created = await _eventRequestService.RaiseEventRequestAsync(dto, adminId);
 
-    if (!int.TryParse(userId, out int adminId))
-        return Unauthorized("Invalid user.");
-
-            var result = await _eventRequestService.RaiseEventRequest(dto, adminId);
-
-            return CreatedAtAction(nameof(RaiseEventRequest), new { id = result.Id }, result);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.InnerException?.Message ?? ex.Message);
-        }
+        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
+    [Authorize(Roles = "Admin")]
+    [HttpGet("{id:int}")]
+    [ProducesResponseType(typeof(EventRequestResponseDto), StatusCodes.Status200OK)]
+    public async Task<ActionResult<EventRequestResponseDto>> GetById(int id)
+    {
+        var adminId = User.GetUserId();
+        var result = await _eventRequestService.GetByIdForAdminAsync(id, adminId);
+
+        return Ok(result);
+    }
+
+    [Authorize(Roles = "Admin,OpsTeam")]
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<EventRequestResponseDto>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<EventRequestResponseDto>>> GetEventSearch(
-[FromQuery] int? id,
-[FromQuery] RequestStatus? status)
+    public async Task<ActionResult<IEnumerable<EventRequestResponseDto>>> Search(
+    [FromQuery] EventRequestFilterDto filter)
     {
-        try
-        {
-            var result = await _eventRequestService.SearchEventRequests(id, status);
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.InnerException?.Message ?? ex.Message);
-        }
+        var result = await _eventRequestService.SearchEventRequestsAsync(filter);
+        return Ok(result);
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id:int}")]
     [ProducesResponseType(typeof(EventRequestResponseDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<EventRequestResponseDto>> EditEventRequest(int id, EditEventRequestDto dto)
+    public async Task<ActionResult<EventRequestResponseDto>> EditEventRequest(int id, [FromBody] EditEventRequestDto dto)
     {
-        try
-        {
-            var result = await _eventRequestService.EditEventRequest(id, dto);
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.InnerException?.Message ?? ex.Message);
-        }
+        var adminId = User.GetUserId();
+        var updated = await _eventRequestService.EditEventRequestAsync(id, dto, adminId);
+
+        return Ok(updated);
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPatch("{id:int}/withdraw")]
     [ProducesResponseType(typeof(EventRequestResponseDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<EventRequestResponseDto>> WithdrawEventRequest(int id)
     {
-        try
-        {
-            var result = await _eventRequestService.WithdrawEventRequest(id);
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.InnerException?.Message ?? ex.Message);
-        }
+        var adminId = User.GetUserId();
+        var updated = await _eventRequestService.WithdrawEventRequestAsync(id, adminId);
+
+        return Ok(updated);
     }
 }
-
-
