@@ -46,7 +46,7 @@ public class EventRequestsController : ControllerBase
         return Ok(result);
     }
 
-    [Authorize(Roles = "Admin,OpsTeam")]
+    [Authorize(Roles = "Admin,Operations")]
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<EventRequestResponseDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<EventRequestResponseDto>>> Search(

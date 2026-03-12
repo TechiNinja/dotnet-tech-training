@@ -11,7 +11,7 @@ namespace SportsManagementApp.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize(Roles = "OpsTeam")]
+[Authorize(Roles = "Operations")]
 public class OperationController : ControllerBase
 {
     private readonly IOperationsService _operationsService;

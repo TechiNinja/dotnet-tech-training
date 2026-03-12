@@ -11,15 +11,18 @@ public class OperationsService : IOperationsService
 {
     private readonly IOperationsRepository _operationsRepository;
     private readonly INotificationService _notificationService;
+    private readonly IEventRequestRepository _eventRequestRepository;
     private readonly IMapper _mapper;
 
     public OperationsService(
         IOperationsRepository operationRepository,
         INotificationService notificationService,
+        IEventRequestRepository eventRequestRepository,
         IMapper mapper)
     {
         _operationsRepository = operationRepository;
         _notificationService = notificationService;
+        _eventRequestRepository = eventRequestRepository;
         _mapper = mapper;
     }
 
@@ -32,7 +35,7 @@ public class OperationsService : IOperationsService
         if (status != RequestStatus.Approved && status != RequestStatus.Rejected)
             throw new ValidationAppException("Only Approved or Rejected decisions are allowed.");
 
-        var request = await _operationsRepository.GetEventRequestByIdAsync(requestId);
+        var request = await _eventRequestRepository.GetEventRequestByIdAsync(requestId);
         if (request == null)
             throw new NotFoundAppException("Event request not found.");
 
