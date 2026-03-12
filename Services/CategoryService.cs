@@ -10,13 +10,13 @@ namespace SportsManagementApp.Services
     public class CategoryService : ICategoryService
     {
         private readonly IEventCategoryRepository _categoryRepo;
-        private readonly IMatchRepository         _matchRepo;
-        private readonly IMapper                  _mapper;
+        private readonly IMatchRepository _matchRepo;
+        private readonly IMapper _mapper;
 
         public CategoryService(
             IEventCategoryRepository categoryRepo,
-            IMatchRepository         matchRepo,
-            IMapper                  mapper)
+            IMatchRepository matchRepo,
+            IMapper mapper)
         {
             _categoryRepo = categoryRepo;
             _matchRepo    = matchRepo;

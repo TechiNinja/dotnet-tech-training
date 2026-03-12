@@ -22,7 +22,7 @@ namespace SportsManagementApp.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("SportsManagementApp.Entities.Event", b =>
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.Event", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -89,7 +89,7 @@ namespace SportsManagementApp.Migrations
                     b.ToTable("Events");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Entities.EventCategory", b =>
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.EventCategory", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -122,7 +122,7 @@ namespace SportsManagementApp.Migrations
                     b.ToTable("EventCategories");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Entities.EventRequest", b =>
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.EventRequest", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -189,7 +189,7 @@ namespace SportsManagementApp.Migrations
                     b.ToTable("EventRequests");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Entities.Match", b =>
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.Match", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -242,7 +242,7 @@ namespace SportsManagementApp.Migrations
                     b.ToTable("Matches");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Entities.MatchSet", b =>
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.MatchSet", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -278,7 +278,38 @@ namespace SportsManagementApp.Migrations
                     b.ToTable("MatchSets");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Entities.ParticipantRegistration", b =>
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EventRequestId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventRequestId");
+
+                    b.ToTable("Notifications");
+                });
+
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.ParticipantRegistration", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -308,7 +339,7 @@ namespace SportsManagementApp.Migrations
                     b.ToTable("ParticipantRegistrations");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Entities.Result", b =>
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.Result", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -336,7 +367,7 @@ namespace SportsManagementApp.Migrations
                     b.ToTable("Results");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Entities.Role", b =>
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.Role", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -359,7 +390,7 @@ namespace SportsManagementApp.Migrations
                     b.ToTable("Roles");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Entities.Sport", b =>
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.Sport", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -382,7 +413,7 @@ namespace SportsManagementApp.Migrations
                     b.ToTable("Sports");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Entities.Team", b =>
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.Team", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -411,7 +442,7 @@ namespace SportsManagementApp.Migrations
                     b.ToTable("Teams");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Entities.TeamMember", b =>
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.TeamMember", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -440,7 +471,7 @@ namespace SportsManagementApp.Migrations
                     b.ToTable("TeamMembers");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Entities.User", b =>
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -481,21 +512,21 @@ namespace SportsManagementApp.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Entities.Event", b =>
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.Event", b =>
                 {
-                    b.HasOne("SportsManagementApp.Entities.EventRequest", "EventRequest")
+                    b.HasOne("SportsManagementApp.Data.Entities.EventRequest", "EventRequest")
                         .WithOne("Event")
-                        .HasForeignKey("SportsManagementApp.Entities.Event", "EventRequestId")
+                        .HasForeignKey("SportsManagementApp.Data.Entities.Event", "EventRequestId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("SportsManagementApp.Entities.User", "Organizer")
+                    b.HasOne("SportsManagementApp.Data.Entities.User", "Organizer")
                         .WithMany()
                         .HasForeignKey("OrganizerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SportsManagementApp.Entities.Sport", "Sport")
+                    b.HasOne("SportsManagementApp.Data.Entities.Sport", "Sport")
                         .WithMany("Events")
                         .HasForeignKey("SportId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -508,9 +539,9 @@ namespace SportsManagementApp.Migrations
                     b.Navigation("Sport");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Entities.EventCategory", b =>
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.EventCategory", b =>
                 {
-                    b.HasOne("SportsManagementApp.Entities.Event", "Event")
+                    b.HasOne("SportsManagementApp.Data.Entities.Event", "Event")
                         .WithMany("Categories")
                         .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -519,20 +550,20 @@ namespace SportsManagementApp.Migrations
                     b.Navigation("Event");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Entities.EventRequest", b =>
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.EventRequest", b =>
                 {
-                    b.HasOne("SportsManagementApp.Entities.User", "Admin")
+                    b.HasOne("SportsManagementApp.Data.Entities.User", "Admin")
                         .WithMany()
                         .HasForeignKey("AdminId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SportsManagementApp.Entities.User", "OperationsReviewer")
+                    b.HasOne("SportsManagementApp.Data.Entities.User", "OperationsReviewer")
                         .WithMany()
                         .HasForeignKey("OperationsReviewerId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("SportsManagementApp.Entities.Sport", "Sport")
+                    b.HasOne("SportsManagementApp.Data.Entities.Sport", "Sport")
                         .WithMany()
                         .HasForeignKey("SportId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -545,9 +576,9 @@ namespace SportsManagementApp.Migrations
                     b.Navigation("Sport");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Entities.Match", b =>
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.Match", b =>
                 {
-                    b.HasOne("SportsManagementApp.Entities.EventCategory", "EventCategory")
+                    b.HasOne("SportsManagementApp.Data.Entities.EventCategory", "EventCategory")
                         .WithMany("Matches")
                         .HasForeignKey("EventCategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -556,9 +587,9 @@ namespace SportsManagementApp.Migrations
                     b.Navigation("EventCategory");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Entities.MatchSet", b =>
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.MatchSet", b =>
                 {
-                    b.HasOne("SportsManagementApp.Entities.Match", "Match")
+                    b.HasOne("SportsManagementApp.Data.Entities.Match", "Match")
                         .WithMany("MatchSets")
                         .HasForeignKey("MatchId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -567,15 +598,26 @@ namespace SportsManagementApp.Migrations
                     b.Navigation("Match");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Entities.ParticipantRegistration", b =>
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.Notification", b =>
                 {
-                    b.HasOne("SportsManagementApp.Entities.EventCategory", "EventCategory")
+                    b.HasOne("SportsManagementApp.Data.Entities.EventRequest", "EventRequest")
+                        .WithMany("EventRegistrations")
+                        .HasForeignKey("EventRequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EventRequest");
+                });
+
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.ParticipantRegistration", b =>
+                {
+                    b.HasOne("SportsManagementApp.Data.Entities.EventCategory", "EventCategory")
                         .WithMany("EventRegistrations")
                         .HasForeignKey("EventCategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("SportsManagementApp.Entities.User", "User")
+                    b.HasOne("SportsManagementApp.Data.Entities.User", "User")
                         .WithMany("Registrations")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -586,20 +628,20 @@ namespace SportsManagementApp.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Entities.Result", b =>
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.Result", b =>
                 {
-                    b.HasOne("SportsManagementApp.Entities.Match", "Match")
+                    b.HasOne("SportsManagementApp.Data.Entities.Match", "Match")
                         .WithOne("Result")
-                        .HasForeignKey("SportsManagementApp.Entities.Result", "MatchId")
+                        .HasForeignKey("SportsManagementApp.Data.Entities.Result", "MatchId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Match");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Entities.Team", b =>
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.Team", b =>
                 {
-                    b.HasOne("SportsManagementApp.Entities.EventCategory", "EventCategory")
+                    b.HasOne("SportsManagementApp.Data.Entities.EventCategory", "EventCategory")
                         .WithMany("Teams")
                         .HasForeignKey("EventCategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -608,15 +650,15 @@ namespace SportsManagementApp.Migrations
                     b.Navigation("EventCategory");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Entities.TeamMember", b =>
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.TeamMember", b =>
                 {
-                    b.HasOne("SportsManagementApp.Entities.Team", "Team")
+                    b.HasOne("SportsManagementApp.Data.Entities.Team", "Team")
                         .WithMany("Members")
                         .HasForeignKey("TeamId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SportsManagementApp.Entities.User", "User")
+                    b.HasOne("SportsManagementApp.Data.Entities.User", "User")
                         .WithMany("TeamMembers")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -627,9 +669,9 @@ namespace SportsManagementApp.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Entities.User", b =>
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.User", b =>
                 {
-                    b.HasOne("SportsManagementApp.Entities.Role", "Role")
+                    b.HasOne("SportsManagementApp.Data.Entities.Role", "Role")
                         .WithMany("Users")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -638,12 +680,12 @@ namespace SportsManagementApp.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Entities.Event", b =>
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.Event", b =>
                 {
                     b.Navigation("Categories");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Entities.EventCategory", b =>
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.EventCategory", b =>
                 {
                     b.Navigation("EventRegistrations");
 
@@ -652,34 +694,36 @@ namespace SportsManagementApp.Migrations
                     b.Navigation("Teams");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Entities.EventRequest", b =>
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.EventRequest", b =>
                 {
                     b.Navigation("Event");
+
+                    b.Navigation("EventRegistrations");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Entities.Match", b =>
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.Match", b =>
                 {
                     b.Navigation("MatchSets");
 
                     b.Navigation("Result");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Entities.Role", b =>
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.Role", b =>
                 {
                     b.Navigation("Users");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Entities.Sport", b =>
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.Sport", b =>
                 {
                     b.Navigation("Events");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Entities.Team", b =>
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.Team", b =>
                 {
                     b.Navigation("Members");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Entities.User", b =>
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.User", b =>
                 {
                     b.Navigation("Registrations");
 

@@ -3,7 +3,7 @@ using SportsManagementApp.DTOs.Request;
 using SportsManagementApp.DTOs.Response;
 using SportsManagementApp.Enums;
 using SportsManagementApp.Exceptions;
-using SportsManagementApp.Entities;
+using SportsManagementApp.Data.Entities;
 using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services.Interfaces;
 using SportsManagementApp.Services.Strategies;
@@ -14,18 +14,18 @@ namespace SportsManagementApp.Services
     public class FixtureService : IFixtureService
     {
         private readonly IEventCategoryRepository _categoryRepo;
-        private readonly IMatchRepository         _matchRepo;
+        private readonly IMatchRepository _matchRepo;
         private readonly IFixtureStrategyResolver _strategyResolver;
-        private readonly IMapper                  _mapper;
+        private readonly IMapper _mapper;
 
         public FixtureService(
             IEventCategoryRepository categoryRepo,
-            IMatchRepository         matchRepo,
+            IMatchRepository matchRepo,
             IFixtureStrategyResolver strategyResolver,
-            IMapper                  mapper)
+            IMapper mapper)
         {
-            _categoryRepo     = categoryRepo;
-            _matchRepo        = matchRepo;
+            _categoryRepo = categoryRepo;
+            _matchRepo = matchRepo;
             _strategyResolver = strategyResolver;
             _mapper           = mapper;
         }
@@ -64,12 +64,11 @@ namespace SportsManagementApp.Services
             return FixtureMapper.MapFixtures(matches, category, _mapper);
         }
 
-        public async Task<IEnumerable<FixtureResponse>> BulkScheduleAsync(int catId, BulkScheduleRequest request)
-        {
+        public async Task<IEnumerable<FixtureResponse>> BulkScheduleAsync(int catId, List<MatchScheduleItem> schedules)        {
             var category = await _categoryRepo.GetByIdWithDetailsAsync(catId)
                 ?? throw new NotFoundException(string.Format(AppConstants.CategoryNotFound, catId));
 
-            foreach (var item in request.Schedules)
+            foreach (var item in schedules)
             {
                 var match = await _matchRepo.GetByIdWithSetsAndResultAsync(item.MatchId)
                     ?? throw new NotFoundException(string.Format(AppConstants.MatchNotFound, item.MatchId));
@@ -86,6 +85,7 @@ namespace SportsManagementApp.Services
 
                 match.MatchDateTime = item.MatchDateTime;
                 match.MatchVenue    = category.Event?.EventVenue ?? string.Empty;
+                match.TotalSets     = item.TotalSets;
                 match.UpdatedAt     = DateTime.UtcNow;
                 _matchRepo.Update(match);
             }

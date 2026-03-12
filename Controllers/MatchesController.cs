@@ -22,15 +22,10 @@ namespace SportsManagementApp.Controllers
         }
 
         [HttpGet("{id:int}")]
-        [ProducesResponseType(typeof(FixtureResponse), 200)]
-        [ProducesResponseType(404)]
         public async Task<IActionResult> GetMatchById(int id) =>
             Ok(await _categoryService.GetMatchByIdAsync(id));
 
         [HttpPatch("{id:int}/sets")]
-        [ProducesResponseType(typeof(SetUpdateResponse), 200)]
-        [ProducesResponseType(400)][ProducesResponseType(404)]
-        [ProducesResponseType(409)][ProducesResponseType(422)]
         public async Task<IActionResult> UpdateSetScore(int id, [FromBody] MatchSetRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -38,8 +33,6 @@ namespace SportsManagementApp.Controllers
         }
 
         [HttpGet("{id:int}/sets")]
-        [ProducesResponseType(typeof(IEnumerable<MatchSetResponse>), 200)]
-        [ProducesResponseType(404)]
         public async Task<IActionResult> GetAllSets(int id) =>
             Ok(await _matchService.GetSetsAsync(id));
     }

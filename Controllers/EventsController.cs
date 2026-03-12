@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SportsManagementApp.DTOs.Request;
 using SportsManagementApp.DTOs.Response;
@@ -6,6 +7,7 @@ using SportsManagementApp.StringConstants;
 
 namespace SportsManagementApp.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/events")]
     [Produces("application/json")]
@@ -13,27 +15,26 @@ namespace SportsManagementApp.Controllers
     public class EventsController : ControllerBase
     {
         private readonly IEventService _eventService;
+        private readonly IEventsService _eventsService;
 
-        public EventsController(IEventService eventService) =>
+        public EventsController(IEventService eventService, IEventsService eventsService)
+        {
             _eventService = eventService;
+            _eventsService = eventsService;
+        }
 
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<EventResponse>), 200)]
-        [ProducesResponseType(400)]
         public async Task<IActionResult> GetAll(
-            [FromQuery] int?    id,
+            [FromQuery] int? id,
             [FromQuery] string? name,
             [FromQuery] string? status,
-            [FromQuery] int?    sportId)
+            [FromQuery] int? sportId)
         {
             var filter = new EventFilterRequest { Id = id, Name = name, Status = status, SportId = sportId };
             return Ok(await _eventService.GetAllAsync(filter));
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(EventResponse), 201)]
-        [ProducesResponseType(400)][ProducesResponseType(404)]
-        [ProducesResponseType(409)][ProducesResponseType(422)]
         public async Task<IActionResult> CreateEvent([FromBody] CreateEventRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -42,24 +43,24 @@ namespace SportsManagementApp.Controllers
         }
 
         [HttpGet("request/{requestId:int}")]
-        [ProducesResponseType(typeof(EventRequestPreFillResponse), 200)]
-        [ProducesResponseType(404)][ProducesResponseType(422)]
         public async Task<IActionResult> GetEventRequest(int requestId) =>
             Ok(await _eventService.GetEventRequestForPreFillAsync(requestId));
 
         [HttpPatch("{id:int}/organizer")]
-        [ProducesResponseType(typeof(EventResponse), 200)]
-        [ProducesResponseType(400)][ProducesResponseType(404)][ProducesResponseType(422)]
-        public async Task<IActionResult> AssignOrganizer(int id, [FromBody] AssignOrganizerRequest request)
+        public async Task<IActionResult> AssignOrganizer(int id, [FromBody] int organizerId)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-            return Ok(await _eventService.AssignOrganizerAsync(id, request));
+            return Ok(await _eventService.AssignOrganizerAsync(id, organizerId));
         }
 
         [HttpGet("{id:int}/categories")]
-        [ProducesResponseType(typeof(IEnumerable<EventCategoryResponse>), 200)]
-        [ProducesResponseType(404)]
         public async Task<IActionResult> GetCategories(int id) =>
             Ok(await _eventService.GetCategoriesByEventIdAsync(id));
+
+        [HttpGet("user/{userId:int}")]
+        public async Task<IActionResult> GetUserEvents(int userId)
+        {
+            var events = await _eventsService.GetUserEventsAsync(userId);
+            return Ok(events);
+        }
     }
 }

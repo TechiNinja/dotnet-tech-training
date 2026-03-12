@@ -1,7 +1,7 @@
 using AutoMapper;
 using SportsManagementApp.DTOs.Request;
 using SportsManagementApp.DTOs.Response;
-using SportsManagementApp.Entities;
+using SportsManagementApp.Data.Entities;
 using SportsManagementApp.Enums;
 using SportsManagementApp.Exceptions;
 using SportsManagementApp.Repositories.Interfaces;
@@ -13,7 +13,7 @@ namespace SportsManagementApp.Services
     public class MatchService : IMatchService
     {
         private readonly IMatchRepository _matchRepo;
-        private readonly IMapper          _mapper;
+        private readonly IMapper _mapper;
 
         public MatchService(IMatchRepository matchRepo, IMapper mapper)
         {

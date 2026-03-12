@@ -1,24 +1,24 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SportsManagementApp.Entities;
-
+using SportsManagementApp.Data.Entities;
 namespace SportsManagementApp.Data
 {
     public class AppDbContext : DbContext
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-        public DbSet<User>                    Users                    { get; set; }
-        public DbSet<Role>                    Roles                    { get; set; }
-        public DbSet<Sport>                   Sports                   { get; set; }
-        public DbSet<EventRequest>            EventRequests            { get; set; }
-        public DbSet<Event>                   Events                   { get; set; }
-        public DbSet<EventCategory>           EventCategories          { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Role> Roles { get; set; }
+        public DbSet<Sport> Sports { get; set; }
+        public DbSet<EventRequest> EventRequests { get; set; }
+        public DbSet<Event> Events { get; set; }
+        public DbSet<EventCategory> EventCategories { get; set; }
         public DbSet<ParticipantRegistration> ParticipantRegistrations { get; set; }
-        public DbSet<Team>                    Teams                    { get; set; }
-        public DbSet<TeamMember>              TeamMembers              { get; set; }
-        public DbSet<Match>                   Matches                  { get; set; }
-        public DbSet<MatchSet>                MatchSets                { get; set; }
-        public DbSet<Result>                  Results                  { get; set; }
+        public DbSet<Team> Teams { get; set; }
+        public DbSet<TeamMember> TeamMembers { get; set; }
+        public DbSet<Match> Matches { get; set; }
+        public DbSet<MatchSet> MatchSets { get; set; }
+        public DbSet<Result> Results { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

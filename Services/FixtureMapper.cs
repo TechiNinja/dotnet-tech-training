@@ -1,6 +1,6 @@
 using AutoMapper;
 using SportsManagementApp.DTOs.Response;
-using SportsManagementApp.Entities;
+using SportsManagementApp.Data.Entities;
 using SportsManagementApp.Enums;
 
 namespace SportsManagementApp.Services
@@ -9,8 +9,8 @@ namespace SportsManagementApp.Services
     {
         public static IEnumerable<FixtureResponse> MapFixtures(
             IEnumerable<Match> matches,
-            EventCategory      category,
-            IMapper            mapper)
+            EventCategory category,
+            IMapper mapper)
         {
             var teamNames = category.Teams
                 .ToDictionary(t => t.Id, t => t.Name);

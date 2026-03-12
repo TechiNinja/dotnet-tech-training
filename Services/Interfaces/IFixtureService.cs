@@ -7,7 +7,7 @@ namespace SportsManagementApp.Services.Interfaces
     {
         Task<IEnumerable<FixtureResponse>> GenerateFixturesAsync(int catId);
         Task<IEnumerable<FixtureResponse>> GetFixturesAsync(int catId, string? status);
-        Task<IEnumerable<FixtureResponse>> BulkScheduleAsync(int catId, BulkScheduleRequest request);
-        Task                               DeleteFixturesAsync(int catId);
+        Task<IEnumerable<FixtureResponse>> BulkScheduleAsync(int catId, List<MatchScheduleItem> schedules);
+        Task DeleteFixturesAsync(int catId);
     }
 }

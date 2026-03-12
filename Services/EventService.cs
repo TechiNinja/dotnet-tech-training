@@ -1,7 +1,7 @@
 using AutoMapper;
 using SportsManagementApp.DTOs.Request;
 using SportsManagementApp.DTOs.Response;
-using SportsManagementApp.Entities;
+using SportsManagementApp.Data.Entities;
 using SportsManagementApp.Enums;
 using SportsManagementApp.Exceptions;
 using SportsManagementApp.Repositories.Interfaces;
@@ -12,16 +12,16 @@ namespace SportsManagementApp.Services
 {
     public class EventService : IEventService
     {
-        private readonly IEventRepository        _eventRepo;
+        private readonly IEventRepository _eventRepo;
         private readonly IEventRequestRepository _requestRepo;
-        private readonly IUserRepository         _userRepo;
-        private readonly IMapper                 _mapper;
+        private readonly IUserRepository _userRepo;
+        private readonly IMapper _mapper;
 
         public EventService(
-            IEventRepository        eventRepo,
+            IEventRepository eventRepo,
             IEventRequestRepository requestRepo,
-            IUserRepository         userRepo,
-            IMapper                 mapper)
+            IUserRepository userRepo,
+            IMapper mapper)
         {
             _eventRepo   = eventRepo;
             _requestRepo = requestRepo;
@@ -109,15 +109,14 @@ namespace SportsManagementApp.Services
             return _mapper.Map<IEnumerable<EventCategoryResponse>>(entity.Categories);
         }
 
-        public async Task<EventResponse> AssignOrganizerAsync(int eventId, AssignOrganizerRequest request)
-        {
+        public async Task<EventResponse> AssignOrganizerAsync(int eventId, int organizerId)        {
             var entity = await _eventRepo.GetByIdWithDetailsAsync(eventId)
                 ?? throw new NotFoundException(string.Format(AppConstants.EventNotFound, eventId));
 
             ValidateEventEditable(entity);
 
-            var organizer = await _userRepo.GetByIdWithRoleAsync(request.OrganizerId)
-                ?? throw new NotFoundException(string.Format(AppConstants.UserNotFound, request.OrganizerId));
+            var organizer = await _userRepo.GetByIdWithRoleAsync(organizerId)
+                ?? throw new NotFoundException(string.Format(AppConstants.UserNotFound, organizerId));
 
             ValidateOrganizer(organizer);
 

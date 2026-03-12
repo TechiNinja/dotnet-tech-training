@@ -2,10 +2,10 @@ namespace SportsManagementApp.Enums
 {
     public enum RequestStatus
     {
-        Unknown = 0,
-        Pending = 1,
-        Approved = 2,
-        Rejected = 3,
+        Pending = 0,
+        Approved = 1,
+        Rejected = 2,
+        Withdrawn = 3,
     }
 
     public enum GenderType
@@ -13,8 +13,8 @@ namespace SportsManagementApp.Enums
         Unknown = 0,
         Male = 1,
         Female = 2,
-        Both = 3,
-        Mixed = 4,
+        Mixed = 3,
+        Both = 4,
     }
 
     public enum MatchFormat
@@ -64,5 +64,12 @@ namespace SportsManagementApp.Enums
         Live = 2,
         Completed = 3,
         Cancelled = 4,
+    }
+
+    public enum NotificationType
+    {
+        Unknown = 0,
+        Approved = 1,
+        Rejected = 2,
     }
 }
