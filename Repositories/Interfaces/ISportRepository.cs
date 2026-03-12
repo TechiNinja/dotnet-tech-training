@@ -1,5 +1,6 @@
 ﻿using SportsManagementApp.Data.DTOs.SportManagement;
 using SportsManagementApp.Data.Entities;
+using System.Linq.Expressions;
 
 namespace SportsManagementApp.Repositories.Interfaces
 {
@@ -7,7 +8,7 @@ namespace SportsManagementApp.Repositories.Interfaces
     {
         Task<bool> SportExistsAsync(string name);
         Task<Sport> CreateSportAsync(string name);
-        Task<IEnumerable<Sport>> GetSportsAsync();
+        Task<List<SportResponseDto>> GetSportsAsync(Expression<Func<Sport, bool>> predicate, Expression<Func<Sport, SportResponseDto>> projection);
         Task<Sport?> GetSportByIdAsync(int id);
         Task UpdateSportAsync(Sport sport);
     }

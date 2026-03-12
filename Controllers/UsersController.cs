@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SportsManagementApp.Constants;
 using SportsManagementApp.Data.DTOs.UserManagement;
+using SportsManagementApp.Data.Filters;
 using SportsManagementApp.Services.Interfaces;
 
 namespace SportsManagementApp.Controllers
@@ -21,21 +22,16 @@ namespace SportsManagementApp.Controllers
 
         [Authorize(Roles = RoleConstants.Admin)]
         [HttpGet]
-        public async Task<IActionResult> GetUsers()
+        public async Task<IActionResult> GetUsers([FromQuery] UserFilterDto filter)
         {
-            return Ok(await _userService.GetUsersAsync());
+            var users = await _userService.GetUsersByFilterAsync(filter);
+            return Ok(users);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUserById(int id)
         {
             var user = await _userService.GetUserByIdAsync(id);
-
-            if (user == null)
-            {
-                return NotFound("User not found");
-            }
-
             return Ok(user);
         }
 
@@ -44,7 +40,6 @@ namespace SportsManagementApp.Controllers
         public async Task<IActionResult> CreateUser(CreateUserDto createUser)
         {
             var user = await _userService.CreateUserAsync(createUser);
-
             return Ok(user);
         }
 
@@ -52,12 +47,6 @@ namespace SportsManagementApp.Controllers
         public async Task<IActionResult> UpdateUser(int id, UpdateUserDto updateUser)
         {
             var result = await _userService.UpdateUserAsync(id, updateUser);
-            
-            if (result == null)
-            {
-                return NotFound("User not found");
-            }
-
             return Ok(result);
         }
     }

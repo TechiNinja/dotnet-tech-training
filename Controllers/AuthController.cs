@@ -19,12 +19,6 @@ namespace SportsManagementApp.Controllers
         public async Task<IActionResult> Login(LoginRequestDto loginRequest)
         {
             var result = await _authService.LoginAsync(loginRequest);
-
-            if (result == null)
-            {
-                return Unauthorized("Invalid email or password");
-            }
-
             return Ok(result);
         }
 

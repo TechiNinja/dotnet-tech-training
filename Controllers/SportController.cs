@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SportsManagementApp.Constants;
 using SportsManagementApp.Data.DTOs.SportManagement;
+using SportsManagementApp.Data.Filters;
 using SportsManagementApp.Services.Interfaces;
 
 namespace SportsManagementApp.Controllers
@@ -23,21 +24,14 @@ namespace SportsManagementApp.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateSport([FromBody] CreateSportDto createSport)
         {
-            try
-            {
-                var sport = await _sportsService.CreateSportAsync(createSport);
-                return Ok(sport);
-            }
-            catch (Exception)
-            {
-                return Problem("An error occurred whlie creating sport");
-            }
+            var sport = await _sportsService.CreateSportAsync(createSport);
+            return Ok(sport);
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetSports()
+        public async Task<IActionResult> GetSports([FromQuery] SportFilterDto filter)
         {
-            var sports = await _sportsService.GetSportsAsync();
+            var sports = await _sportsService.GetSportsAsync(filter);
             return Ok(sports);
         }
 
@@ -45,15 +39,8 @@ namespace SportsManagementApp.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateSport(int id, [FromBody] UpdateSportDto updateSport)
         {
-            try
-            {
-                var sport = await _sportsService.UpdateSportAsync(id, updateSport);
-                return Ok(sport);
-            }
-            catch (Exception)
-            {
-                return Problem("An error occurred while updating sport");
-            }
+            var sport = await _sportsService.UpdateSportAsync(id, updateSport);
+            return Ok(sport);
         }
     }
 }

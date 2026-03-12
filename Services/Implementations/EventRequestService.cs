@@ -1,10 +1,10 @@
 using SportsManagementApp.Enums;
-using SportsManagementApp.Helper;
 using SportsManagementApp.Services.Interfaces;
 using SportsManagementApp.Repositories.Interfaces;
 using AutoMapper;
 using SportsManagementApp.Data.DTOs;
 using SportsManagementApp.Data.Entities;
+using SportsManagementApp.StringConstants;
 
 namespace SportsManagementApp.Services.EventRequestService.Implementations;
 
@@ -38,7 +38,7 @@ public class EventRequestService : IEventRequestService
 
         if (!await _sportRepository.SportExistsAsync(dto.SportName))
         {
-            throw new Exception(StringConstant.invalidSportsId);
+            throw new Exception(StringConstant.InvalidSportsId);
         }
 
         if (dto.Format == MatchFormat.Unknown)
@@ -54,7 +54,7 @@ public class EventRequestService : IEventRequestService
         var existingEventRequest = await _eventRequestRepository.ExistsAsync(e => e.SportId == dto.SportId && e.Gender == dto.Gender && e.Format == dto.Format && e.StartDate == dto.StartDate);
         if (existingEventRequest)
         {
-            throw new Exception(StringConstant.eventExist);
+            throw new Exception(StringConstant.EventExist);
         }
 
         var request = _mapper.Map<EventRequest>(dto);
@@ -100,12 +100,12 @@ public class EventRequestService : IEventRequestService
 
         if (request == null)
         {
-            throw new Exception(StringConstant.noRequestFound);
+            throw new Exception(StringConstant.NoRequestFound);
         }
 
         if (request.Status != RequestStatus.Pending)
         {
-            throw new Exception(StringConstant.eventRequestModifyNotAllowed);
+            throw new Exception(StringConstant.EventRequestModifyNotAllowed);
         }
 
         _mapper.Map(dto, request);
@@ -122,12 +122,12 @@ public class EventRequestService : IEventRequestService
 
         if (request == null)
         {
-            throw new Exception(StringConstant.noRequestFound);
+            throw new Exception(StringConstant.NoRequestFound);
         }
 
         if (request.Status != RequestStatus.Pending)
         {
-            throw new Exception(StringConstant.eventRequestWithdrawlNotAllowed);
+            throw new Exception(StringConstant.EventRequestWithdrawalNotAllowed);
         }
 
         request.Status = RequestStatus.Withdrawn;

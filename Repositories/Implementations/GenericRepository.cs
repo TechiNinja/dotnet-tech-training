@@ -21,6 +21,14 @@ namespace SportsManagementApp.Repositories.Implementations
 
         public async Task<IEnumerable<T>> GetAllAsync() => await _dbSet.AsNoTracking().ToListAsync();
 
+        public async Task<List<TDto>> GetAllAsync<TDto>(Expression<Func<T, bool>> predicate, Expression<Func<T, TDto>> projection)
+        {
+            return await _dbSet
+                .Where(predicate)
+                .Select(projection)
+                .ToListAsync();
+        }
+
         public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate) =>
             await _dbSet.AsNoTracking().Where(predicate).ToListAsync();
 
