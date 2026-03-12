@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using SportsManagementApp.Data.DTOs.Participant;
 using SportsManagementApp.Data.Entities;
+using SportsManagementApp.Exceptions;
 using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services.Interfaces;
 
@@ -23,7 +24,7 @@ namespace SportsManagementApp.Services.Implementations
 
             if (exists)
             {
-                throw new Exception("Participant already registered in this category");
+                throw new ConflictException("Participant already registered in this category");
             }
 
             var registration = _mapper.Map<ParticipantRegistration>(request);
@@ -33,7 +34,7 @@ namespace SportsManagementApp.Services.Implementations
             var saved = await _registrationRepository.GetParticipantsByIdWithUserAsync(registration.Id);
             if (saved == null)
             {
-                throw new Exception("Registration not saved correctly");
+                throw new BadRequestException("Registration not saved correctly");
             }
 
             return _mapper.Map<ParticipantRegistrationResponseDto>(saved);

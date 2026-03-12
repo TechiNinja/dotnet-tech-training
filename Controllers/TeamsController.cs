@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SportsManagementApp.Data.DTOs.TeamManagement;
+using SportsManagementApp.Data.Filters;
 using SportsManagementApp.Services.Interfaces;
 
 namespace SportsManagementApp.Controllers
@@ -18,26 +18,18 @@ namespace SportsManagementApp.Controllers
             _teamsService = teamsService;
         }
 
-        [HttpGet("user/{userId}")]
-        public async Task<IActionResult> GetUserTeam(int userId)
+        [HttpGet]
+        public async Task<ActionResult<List<TeamResponseDto>>> GetTeams([FromQuery] TeamFilterDto filter)
         {
-            var teams = await _teamsService.GetUserTeamsAsync(userId);
-
+            var teams = await _teamsService.GetTeamsAsync(filter);
             return Ok(teams);
         }
 
         [HttpPost("create")]
         [Authorize(Roles = "Organizer")]
-        public async Task<ActionResult<TeamResponseDto>> CreateTeams(CreateTeamRequestDto request)
+        public async Task<ActionResult<List<TeamResponseDto>>> CreateTeams(CreateTeamRequestDto request)
         {
             var result = await _teamsService.CreateTeamsAsync(request);
-            return Ok(result);
-        }
-
-        [HttpGet("category/{categoryId}")]
-        public async Task<ActionResult<List<TeamResponseDto>>> GetTeams(int categoryId)
-        {
-            var result = await _teamsService.GetTeamsByCategoryAsync(categoryId);
             return Ok(result);
         }
     }

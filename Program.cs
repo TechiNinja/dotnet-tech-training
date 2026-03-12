@@ -5,6 +5,7 @@ using System.Text;
 using SportsManagementApp.Data;
 using SportsManagementApp.Extensions;
 using System.Text.Json.Serialization;
+using SportsManagementApp.Middlewares;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -54,6 +55,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

@@ -2,10 +2,11 @@
 
 namespace SportsManagementApp.Repositories.Interfaces
 {
-    public interface IGenericRepository<T> where T: class
+    public interface IGenericRepository<T> where T : class
     {
         Task<T?> GetByIdAsync(int id);
         Task<List<T>> GetAllAsync();
+        Task<List<TDto>> GetAllAsync<TDto>(Expression<Func<T, bool>> predicate, Expression<Func<T, TDto>> projection);
         Task AddAsync(T entity);
         Task UpdateAsync(T entity);
         Task<int> SaveChangesAsync();

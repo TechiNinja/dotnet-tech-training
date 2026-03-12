@@ -1,7 +1,7 @@
 using SportsManagementApp.Data.Entities;
 using SportsManagementApp.Enums;
 
-namespace SportsManagementApp.Entities
+namespace SportsManagementApp.Data.Entities
 {
     public class Notification
     {

@@ -1,10 +1,10 @@
 using SportsManagementApp.Enums;
-using SportsManagementApp.Helper;
 using SportsManagementApp.Services.Interfaces;
 using SportsManagementApp.Repositories.Interfaces;
 using AutoMapper;
 using SportsManagementApp.Data.DTOs;
 using SportsManagementApp.Data.Entities;
+using SportsManagementApp.Constants;
 
 namespace SportsManagementApp.Services.EventRequestService.Implementations;
 

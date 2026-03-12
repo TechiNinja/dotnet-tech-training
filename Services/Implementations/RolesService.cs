@@ -1,5 +1,6 @@
 ﻿using SportsManagementApp.Data.DTOs.RoleManagement;
 using SportsManagementApp.Data.Entities;
+using SportsManagementApp.Exceptions;
 using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services.Interfaces;
 
@@ -25,7 +26,7 @@ namespace SportsManagementApp.Services.Implementations
 
             if (existing != null)
             {
-                throw new Exception("Role already exists");
+                throw new ConflictException("Role already exists");
             }
 
             var role = new Role

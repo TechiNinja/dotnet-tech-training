@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using SportsManagementApp.Constants;
 using SportsManagementApp.Data.DTOs.Auth;
 using SportsManagementApp.Data.Entities;
+using SportsManagementApp.Exceptions;
 using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
@@ -35,24 +36,24 @@ namespace SportsManagementApp.Services.Implementations
 
             if (user == null)
             {
-                throw new Exception("Invalid email or password");
+                throw new UnauthorizedException("Invalid email or password");
             }
 
             var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, loginRequest.Password);
 
             if (result == PasswordVerificationResult.Failed)
             {
-                throw new Exception("Invalid password");
+                throw new UnauthorizedException("Invalid password");
             }
 
             if (!user.IsActive)
             {
-                throw new Exception("User is deactivated");
+                throw new BadRequestException("User is deactivated");
             }
 
             if (user.Role == null)
             {
-                throw new Exception("User role is not assigned");
+                throw new BadRequestException("User role is not assigned");
             }
 
             var token = GenerateJwtToken(user);
@@ -67,14 +68,14 @@ namespace SportsManagementApp.Services.Implementations
         {
             if (await _authRepository.UserExistsAsync(registerRequest.Email))
             {
-                throw new Exception("User already exists");
+                throw new ConflictException("User already exists");
             }
 
             var participantRole = await _roleRepository.GetRoleByTypeAsync(RoleConstants.Participant);
 
             if (participantRole == null)
             {
-                throw new Exception("Participant Role not found");
+                throw new NotFoundException("Participant Role not found");
             }
 
             var user = _mapper.Map<User>(registerRequest);

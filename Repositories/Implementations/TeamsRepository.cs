@@ -1,41 +1,24 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SportsManagementApp.Data;
-using SportsManagementApp.Data.DTOs.Participant;
+﻿using SportsManagementApp.Data;
+using SportsManagementApp.Data.DTOs.TeamManagement;
 using SportsManagementApp.Data.Entities;
 using SportsManagementApp.Repositories.Interfaces;
+using System.Linq.Expressions;
 
 namespace SportsManagementApp.Repositories.Implementations
 {
-    public class TeamsRepository: GenericRepository<Team>, ITeamsRepository
+    public class TeamsRepository : GenericRepository<Team>, ITeamsRepository
     {
-        public TeamsRepository(AppDbContext context): base(context) { }
+        public TeamsRepository(AppDbContext context) : base(context) { }
 
-        public async Task<List<MyTeamDto>> GetUserTeamsAsync(int userId)
+        public async Task<List<TeamResponseDto>> GetTeamsByFilterAsync(Expression<Func<Team, bool>> predicate, Expression<Func<Team, TeamResponseDto>> projection)
         {
-            return await _context.TeamMembers
-                .Where(member => member.UserId == userId)
-                .Select(member => new MyTeamDto
-                {
-                    TeamId = member.TeamId,
-                    TeamName = member.Team != null ? member.Team.Name : "N/A",
-                    Category = member.Team != null && member.Team.EventCategory != null
-                        ? $"{member.Team.EventCategory.Gender} {member.Team.EventCategory.Format}"
-                        : "N/A",
-                    EventName = member.Team != null
-                        && member.Team.EventCategory != null
-                        && member.Team.EventCategory.Event != null
-                            ? member.Team.EventCategory.Event.Name
-                            : "N/A",
-                })
-                .ToListAsync();
+            return await GetAllAsync(predicate, projection);
         }
 
-        public async Task<List<Team>> GetTeamsByCategoryAsync(int categoryId)
+        public async Task AddTeamAsync(Team team)
         {
-            return await _dbSet.Include(team => team.Members)
-                .ThenInclude(member => member.User)
-                .Where(team => team.EventCategoryId == categoryId)
-                .ToListAsync();
+            await _dbSet.AddAsync(team);
+            await _context.SaveChangesAsync();
         }
     }
 }

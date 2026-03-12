@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SportsManagementApp.Data.Entities;
-using SportsManagementApp.Entities;
 using System;
 
 namespace SportsManagementApp.Data
