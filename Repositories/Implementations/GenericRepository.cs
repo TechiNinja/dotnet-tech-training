@@ -29,12 +29,6 @@ namespace SportsManagementApp.Repositories.Implementations
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate) =>
-            await _dbSet.AsNoTracking().Where(predicate).ToListAsync();
-
-        public async Task<IEnumerable<T>> FindAsync(ISpecification<T> spec) =>
-            await _dbSet.AsNoTracking().Where(spec.ToExpression()).ToListAsync();
-
         public async Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate) =>
             await _dbSet.AnyAsync(predicate);
 
@@ -53,11 +47,6 @@ namespace SportsManagementApp.Repositories.Implementations
 
         public void Delete(T entity) => _dbSet.Remove(entity);
 
-        public void DeleteRange(IEnumerable<T> entities) => _dbSet.RemoveRange(entities);
-
         public async Task SaveChangesAsync() => await _context.SaveChangesAsync();
-
-        public async Task<int> SaveChangesAsync(bool returnCount) =>
-            await _context.SaveChangesAsync();
     }
 }

@@ -12,26 +12,18 @@ namespace SportsManagementApp.Services
             if (gender == GenderType.Mixed)
                 return new List<EventCategory> { Make(GenderType.Mixed, MatchFormat.Singles, now) };
 
-            return ExpandGenders(gender)
-                .SelectMany(g => ExpandFormats(format), (g, f) => Make(g, f, now))
+            var genders = gender == GenderType.Both
+                ? new[] { GenderType.Male, GenderType.Female }
+                : new[] { gender };
+
+            var formats = format == MatchFormat.Both
+                ? new[] { MatchFormat.Singles, MatchFormat.Doubles }
+                : new[] { format };
+
+            return genders
+                .SelectMany(g => formats, (g, f) => Make(g, f, now))
                 .ToList();
         }
-
-        private static IEnumerable<GenderType> ExpandGenders(GenderType gender) => gender switch
-        {
-            GenderType.Male   => new[] { GenderType.Male },
-            GenderType.Female => new[] { GenderType.Female },
-            GenderType.Both   => new[] { GenderType.Male, GenderType.Female },
-            _                 => Array.Empty<GenderType>()
-        };
-
-        private static IEnumerable<MatchFormat> ExpandFormats(MatchFormat format) => format switch
-        {
-            MatchFormat.Singles => new[] { MatchFormat.Singles },
-            MatchFormat.Doubles => new[] { MatchFormat.Doubles },
-            MatchFormat.Both    => new[] { MatchFormat.Singles, MatchFormat.Doubles },
-            _                   => Array.Empty<MatchFormat>()
-        };
 
         private static EventCategory Make(GenderType gender, MatchFormat format, DateTime now) => new()
         {

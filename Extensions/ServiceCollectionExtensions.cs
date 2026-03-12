@@ -12,8 +12,6 @@ namespace SportsManagementApp.Extensions
         public static IServiceCollection AddFixtureServices(this IServiceCollection services)
         {
             services.AddScoped<IFixtureStrategy, KnockoutFixtureStrategy>();
-            services.AddScoped<IFixtureStrategy, RoundRobinFixtureStrategy>();
-            services.AddScoped<IFixtureStrategyResolver, FixtureStrategyResolver>();
             services.AddScoped<IEventService, EventService>();
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IFixtureService, FixtureService>();

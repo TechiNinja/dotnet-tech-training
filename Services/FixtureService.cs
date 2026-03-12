@@ -15,18 +15,18 @@ namespace SportsManagementApp.Services
     {
         private readonly IEventCategoryRepository _categoryRepo;
         private readonly IMatchRepository _matchRepo;
-        private readonly IFixtureStrategyResolver _strategyResolver;
+        private readonly IFixtureStrategy _fixtureStrategy;
         private readonly IMapper _mapper;
 
         public FixtureService(
             IEventCategoryRepository categoryRepo,
             IMatchRepository matchRepo,
-            IFixtureStrategyResolver strategyResolver,
+            IFixtureStrategy fixtureStrategy,
             IMapper mapper)
         {
             _categoryRepo = categoryRepo;
             _matchRepo = matchRepo;
-            _strategyResolver = strategyResolver;
+            _fixtureStrategy = fixtureStrategy;
             _mapper           = mapper;
         }
 
@@ -39,7 +39,7 @@ namespace SportsManagementApp.Services
                 throw new ConflictException(AppConstants.FixturesAlreadyExist);
 
             var sideIds  = ExtractSideIds(category);
-            var strategy = _strategyResolver.Resolve(category.Event?.TournamentType ?? TournamentType.Knockout);
+            var strategy = _fixtureStrategy;
             var matches  = strategy.Generate(sideIds, catId);
 
             foreach (var match in matches)

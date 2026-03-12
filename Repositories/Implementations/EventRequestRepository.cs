@@ -22,19 +22,11 @@ namespace SportsManagementApp.Repositories.Implementations
                 .Include(e => e.Sport)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
-        public async Task<IEnumerable<EventRequest>> Search(int? id, RequestStatus? status)
-        {
-            var query = _context.EventRequests
+        public async Task<IEnumerable<EventRequest>> Search(int? id, RequestStatus? status) =>
+            await _context.EventRequests
                 .Include(e => e.Sport)
-                .AsQueryable();
-
-            if (id.HasValue)
-                query = query.Where(e => e.Id == id.Value);
-
-            if (status.HasValue)
-                query = query.Where(e => e.Status == status.Value);
-
-            return await query.ToListAsync();
-        }
+                .Where(e => (!id.HasValue || e.Id == id.Value) &&
+                            (!status.HasValue || e.Status == status.Value))
+                .ToListAsync();
     }
 }
