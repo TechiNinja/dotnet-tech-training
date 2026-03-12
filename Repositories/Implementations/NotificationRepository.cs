@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SportsManagementApp.Data;
-using SportsManagementApp.Entities;
+using SportsManagementApp.Data.Entities;
 using SportsManagementApp.Enums;
 using SportsManagementApp.Repositories.Interfaces;
 

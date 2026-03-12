@@ -19,8 +19,7 @@ namespace SportsManagementApp.Data
         public DbSet<Match> Matches { get; set; }
         public DbSet<MatchSet> MatchSets { get; set; }
         public DbSet<Result> Results { get; set; }
-
-        public DbSet<Notification> Notifications {get; set;}
+        public DbSet<Notification> Notifications {get;set;}
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

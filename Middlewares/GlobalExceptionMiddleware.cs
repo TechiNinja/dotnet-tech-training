@@ -1,4 +1,4 @@
-﻿using SportsManagementApp.Constants;
+using SportsManagementApp.Constants;
 using SportsManagementApp.Exceptions;
 using System.Net;
 using System.Text.Json;
@@ -35,6 +35,8 @@ namespace SportsManagementApp.Middlewares
                 BadRequestException => (HttpStatusCode.BadRequest, exception.Message),
                 ConflictException => (HttpStatusCode.Conflict, exception.Message),
                 UnauthorizedException => (HttpStatusCode.Unauthorized, exception.Message),
+                ValidationException => (HttpStatusCode.Unauthorized, exception.Message),
+                ForbiddenException => (HttpStatusCode.Unauthorized, exception.Message),
                 _ => (HttpStatusCode.InternalServerError, StringConstant.InternalServerError),
             };
 

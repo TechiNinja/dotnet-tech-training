@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.SignalR;
-using SportsManagementApp.Common.Exceptions;
-using SportsManagementApp.Entities;
+using SportsManagementApp.Exceptions;
+using SportsManagementApp.Data.Entities;
 using SportsManagementApp.Enums;
 using SportsManagementApp.Hubs;
 using SportsManagementApp.Repositories.Interfaces;
@@ -29,13 +29,13 @@ public class NotificationService : INotificationService
         NotificationAudience audience)
     {
         if (requestId <= 0)
-            throw new ValidationAppException("Invalid requestId.");
+            throw new ValidationException("Invalid requestId.");
 
         if (string.IsNullOrWhiteSpace(message))
-            throw new ValidationAppException("Message is required.");
+            throw new ValidationException("Message is required.");
 
         if (audience == NotificationAudience.Admin && (!userId.HasValue || userId.Value <= 0))
-            throw new ValidationAppException("UserId is required for Admin notifications.");
+            throw new ValidationException("UserId is required for Admin notifications.");
 
         if (audience == NotificationAudience.Ops)
             userId = null;
@@ -86,7 +86,7 @@ public class NotificationService : INotificationService
     public async Task<List<Notification>> GetAdminAsync(int adminId)
     {
         if (adminId <= 0)
-            throw new ValidationAppException("Invalid adminId.");
+            throw new ValidationException("Invalid adminId.");
 
         return await _notificationRepository.GetAdminAsync(adminId);
     }

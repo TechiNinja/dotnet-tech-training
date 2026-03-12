@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 
 namespace SportsManagementApp.Exceptions
 {
@@ -14,4 +14,6 @@ namespace SportsManagementApp.Exceptions
     public class UnauthorizedException(string message) : AppException(message, HttpStatusCode.Unauthorized) { }
 
     public class ConflictException(string message) : AppException(message, HttpStatusCode.Conflict) { }
+    public class ValidationException(string message) : AppException(message, HttpStatusCode.BadRequest) { }
+    public class ForbiddenException(string message) : AppException(message, HttpStatusCode.Forbidden) { }
 }

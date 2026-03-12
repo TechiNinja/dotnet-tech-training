@@ -1,4 +1,3 @@
-﻿using SportsManagementApp.Services.EventRequestService.Implementations;
 using SportsManagementApp.Services.Implementations;
 using SportsManagementApp.Services.Interfaces;
 

@@ -1,4 +1,4 @@
-namespace SportsManagementApp.Helper;
+namespace SportsManagementApp.Constants;
 public class StringConstant
 {
     public const string eventCreated  = "Event request created successfully";
@@ -21,4 +21,6 @@ public class StringConstant
     public const string sportsExist = "Sports Already Exist";
     public const string sportsNameRequired = "Sports Name Required";
     public const string sportsIdGreaterThanZero = "SportId must be greater than 0.";
+    public const string InternalServerError = "An unexpected error occurred";
+    public const string UnhandledException = "An unhandled exception occurred";
 }

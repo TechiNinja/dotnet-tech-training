@@ -1,6 +1,7 @@
 ﻿using SportsManagementApp.Data.DTOs.Participant;
 using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services.Interfaces;
+using SportsManagementApp.Exceptions;
 
 namespace SportsManagementApp.Services.Implementations
 {

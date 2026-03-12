@@ -1,7 +1,7 @@
 using System.Security.Claims;
-using SportsManagementApp.Common.Exceptions;
+using SportsManagementApp.Exceptions;
 
-namespace SportsManagementApp.Common.Helper;
+namespace SportsManagementApp.Helper;
 
 public static class GetCurrentUser
 {
@@ -10,7 +10,7 @@ public static class GetCurrentUser
         var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
 
         if (!int.TryParse(userId, out var id))
-            throw new UnauthorizedAppException("Invalid user token.");
+            throw new UnauthorizedException("Invalid user token.");
 
         return id;
     }

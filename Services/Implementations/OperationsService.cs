@@ -1,11 +1,11 @@
 using AutoMapper;
-using SportsManagementApp.Common.Exceptions;
+using SportsManagementApp.Exceptions;
 using SportsManagementApp.Data.DTOs;
 using SportsManagementApp.Enums;
 using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services.Interfaces;
 
-namespace SportsManagementApp.Services.OperationsService;
+namespace SportsManagementApp.Services.Implementations;
 
 public class OperationsService : IOperationsService
 {
@@ -33,21 +33,21 @@ public class OperationsService : IOperationsService
         RequestStatus status)
     {
         if (status != RequestStatus.Approved && status != RequestStatus.Rejected)
-            throw new ValidationAppException("Only Approved or Rejected decisions are allowed.");
+            throw new ValidationException("Only Approved or Rejected decisions are allowed.");
 
         var request = await _eventRequestRepository.GetEventRequestByIdAsync(requestId);
         if (request == null)
-            throw new NotFoundAppException("Event request not found.");
+            throw new NotFoundException("Event request not found.");
 
         if (request.Status != RequestStatus.Pending)
-            throw new ConflictAppException("Request already processed. Double approval or rejection is not allowed.");
+            throw new ConflictException("Request already processed. Double approval or rejection is not allowed.");
 
         request.Status = status;
         request.Remarks = dto.Remarks.Trim();
         request.OperationsReviewerId = opsUserId;
         request.UpdatedDate = DateTime.UtcNow;
 
-        _operationsRepository.Update(request);
+        _operationsRepository.UpdateAsync(request);
         await _operationsRepository.SaveChangesAsync();
 
         var message = status == RequestStatus.Approved

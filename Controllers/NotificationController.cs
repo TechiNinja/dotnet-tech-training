@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SportsManagementApp.Common.Exceptions;
+using SportsManagementApp.Exceptions;
 using SportsManagementApp.Enums;
 using SportsManagementApp.Services.Interfaces;
 
@@ -31,7 +31,7 @@ public class NotificationsController : ControllerBase
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         if (!int.TryParse(userId, out var adminId))
-            throw new UnauthorizedAppException("UserId not found in token.");
+            throw new UnauthorizedException("UserId not found in token.");
 
         var adminData = await _notificationService.GetAdminAsync(adminId);
         return Ok(adminData);

@@ -1,4 +1,4 @@
-using SportsManagementApp.Entities;
+using SportsManagementApp.Data.Entities;
 using SportsManagementApp.Enums;
 
 namespace SportsManagementApp.Repositories.Interfaces;

@@ -1,8 +1,8 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SportsManagementApp.Common.Exceptions;
-using SportsManagementApp.Common.Helper;
+using SportsManagementApp.Exceptions;
+using SportsManagementApp.Helper;
 using SportsManagementApp.Data.DTOs;
 using SportsManagementApp.Data.Filters;
 using SportsManagementApp.Enums;
