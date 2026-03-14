@@ -22,6 +22,7 @@ namespace SportsManagementApp.Mappings
             CreateMap<User, LoginResponseDto>()
                 .ForMember(dest => dest.Role,
                     opt => opt.MapFrom(src => src.Role!.Name));
+
         }
     }
 }

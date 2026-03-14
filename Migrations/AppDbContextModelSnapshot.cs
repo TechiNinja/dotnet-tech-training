@@ -40,7 +40,14 @@ namespace SportsManagementApp.Migrations
                     b.Property<DateOnly>("EndDate")
                         .HasColumnType("date");
 
+<<<<<<< HEAD
                     b.Property<int>("EventRequestId")
+=======
+                    b.Property<int?>("EventRequestId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EventRquestId")
+>>>>>>> 5170b41a9f7db4a9ef1088d78928646be4b14849
                         .HasColumnType("int");
 
                     b.Property<string>("EventVenue")
@@ -48,9 +55,12 @@ namespace SportsManagementApp.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+<<<<<<< HEAD
                     b.Property<int>("MaxParticipantsCount")
                         .HasColumnType("int");
 
+=======
+>>>>>>> 5170b41a9f7db4a9ef1088d78928646be4b14849
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -71,16 +81,23 @@ namespace SportsManagementApp.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
+<<<<<<< HEAD
                     b.Property<int>("TournamentType")
                         .HasColumnType("int");
 
+=======
+>>>>>>> 5170b41a9f7db4a9ef1088d78928646be4b14849
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
+<<<<<<< HEAD
                     b.HasIndex("EventRequestId")
                         .IsUnique();
+=======
+                    b.HasIndex("EventRequestId");
+>>>>>>> 5170b41a9f7db4a9ef1088d78928646be4b14849
 
                     b.HasIndex("OrganizerId");
 
@@ -112,6 +129,12 @@ namespace SportsManagementApp.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
+<<<<<<< HEAD
+=======
+                    b.Property<int>("TournamentType")
+                        .HasColumnType("int");
+
+>>>>>>> 5170b41a9f7db4a9ef1088d78928646be4b14849
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -278,6 +301,7 @@ namespace SportsManagementApp.Migrations
                     b.ToTable("MatchSets");
                 });
 
+<<<<<<< HEAD
             modelBuilder.Entity("SportsManagementApp.Data.Entities.Notification", b =>
                 {
                     b.Property<int>("Id")
@@ -309,6 +333,8 @@ namespace SportsManagementApp.Migrations
                     b.ToTable("Notifications");
                 });
 
+=======
+>>>>>>> 5170b41a9f7db4a9ef1088d78928646be4b14849
             modelBuilder.Entity("SportsManagementApp.Data.Entities.ParticipantRegistration", b =>
                 {
                     b.Property<int>("Id")
@@ -512,6 +538,7 @@ namespace SportsManagementApp.Migrations
                     b.ToTable("Users");
                 });
 
+<<<<<<< HEAD
             modelBuilder.Entity("SportsManagementApp.Data.Entities.Event", b =>
                 {
                     b.HasOne("SportsManagementApp.Data.Entities.EventRequest", "EventRequest")
@@ -519,6 +546,47 @@ namespace SportsManagementApp.Migrations
                         .HasForeignKey("SportsManagementApp.Data.Entities.Event", "EventRequestId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+=======
+            modelBuilder.Entity("SportsManagementApp.Entities.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Audience")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EventRequestId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventRequestId");
+
+                    b.ToTable("Notifications");
+                });
+
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.Event", b =>
+                {
+                    b.HasOne("SportsManagementApp.Data.Entities.EventRequest", "EventRequest")
+                        .WithMany()
+                        .HasForeignKey("EventRequestId");
+>>>>>>> 5170b41a9f7db4a9ef1088d78928646be4b14849
 
                     b.HasOne("SportsManagementApp.Data.Entities.User", "Organizer")
                         .WithMany()
@@ -598,6 +666,7 @@ namespace SportsManagementApp.Migrations
                     b.Navigation("Match");
                 });
 
+<<<<<<< HEAD
             modelBuilder.Entity("SportsManagementApp.Data.Entities.Notification", b =>
                 {
                     b.HasOne("SportsManagementApp.Data.Entities.EventRequest", "EventRequest")
@@ -609,6 +678,8 @@ namespace SportsManagementApp.Migrations
                     b.Navigation("EventRequest");
                 });
 
+=======
+>>>>>>> 5170b41a9f7db4a9ef1088d78928646be4b14849
             modelBuilder.Entity("SportsManagementApp.Data.Entities.ParticipantRegistration", b =>
                 {
                     b.HasOne("SportsManagementApp.Data.Entities.EventCategory", "EventCategory")
@@ -680,6 +751,20 @@ namespace SportsManagementApp.Migrations
                     b.Navigation("Role");
                 });
 
+<<<<<<< HEAD
+=======
+            modelBuilder.Entity("SportsManagementApp.Entities.Notification", b =>
+                {
+                    b.HasOne("SportsManagementApp.Data.Entities.EventRequest", "EventRequest")
+                        .WithMany("EventRegistrations")
+                        .HasForeignKey("EventRequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EventRequest");
+                });
+
+>>>>>>> 5170b41a9f7db4a9ef1088d78928646be4b14849
             modelBuilder.Entity("SportsManagementApp.Data.Entities.Event", b =>
                 {
                     b.Navigation("Categories");
@@ -696,8 +781,11 @@ namespace SportsManagementApp.Migrations
 
             modelBuilder.Entity("SportsManagementApp.Data.Entities.EventRequest", b =>
                 {
+<<<<<<< HEAD
                     b.Navigation("Event");
 
+=======
+>>>>>>> 5170b41a9f7db4a9ef1088d78928646be4b14849
                     b.Navigation("EventRegistrations");
                 });
 

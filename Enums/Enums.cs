@@ -1,4 +1,4 @@
-namespace SportsManagementApp.Enums
+﻿﻿namespace SportsManagementApp.Enums
 {
     public enum RequestStatus
     {
@@ -65,11 +65,19 @@ namespace SportsManagementApp.Enums
         Completed = 3,
         Cancelled = 4,
     }
-
-    public enum NotificationType
+   public enum NotificationType
     {
         Unknown = 0,
         Approved = 1,
         Rejected = 2,
+        NewRequest = 3,
     }
+
+    public enum NotificationAudience
+    {
+        Ops = 1,
+        Admin = 2
+    }
+
+
 }

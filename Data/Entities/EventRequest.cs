@@ -26,8 +26,7 @@ namespace SportsManagementApp.Data.Entities
         public User? OperationsReviewer { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
-        public ICollection<Notification> EventRegistrations { get; set; } = new List<Notification>();
+        public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 
     }
 }
-

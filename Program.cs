@@ -7,7 +7,9 @@ using System.Text.Json.Serialization;
 using SportsManagementApp.Data;
 using SportsManagementApp.Extensions;
 using SportsManagementApp.Middleware;
+using SportsManagementApp.Middlewares;
 using SportsManagementApp.StringConstants;
+using SportsManagementApp.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,6 +55,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddApplicationServices();
 builder.Services.AddFixtureServices();
 builder.Services.AddRepositories();
+builder.Services.AddSignalR();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -84,10 +87,12 @@ app.UseSwaggerUi(settings =>
     settings.DocumentPath = "/swagger/v1/swagger.json";
 });
 
-// app.UseHttpsRedirection();   
+// app.UseHttpsRedirection();
 app.UseCors(AppConstants.ReactNativeCorsPolicy);
+app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
+app.MapHub<NotificationHub>("/hubs/notifications");
+
 app.Run();

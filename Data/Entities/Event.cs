@@ -1,4 +1,4 @@
-﻿using SportsManagementApp.Enums;
+﻿﻿using SportsManagementApp.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace SportsManagementApp.Data.Entities

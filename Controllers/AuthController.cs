@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿﻿using Microsoft.AspNetCore.Mvc;
 using SportsManagementApp.Data.DTOs.Auth;
 using SportsManagementApp.Services.Interfaces;
 
@@ -19,6 +19,7 @@ namespace SportsManagementApp.Controllers
         public async Task<IActionResult> Login(LoginRequestDto loginRequest)
         {
             var result = await _authService.LoginAsync(loginRequest);
+
             return Ok(result);
         }
 

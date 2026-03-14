@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 
 namespace SportsManagementApp.Exceptions
 {
@@ -15,4 +15,7 @@ namespace SportsManagementApp.Exceptions
 
     public class ConflictException(string message) : AppException(message, HttpStatusCode.Conflict) { }
     public class UnprocessableEntityException(string message) : AppException(message, HttpStatusCode.UnprocessableEntity) { }
+
+    public class ValidationException(string message) : AppException(message, HttpStatusCode.BadRequest) { }
+    public class ForbiddenException(string message) : AppException(message, HttpStatusCode.Forbidden) { }
 }
