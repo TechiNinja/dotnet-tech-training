@@ -1,5 +1,4 @@
 ﻿using SportsManagementApp.Tests.TestData;
-using FluentAssertions;
 using Moq;
 using SportsManagementApp.Data.DTOs.SportManagement;
 using SportsManagementApp.Data.Entities;
