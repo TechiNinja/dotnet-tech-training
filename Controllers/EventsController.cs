@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SportsManagementApp.DTOs.Request;
 using SportsManagementApp.DTOs.Response;
@@ -10,7 +10,7 @@ namespace SportsManagementApp.Controllers
     [Authorize]
     [ApiController]
     [Route("api/events")]
-    [Produces("application/json")]
+    [Produces("application/json")]  
     [Tags(AppConstants.TagEvents)]
     public class EventsController : ControllerBase
     {
@@ -19,7 +19,7 @@ namespace SportsManagementApp.Controllers
 
         public EventsController(IEventService eventService, IEventsService eventsService)
         {
-            _eventService = eventService;
+            _eventService  = eventService;
             _eventsService = eventsService;
         }
 
@@ -40,6 +40,14 @@ namespace SportsManagementApp.Controllers
             if (!ModelState.IsValid) return BadRequest(ModelState);
             var result = await _eventService.CreateEventFromRequestAsync(request);
             return CreatedAtAction(nameof(GetAll), new { id = result.Id }, result);
+        }
+
+        [HttpPatch("{id:int}")]
+        public async Task<IActionResult> PatchEvent(int id, [FromBody] PatchEventRequest request)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            var result = await _eventService.PatchEventAsync(id, request);
+            return Ok(result);
         }
 
         [HttpGet("request/{requestId:int}")]

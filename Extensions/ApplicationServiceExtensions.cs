@@ -1,6 +1,7 @@
 ﻿using SportsManagementApp.Services.EventRequestService.Implementations;
 using SportsManagementApp.Services.Implementations;
 using SportsManagementApp.Services.Interfaces;
+using SportsManagementApp.Services;
 
 namespace SportsManagementApp.Extensions
 {
@@ -18,8 +19,7 @@ namespace SportsManagementApp.Extensions
             services.AddScoped<IParticipantRegistrationService, ParticipantRegistrationService>();
             services.AddScoped<IEventRequestService, EventRequestService>();
             services.AddScoped<IAnalyticsService, AnalyticsService>();
-         
-
+            services.AddScoped<IEventService, EventService>();
             return services;
         }
     }

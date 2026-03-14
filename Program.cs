@@ -34,6 +34,18 @@ builder.Services.AddOpenApiDocument(config =>
     config.Title       = AppConstants.SwaggerTitle;
     config.Description = AppConstants.SwaggerDescription;
     config.Version     = "v1";
+
+    config.AddSecurity("JWT", new NSwag.OpenApiSecurityScheme
+    {
+        Type        = NSwag.OpenApiSecuritySchemeType.ApiKey,
+        Name        = "Authorization",
+        In          = NSwag.OpenApiSecurityApiKeyLocation.Header,
+        Description = "Enter: Bearer {your token}"
+    });
+
+    config.OperationProcessors.Add(
+        new NSwag.Generation.Processors.Security.AspNetCoreOperationSecurityScopeProcessor("JWT")
+    );
 });
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -72,7 +84,7 @@ app.UseSwaggerUi(settings =>
     settings.DocumentPath = "/swagger/v1/swagger.json";
 });
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();   
 app.UseCors(AppConstants.ReactNativeCorsPolicy);
 app.UseAuthentication();
 app.UseAuthorization();

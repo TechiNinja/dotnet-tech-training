@@ -102,6 +102,60 @@ namespace SportsManagementApp.Services
             return _mapper.Map<EventResponse>(created!);
         }
 
+        public async Task<EventResponse> PatchEventAsync(int eventId, PatchEventRequest request)
+        {
+            var entity = await _eventRepo.GetByIdWithDetailsAsync(eventId)
+                ?? throw new NotFoundException(string.Format(AppConstants.EventNotFound, eventId));
+
+            ValidateEventEditable(entity);
+
+            var action = request.Action.Trim().ToLower();
+
+            if (action == "cancel")
+            {
+                entity.Status    = EventStatus.Cancelled;
+                entity.UpdatedAt = DateTime.UtcNow;
+            }
+            else if (action == "publish")
+            {
+                if (entity.Status != EventStatus.Upcoming)
+                    throw new BadRequestException("Only Upcoming events can be published.");
+                entity.Status    = EventStatus.Open;
+                entity.UpdatedAt = DateTime.UtcNow;
+            }
+            else if (action == "update")
+            {
+                if (request.Name != null)
+                    entity.Name = request.Name.Trim();
+
+                if (request.Description != null)
+                    entity.Description = request.Description.Trim();
+
+                if (request.MaxParticipantsCount.HasValue)
+                    entity.MaxParticipantsCount = request.MaxParticipantsCount.Value;
+
+                if (request.RegistrationDeadline.HasValue)
+                {
+                    if (request.RegistrationDeadline.Value >= entity.StartDate)
+                        throw new BadRequestException(AppConstants.RegistrationDeadlineInvalid);
+                    entity.RegistrationDeadline = request.RegistrationDeadline.Value;
+                    if (entity.Status == EventStatus.Cancelled)
+                        entity.Status = EventStatus.Open;
+                }
+
+                entity.UpdatedAt = DateTime.UtcNow;
+            }
+            else
+            {
+                throw new BadRequestException($"Invalid action '{request.Action}'. Use 'update', 'publish' or 'cancel'.");
+            }
+
+            _eventRepo.Update(entity);
+            await _eventRepo.SaveChangesAsync();
+
+            return _mapper.Map<EventResponse>(entity);
+        }
+
         public async Task<IEnumerable<EventCategoryResponse>> GetCategoriesByEventIdAsync(int eventId)
         {
             var entity = await _eventRepo.GetByIdWithDetailsAsync(eventId)
@@ -109,7 +163,8 @@ namespace SportsManagementApp.Services
             return _mapper.Map<IEnumerable<EventCategoryResponse>>(entity.Categories);
         }
 
-        public async Task<EventResponse> AssignOrganizerAsync(int eventId, int organizerId)        {
+        public async Task<EventResponse> AssignOrganizerAsync(int eventId, int organizerId)
+        {
             var entity = await _eventRepo.GetByIdWithDetailsAsync(eventId)
                 ?? throw new NotFoundException(string.Format(AppConstants.EventNotFound, eventId));
 

@@ -11,5 +11,6 @@ namespace SportsManagementApp.Services.Interfaces
         Task<IEnumerable<EventCategoryResponse>> GetCategoriesByEventIdAsync(int eventId);
         Task<EventRequestPreFillResponse> GetEventRequestForPreFillAsync(int requestId);
         Task<EventResponse> AssignOrganizerAsync(int eventId, int organizerId);
+        Task<EventResponse> PatchEventAsync(int eventId, PatchEventRequest request);
     }
 }
