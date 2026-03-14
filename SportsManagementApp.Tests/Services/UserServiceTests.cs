@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using FluentAssertions;
 using Moq;
 using SportsManagementApp.Data.DTOs.UserManagement;
 using SportsManagementApp.Data.Entities;
@@ -149,7 +148,7 @@ namespace SportsManagementApp.Tests.Services
         }
 
         [Fact]
-        public async Task UpdatedUserAsync_WhenPasswordNotProvided_DoesNotChangePasswordHash()
+        public async Task UpdateUserAsync_WhenPasswordNotProvided_DoesNotChangePasswordHash()
         {
             var user = UserTestData.UserNavneetWithOldHash();
             var dto = UserTestData.UpdateNavneetWithoutPassword();
