@@ -1,11 +1,13 @@
+using AutoMapper;
 using Microsoft.AspNetCore.SignalR;
-using SportsManagementApp.Exceptions;
+using SportsManagementApp.Constants;
+using SportsManagementApp.Data.DTOs;
 using SportsManagementApp.Data.Entities;
 using SportsManagementApp.Enums;
+using SportsManagementApp.Exceptions;
 using SportsManagementApp.Hubs;
 using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services.Interfaces;
-using SportsManagementApp.Constants;
 
 namespace SportsManagementApp.Services.Implementations;
 
@@ -13,43 +15,36 @@ public class NotificationService : INotificationService
 {
     private readonly INotificationRepository _notificationRepository;
     private readonly IHubContext<NotificationHub> _hubContext;
+    private readonly IMapper _mapper;
 
     public NotificationService(
         INotificationRepository notificationRepository,
-        IHubContext<NotificationHub> hubContext)
+        IHubContext<NotificationHub> hubContext,
+        IMapper mapper)
     {
         _notificationRepository = notificationRepository;
         _hubContext = hubContext;
+        _mapper = mapper;
     }
 
-    public async Task<Notification> CreateAsync(
-        int? userId,
-        int requestId,
-        string message,
-        NotificationType type,
-        NotificationAudience audience)
+    public async Task<Notification> CreateAsync(CreateNotificationDto dto)
     {
-        if (requestId <= 0)
+        if (dto.EventRequestId <= 0)
             throw new ValidationException(StringConstant.InvalidId);
 
-        if (string.IsNullOrWhiteSpace(message))
+        if (string.IsNullOrWhiteSpace(dto.Message))
             throw new ValidationException(StringConstant.MessageRequired);
 
-        if (audience == NotificationAudience.Admin && (!userId.HasValue || userId.Value <= 0))
+        if (dto.Audience == NotificationAudience.Admin &&
+            (!dto.UserId.HasValue || dto.UserId.Value <= 0))
             throw new ValidationException(StringConstant.IdRequired);
 
-        if (audience == NotificationAudience.Ops)
-            userId = null;
+        if (dto.Audience == NotificationAudience.Ops)
+            dto.UserId = null;
 
-        var notification = new Notification
-        {
-            UserId = userId,
-            Audience = audience,
-            EventRequestId = requestId,
-            Message = message.Trim(),
-            Type = type,
-            CreatedAt = DateTime.UtcNow
-        };
+        dto.Message = dto.Message.Trim();
+
+        var notification = _mapper.Map<Notification>(dto);
 
         await _notificationRepository.AddAsync(notification);
         await _notificationRepository.SaveChangesAsync();
@@ -65,14 +60,14 @@ public class NotificationService : INotificationService
             createdAt = notification.CreatedAt
         };
 
-        if (audience == NotificationAudience.Ops)
+        if (notification.Audience == NotificationAudience.Ops)
         {
             await _hubContext.Clients.Group("ops")
                 .SendAsync(StringConstant.NewNotificationEvent, payload);
         }
         else
         {
-            await _hubContext.Clients.Group($"admin:{userId!.Value}")
+            await _hubContext.Clients.Group($"admin:{notification.UserId!.Value}")
                 .SendAsync(StringConstant.NewNotificationEvent, payload);
         }
 
@@ -81,8 +76,8 @@ public class NotificationService : INotificationService
 
     public async Task<List<Notification>> GetOpsAsync()
     {
-       return await _notificationRepository.GetOpsAsync();
-    } 
+        return await _notificationRepository.GetOpsAsync();
+    }
 
     public async Task<List<Notification>> GetAdminAsync(int adminId)
     {

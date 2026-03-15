@@ -21,6 +21,20 @@ namespace SportsManagementApp.Repositories.Implementations
             return await _dbSet.FindAsync(id);
         }
 
+        public async Task<T?> GetByIdWithIncludesAsync(
+            Expression<Func<T, bool>> predicate,
+            params Expression<Func<T, object>>[] includes)
+        {
+            IQueryable<T> query = _dbSet;
+
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+
+            return await query.FirstOrDefaultAsync(predicate);
+        }
+
         public async Task<List<T>> GetAllAsync()
         {
             return await _dbSet.ToListAsync();
@@ -29,6 +43,7 @@ namespace SportsManagementApp.Repositories.Implementations
         public async Task<List<TDto>> GetAllAsync<TDto>(Expression<Func<T, bool>> predicate, Expression<Func<T, TDto>> projection)
         {
             return await _dbSet
+                .AsNoTracking()
                 .Where(predicate)
                 .Select(projection)
                 .ToListAsync();

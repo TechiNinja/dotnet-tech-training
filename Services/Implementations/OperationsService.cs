@@ -5,6 +5,7 @@ using SportsManagementApp.Enums;
 using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services.Interfaces;
 using SportsManagementApp.Constants;
+using SportsManagementApp.Helper;
 
 namespace SportsManagementApp.Services.Implementations;
 
@@ -27,7 +28,7 @@ public class OperationsService : IOperationsService
         _mapper = mapper;
     }
 
-    public async Task<EventRequestResponseDto> DecideAsync(
+    public async Task<EventRequestResponseDto> ReviewEventRequestAsync(
         int requestId,
         DecideEventRequestDto dto,
         int opsUserId,
@@ -54,14 +55,10 @@ public class OperationsService : IOperationsService
         var message = status == RequestStatus.Approved
             ? $"Your request #{request.Id} has been approved."
             : $"Your request #{request.Id} has been rejected. Remarks: {request.Remarks}";
-
-        await _notificationService.CreateAsync(
-            userId: request.AdminId,
-            requestId: request.Id,
-            message: message,
-            type: status == RequestStatus.Approved ? NotificationType.Approved : NotificationType.Rejected,
-            audience: NotificationAudience.Admin
-        );
+            
+                await _notificationService.CreateAsync(
+    request.CreateNotification(message, status)
+);
 
         return _mapper.Map<EventRequestResponseDto>(request);
     }

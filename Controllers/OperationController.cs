@@ -24,13 +24,13 @@ public class OperationController : ControllerBase
 
     [HttpPut("{id:int}/{status}")]
     [ProducesResponseType(typeof(EventRequestResponseDto), StatusCodes.Status200OK)]
-    public async Task<ActionResult<EventRequestResponseDto>> DecideEventRequest(
+    public async Task<ActionResult<EventRequestResponseDto>> ReviewEventRequest(
         int id,
         [FromBody] DecideEventRequestDto dto,
         [FromRoute] RequestStatus status)
     {
         var opsId = User.GetUserId();
-        var updated = await _operationsService.DecideAsync(id, dto, opsId, status);
+        var updated = await _operationsService.ReviewEventRequestAsync(id, dto, opsId, status);
         return Ok(updated);
     }
 }

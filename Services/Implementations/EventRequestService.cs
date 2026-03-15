@@ -7,6 +7,7 @@ using SportsManagementApp.Data.Filters;
 using SportsManagementApp.Enums;
 using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services.Interfaces;
+using SportsManagementApp.Helper;
 
 namespace SportsManagementApp.Services.Implementations;
 
@@ -59,13 +60,11 @@ public class EventRequestService : IEventRequestService
         if (createdRequest == null)
             throw new NotFoundException(StringConstant.noRequestFound);
 
+        var message = $"New event request #{request.Id} is pending for review.";    
+
         await _notificationService.CreateAsync(
-            userId: null,
-            requestId: request.Id,
-            message: $"New event request #{request.Id} is pending for review.",
-            type: NotificationType.NewRequest,
-            audience: NotificationAudience.Ops
-        );
+        request.CreateNotification(message, RequestStatus.Pending)
+);
 
         return createdRequest;
     }

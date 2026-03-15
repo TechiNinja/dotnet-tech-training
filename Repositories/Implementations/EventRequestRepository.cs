@@ -14,13 +14,14 @@ public class EventRequestRepository : GenericRepository<EventRequest>, IEventReq
     public EventRequestRepository(AppDbContext context) : base(context) { }
 
     public async Task<EventRequest?> GetEventRequestByIdAsync(int id)
-    {
-        return await _context.EventRequests
-            .Include(e => e.Sport)
-            .Include(e => e.OperationsReviewer)
-            .Include(e => e.Admin)
-            .FirstOrDefaultAsync(e => e.Id == id);
-    }
+{
+    return await GetByIdWithIncludesAsync(
+        e => e.Id == id,
+        e => e.Sport,
+        e => e.OperationsReviewer,
+        e => e.Admin
+    );
+}
 
     public async Task<EventRequestResponseDto?> GetEventRequestDtoByIdAsync(int id)
     {
@@ -32,14 +33,12 @@ public class EventRequestRepository : GenericRepository<EventRequest>, IEventReq
     }
 
     public async Task<List<EventRequestResponseDto>> GetEventRequestsByFilterAsync(EventRequestFilterDto filter)
-    {
-        var predicate = EventRequestPredicateBuilder.Build(filter);
+{
+    var predicate = EventRequestPredicateBuilder.Build(filter);
 
-        return await _context.EventRequests
-            .AsNoTracking()
-            .Where(predicate)
-            .OrderByDescending(e => e.CreatedDate)
-            .Select(EventRequestProjectionBuilder.Build())
-            .ToListAsync();
-    }
+    return await GetAllAsync(
+        predicate,
+        EventRequestProjectionBuilder.Build()
+    );
+}
 }
