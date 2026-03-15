@@ -4,6 +4,7 @@ using SportsManagementApp.Data.DTOs;
 using SportsManagementApp.Enums;
 using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services.Interfaces;
+using SportsManagementApp.Constants;
 
 namespace SportsManagementApp.Services.Implementations;
 
@@ -33,21 +34,21 @@ public class OperationsService : IOperationsService
         RequestStatus status)
     {
         if (status != RequestStatus.Approved && status != RequestStatus.Rejected)
-            throw new ValidationException("Only Approved or Rejected decisions are allowed.");
+            throw new ValidationException(StringConstant.onlyApproveorRejectAllowed);
 
         var request = await _eventRequestRepository.GetEventRequestByIdAsync(requestId);
         if (request == null)
-            throw new NotFoundException("Event request not found.");
+            throw new NotFoundException(StringConstant.noEventFound);
 
         if (request.Status != RequestStatus.Pending)
-            throw new ConflictException("Request already processed. Double approval or rejection is not allowed.");
+            throw new ConflictException(StringConstant.requestProcessNotAllowed);
 
         request.Status = status;
         request.Remarks = dto.Remarks.Trim();
         request.OperationsReviewerId = opsUserId;
         request.UpdatedDate = DateTime.UtcNow;
 
-        _operationsRepository.UpdateAsync(request);
+        await _operationsRepository.UpdateAsync(request);
         await _operationsRepository.SaveChangesAsync();
 
         var message = status == RequestStatus.Approved

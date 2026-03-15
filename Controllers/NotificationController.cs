@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SportsManagementApp.Exceptions;
 using SportsManagementApp.Enums;
+using SportsManagementApp.Helper;
 using SportsManagementApp.Services.Interfaces;
 
 namespace SportsManagementApp.Controllers;
@@ -28,10 +29,7 @@ public class NotificationsController : ControllerBase
             return Ok(data);
         }
 
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        if (!int.TryParse(userId, out var adminId))
-            throw new UnauthorizedException("UserId not found in token.");
+        var adminId = User.GetUserId();
 
         var adminData = await _notificationService.GetAdminAsync(adminId);
         return Ok(adminData);

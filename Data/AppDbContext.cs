@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SportsManagementApp.Data.Entities;
 using System;
+using System.Text.Json;
 
 namespace SportsManagementApp.Data
 {
@@ -19,7 +20,7 @@ namespace SportsManagementApp.Data
         public DbSet<Match> Matches { get; set; }
         public DbSet<MatchSet> MatchSets { get; set; }
         public DbSet<Result> Results { get; set; }
-        public DbSet<Notification> Notifications {get;set;}
+        public DbSet<Notification> Notifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -76,6 +77,13 @@ namespace SportsManagementApp.Data
                 .WithOne(set => set.Match)
                 .HasForeignKey(set => set.MatchId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Sport>()
+    .Property(s => s.AllowedFormats)
+    .HasConversion(
+        v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
+        v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions)null) ?? new List<string>()
+    );
         }
     }
 }

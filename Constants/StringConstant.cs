@@ -23,4 +23,18 @@ public class StringConstant
     public const string sportsIdGreaterThanZero = "SportId must be greater than 0.";
     public const string InternalServerError = "An unexpected error occurred";
     public const string UnhandledException = "An unhandled exception occurred";
+    public const string noRequestAccess = "You can only access your own event requests.";
+    public const string onlyEditOwnRequest = "You can only edit your own event requests.";
+    public const string onlyWithdrawOwnRequest = "You can only withdraw your own event requests.";
+    public const string onlyApproveorRejectAllowed = "Only Approved or Rejected decisions are allowed.";
+    public const string requestProcessNotAllowed = "Request already processed. Double approval or rejection is not allowed.";
+    public const string NewNotificationEvent = "notification:new";
+    public const string OpsGroupName = "ops";
+    public const string InvalidId = "Invalid Id";
+    public const string MessageRequired = "Meassage is Required";
+    public const string IdRequired = "User ID Required for admin";
+
+    
+
+
 }
