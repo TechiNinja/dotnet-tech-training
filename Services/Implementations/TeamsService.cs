@@ -62,7 +62,9 @@ namespace SportsManagementApp.Services.Implementations
                     new() { UserId = registration[index + 1].UserId }
                 };
 
-                await _teamsRepository.AddTeamAsync(team);
+                await _teamsRepository.AddAsync(team);
+                await _teamsRepository.SaveChangesAsync();
+
                 result.Add(_mapper.Map<TeamResponseDto>(team));
                 teamNumber++;
             }

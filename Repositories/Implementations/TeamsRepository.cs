@@ -14,11 +14,5 @@ namespace SportsManagementApp.Repositories.Implementations
         {
             return await GetAllAsync(predicate, projection);
         }
-
-        public async Task AddTeamAsync(Team team)
-        {
-            await _dbSet.AddAsync(team);
-            await _context.SaveChangesAsync();
-        }
     }
 }

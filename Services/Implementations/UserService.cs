@@ -32,7 +32,7 @@ namespace SportsManagementApp.Services.Implementations
 
         public async Task<List<UserResponseDto>> GetUsersByFilterAsync(UserFilterDto filter)
         {
-            return await _userRepository.GetUsersByFilterAsync(
+            return await _userRepository.GetAllAsync(
                 UserPredicateBuilder.Build(filter),
                 UserProjectionBuilder.Build()
             );
@@ -40,13 +40,13 @@ namespace SportsManagementApp.Services.Implementations
 
         public async Task<UserResponseDto?> GetUserByIdAsync(int userId)
         {
-            var user = await _userRepository.GetUserEntityByIdAsync(userId);
+            var user = await _userRepository.GetUserDtoByIdAsync(userId, UserProjectionBuilder.Build());
             return _mapper.Map<UserResponseDto?>(user);
         }
 
         public async Task<UserResponseDto> CreateUserAsync(CreateUserDto createUser)
         {
-            var existingUser = await _userRepository.GetUsersByFilterAsync(
+            var existingUser = await _userRepository.GetAllAsync(
                 UserPredicateBuilder.Build(new UserFilterDto { SearchTerm = createUser.Email }),
                 UserProjectionBuilder.Build()
             );
@@ -66,7 +66,7 @@ namespace SportsManagementApp.Services.Implementations
 
         public async Task<UserResponseDto?> UpdateUserAsync(int userId, UpdateUserDto updateUser)
         {
-            var user = await _userRepository.GetUserEntityByIdAsync(userId);
+            var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)
                 throw new NotFoundException("User not found");
 
@@ -78,6 +78,7 @@ namespace SportsManagementApp.Services.Implementations
             user.UpdatedAt = DateTime.UtcNow;
 
             await _userRepository.UpdateAsync(user);
+            await _userRepository.SaveChangesAsync();
 
             var updatedUserDto = await _userRepository.GetUserDtoByIdAsync(user.Id, UserProjectionBuilder.Build());
             return updatedUserDto!;

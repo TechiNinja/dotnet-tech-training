@@ -17,7 +17,7 @@ namespace SportsManagementApp.Services.Implementations
 
         public async Task<List<Role>> GetRolesAsync()
         {
-            return await _roleRepository.GetRolesAsync();
+            return await _roleRepository.GetAllAsync();
         }
 
         public async Task<Role> CreateRoleAsync(CreateRoleDto createRole)
@@ -34,7 +34,8 @@ namespace SportsManagementApp.Services.Implementations
                 Name = createRole.RoleName,
             };
 
-            await _roleRepository.AddRoleAsync(role);
+            await _roleRepository.AddAsync(role);
+            await _roleRepository.SaveChangesAsync();
             return role;
         }
     }

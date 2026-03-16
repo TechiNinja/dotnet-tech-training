@@ -84,7 +84,8 @@ namespace SportsManagementApp.Services.Implementations
             user.CreatedAt = DateTime.UtcNow;
             user.PasswordHash = _passwordHasher.HashPassword(user, registerRequest.Password);
 
-            await _authRepository.AddUserAsync(user);
+            await _authRepository.AddAsync(user);
+            await _authRepository.SaveChangesAsync();
 
             var token = GenerateJwtToken(user);
 

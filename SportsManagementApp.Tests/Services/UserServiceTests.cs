@@ -48,8 +48,11 @@ namespace SportsManagementApp.Tests.Services
             var user = UserTestData.UserHimani();
             var expected = UserTestData.UserHimaniResponse();
 
-            _mockRepo.Setup(repo => repo.GetUserEntityByIdAsync(4)).ReturnsAsync(user);
-            _mockMapper.Setup(mapper => mapper.Map<UserResponseDto?>(user)).Returns(expected);
+            _mockRepo.Setup(repo => repo.GetByIdAsync(4)).ReturnsAsync(user);
+
+            _mockMapper
+                .Setup(mapper => mapper.Map<UserResponseDto>(It.IsAny<User>()))
+                .Returns(expected);
 
             var result = await _service.GetUserByIdAsync(4);
 
@@ -60,8 +63,8 @@ namespace SportsManagementApp.Tests.Services
         [Fact]
         public async Task GetUserByIdAsync_WhenUserNotFound_ReturnsNull()
         {
-            _mockRepo.Setup(repo => repo.GetUserEntityByIdAsync(99)).ReturnsAsync((User?)null);
-            _mockMapper.Setup(mapper => mapper.Map<UserResponseDto?>(null)).Returns((UserResponseDto?)null);
+            _mockRepo.Setup(repo => repo.GetByIdAsync(99))
+                .ReturnsAsync((User?)null);
 
             var result = await _service.GetUserByIdAsync(99);
 
@@ -78,7 +81,7 @@ namespace SportsManagementApp.Tests.Services
                 new() { Id = 2, Email = "vishal@test.com" }
             };
 
-            _mockRepo.Setup(repo => repo.GetUsersByFilterAsync(
+            _mockRepo.Setup(repo => repo.GetAllAsync(
                 It.IsAny<Expression<Func<User, bool>>>(),
                 It.IsAny<Expression<Func<User, UserResponseDto>>>()))
                 .ReturnsAsync(existingUsers);
@@ -96,7 +99,7 @@ namespace SportsManagementApp.Tests.Services
             var mappedUser = UserTestData.MappedNewUser();
             var savedDto = UserTestData.CreatedHimeshResponse();
 
-            _mockRepo.Setup(repo => repo.GetUsersByFilterAsync(
+            _mockRepo.Setup(repo => repo.GetAllAsync(
                 It.IsAny<Expression<Func<User, bool>>>(),
                 It.IsAny<Expression<Func<User, UserResponseDto>>>()))
                 .ReturnsAsync(new List<UserResponseDto>());
@@ -118,7 +121,7 @@ namespace SportsManagementApp.Tests.Services
         [Fact]
         public async Task UpdateUserAsync_WhenUserNotFound_ThrowsNotFoundException()
         {
-            _mockRepo.Setup(repo => repo.GetUserEntityByIdAsync(99)).ReturnsAsync((User?)null);
+            _mockRepo.Setup(repo => repo.GetByIdAsync(99)).ReturnsAsync((User?)null);
 
             var exception = await Assert.ThrowsAsync<NotFoundException>(
                 async () => await _service.UpdateUserAsync(99, new UpdateUserDto()));
@@ -132,7 +135,7 @@ namespace SportsManagementApp.Tests.Services
             var dto = UserTestData.UpdateVishalWithPassword();
             var updatedDto = UserTestData.UpdatedVishalResponse();
 
-            _mockRepo.Setup(repo => repo.GetUserEntityByIdAsync(2)).ReturnsAsync(user);
+            _mockRepo.Setup(repo => repo.GetByIdAsync(2)).ReturnsAsync(user);
             _mockMapper.Setup(mapper => mapper.Map(dto, user));
             _mockRepo.Setup(repo => repo.UpdateAsync(user)).Returns(Task.CompletedTask);
             _mockRepo.Setup(repo => repo.GetUserDtoByIdAsync(
@@ -154,7 +157,7 @@ namespace SportsManagementApp.Tests.Services
             var dto = UserTestData.UpdateNavneetWithoutPassword();
             var updatedDto = UserTestData.UpdatedNavneetResponse();
 
-            _mockRepo.Setup(repo => repo.GetUserEntityByIdAsync(5)).ReturnsAsync(user);
+            _mockRepo.Setup(repo => repo.GetByIdAsync(5)).ReturnsAsync(user);
             _mockMapper.Setup(mapper => mapper.Map(dto, user));
             _mockRepo.Setup(repo => repo.UpdateAsync(user)).Returns(Task.CompletedTask);
             _mockRepo.Setup(repo => repo.GetUserDtoByIdAsync(
@@ -176,7 +179,7 @@ namespace SportsManagementApp.Tests.Services
             var dto = UserTestData.UpdateVaishak();
             var updatedDto = UserTestData.UpdatedVaishakResponse();
 
-            _mockRepo.Setup(repo => repo.GetUserEntityByIdAsync(6)).ReturnsAsync(user);
+            _mockRepo.Setup(repo => repo.GetByIdAsync(6)).ReturnsAsync(user);
             _mockMapper.Setup(mapper => mapper.Map(dto, user));
             _mockRepo.Setup(repo => repo.UpdateAsync(user)).Returns(Task.CompletedTask);
             _mockRepo.Setup(repo => repo.GetUserDtoByIdAsync(
