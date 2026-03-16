@@ -147,7 +147,7 @@ namespace SportsManagementApp.Tests.Services
             _mockRoleRepo.Setup(repo => repo.GetRoleByTypeAsync(RoleConstants.Participant))
                 .ReturnsAsync(participantRole);
             _mockMapper.Setup(mapper => mapper.Map<User>(request)).Returns(mappedUser);
-            _mockAuthRepo.Setup(repo => repo.AddUserAsync(It.IsAny<User>())).Returns(Task.CompletedTask);
+            _mockAuthRepo.Setup(repo => repo.AddAsync(It.IsAny<User>())).Returns(Task.CompletedTask);
             _mockMapper.Setup(mapper => mapper.Map<LoginResponseDto>((It.IsAny<User>()))).Returns(responseDto);
 
             var result = await _service.RegisterAsync(request);
@@ -155,7 +155,7 @@ namespace SportsManagementApp.Tests.Services
             Assert.NotNull(result);
             Assert.Equal("piyush@test.com", result.Email);
             Assert.False(string.IsNullOrEmpty(result.Token));
-            _mockAuthRepo.Verify(repo => repo.AddUserAsync(It.IsAny<User>()), Times.Once);
+            _mockAuthRepo.Verify(repo => repo.AddAsync(It.IsAny<User>()), Times.Once);
         }
     }
 }

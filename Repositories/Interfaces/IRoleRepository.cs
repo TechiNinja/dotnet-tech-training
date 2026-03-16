@@ -2,10 +2,8 @@
 
 namespace SportsManagementApp.Repositories.Interfaces
 {
-    public interface IRoleRepository
+    public interface IRoleRepository: IGenericRepository<Role>
     {
-        Task<List<Role>> GetRolesAsync();
         Task<Role?> GetRoleByTypeAsync(string RoleName);
-        Task AddRoleAsync(Role role);
     }
 }

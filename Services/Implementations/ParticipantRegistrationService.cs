@@ -30,6 +30,7 @@ namespace SportsManagementApp.Services.Implementations
             var registration = _mapper.Map<ParticipantRegistration>(request);
 
             await _registrationRepository.AddAsync(registration);
+            await _registrationRepository.SaveChangesAsync();
 
             var saved = await _registrationRepository.GetParticipantsByIdWithUserAsync(registration.Id);
             if (saved == null)

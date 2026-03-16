@@ -7,18 +7,21 @@ using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services.Implementations;
 using System.Linq.Expressions;
 using Xunit;
+using AutoMapper;
 
 namespace SportsManagementApp.Tests.Services
 {
     public class SportServiceTests
     {
         private readonly Mock<ISportRepository> _mockRepo;
+        private readonly Mock<IMapper> _mockMapper;
         private readonly SportService _service;
 
         public SportServiceTests()
         {
             _mockRepo = new Mock<ISportRepository>();
-            _service = new SportService(_mockRepo.Object);
+            _mockMapper = new Mock<IMapper>();
+            _service = new SportService(_mockRepo.Object, _mockMapper.Object);
         }
 
         [Fact]
@@ -59,12 +62,25 @@ namespace SportsManagementApp.Tests.Services
             var expectedSport = SportTestData.CreatedSport();
 
             _mockRepo.Setup(repo => repo.SportExistsAsync("Pool")).ReturnsAsync(false);
-            _mockRepo.Setup(repo => repo.CreateSportAsync("Pool")).ReturnsAsync(expectedSport);
+
+            _mockMapper.Setup(mapper => mapper.Map<Sport>(dto))
+                .Returns(new Sport { Id = 1, Name = "Pool" });
+
+            _mockRepo.Setup(repo => repo.AddAsync(It.IsAny<Sport>()))
+                .Returns(Task.CompletedTask);
+
+            _mockMapper.Setup(mapper => mapper.Map<SportResponseDto>(It.IsAny<Sport>()))
+                .Returns((Sport sport) => new SportResponseDto
+                {
+                    Id = sport.Id,
+                    Name = sport.Name
+                });
 
             var result = await _service.CreateSportAsync(dto);
 
             Assert.NotNull(result);
             Assert.Equal(expectedSport.Name, result.Name);
+
             _mockRepo.Verify(repo => repo.SportExistsAsync("Pool"), Times.Once);
         }
 
@@ -82,7 +98,7 @@ namespace SportsManagementApp.Tests.Services
         public async Task UpdateSportAsync_WhenSportNotFound_ThrowsNotFoundException()
         {
             var dto = SportTestData.NotFoundUpdateDto();
-            _mockRepo.Setup(repo => repo.GetSportByIdAsync(99)).ReturnsAsync((Sport?)null);
+            _mockRepo.Setup(repo => repo.GetByIdAsync(99)).ReturnsAsync((Sport?)null);
 
             var exception = await Assert.ThrowsAsync<NotFoundException>(
                 async () => await _service.UpdateSportAsync(99, dto));
@@ -95,7 +111,7 @@ namespace SportsManagementApp.Tests.Services
             var existing = SportTestData.ExistingSport();
             var dto = SportTestData.ConflictingUpdateDto();
 
-            _mockRepo.Setup(repo => repo.GetSportByIdAsync(1)).ReturnsAsync(existing);
+            _mockRepo.Setup(repo => repo.GetByIdAsync(1)).ReturnsAsync(existing);
             _mockRepo.Setup(repo => repo.SportExistsAsync("Carrom")).ReturnsAsync(true);
 
             var exception = await Assert.ThrowsAsync<ConflictException>(
@@ -109,15 +125,15 @@ namespace SportsManagementApp.Tests.Services
             var existing = SportTestData.ExistingSport();
             var dto = SportTestData.SameNameUpdateDto();
 
-            _mockRepo.Setup(repo => repo.GetSportByIdAsync(1)).ReturnsAsync(existing);
+            _mockRepo.Setup(repo => repo.GetByIdAsync(1)).ReturnsAsync(existing);
             _mockRepo.Setup(repo => repo.SportExistsAsync("Badminton")).ReturnsAsync(true);
-            _mockRepo.Setup(repo => repo.UpdateSportAsync(existing)).Returns(Task.CompletedTask);
+            _mockRepo.Setup(repo => repo.UpdateAsync(existing)).Returns(Task.CompletedTask);
 
             var result = await _service.UpdateSportAsync(1, dto);
 
             Assert.NotNull(result);
             Assert.Equal("Badminton", result.Name);
-            _mockRepo.Verify(repo => repo.UpdateSportAsync(existing), Times.Once);
+            _mockRepo.Verify(repo => repo.UpdateAsync(existing), Times.Once);
         }
 
         [Fact]
@@ -126,14 +142,14 @@ namespace SportsManagementApp.Tests.Services
             var existing = SportTestData.ExistingSport();
             var dto = SportTestData.ValidUpdateDto();
 
-            _mockRepo.Setup(repo => repo.GetSportByIdAsync(1)).ReturnsAsync(existing);
+            _mockRepo.Setup(repo => repo.GetByIdAsync(1)).ReturnsAsync(existing);
             _mockRepo.Setup(repo => repo.SportExistsAsync("Tennis")).ReturnsAsync(false);
-            _mockRepo.Setup(repo => repo.UpdateSportAsync(existing)).Returns(Task.CompletedTask);
+            _mockRepo.Setup(repo => repo.UpdateAsync(existing)).Returns(Task.CompletedTask);
 
             var result = await _service.UpdateSportAsync(1, dto);
 
             Assert.Equal("Tennis", result.Name);
-            _mockRepo.Verify(repo => repo.UpdateSportAsync(existing), Times.Once);
+            _mockRepo.Verify(repo => repo.UpdateAsync(existing), Times.Once);
         }
 
         [Fact]
@@ -142,7 +158,7 @@ namespace SportsManagementApp.Tests.Services
             var expected = SportTestData.SportResponseList();
 
             _mockRepo
-                .Setup(repo => repo.GetSportsAsync(
+                .Setup(repo => repo.GetAllAsync(
                     It.IsAny<Expression<Func<Sport, bool>>>(),
                     It.IsAny<Expression<Func<Sport, SportResponseDto>>>()))
                 .ReturnsAsync(expected);

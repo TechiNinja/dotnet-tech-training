@@ -11,7 +11,9 @@ namespace SportsManagementApp.Data.Predicates
             return user =>
                 (!filter.IsActive.HasValue || user.IsActive == filter.IsActive.Value) &&
                 (!filter.RoleId.HasValue || user.RoleId == filter.RoleId.Value) &&
-                (string.IsNullOrEmpty(filter.SearchTerm) || user.FullName == filter.SearchTerm || user.Email == filter.SearchTerm);
+                (string.IsNullOrEmpty(filter.SearchTerm) ||
+                user.FullName.ToLower().Contains(filter.SearchTerm.ToLower()) ||
+                user.Email.ToLower().Contains(filter.SearchTerm.ToLower()));
         }
     }
 }

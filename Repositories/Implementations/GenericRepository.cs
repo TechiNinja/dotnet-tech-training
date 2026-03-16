@@ -70,13 +70,11 @@ namespace SportsManagementApp.Repositories.Implementations
         public async Task AddAsync(T entity)
         {
             _dbSet.Add(entity);
-            await _context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(T entity)
         {
             _dbSet.Update(entity);
-            await _context.SaveChangesAsync();
         }
 
         public async Task<int> SaveChangesAsync()

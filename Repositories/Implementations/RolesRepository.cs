@@ -9,19 +9,9 @@ namespace SportsManagementApp.Repositories.Implementations
     {
         public RolesRepository(AppDbContext context) : base(context) { }
 
-        public async Task<List<Role>> GetRolesAsync()
-        {
-            return await GetAllAsync();
-        }
-
         public async Task<Role?> GetRoleByTypeAsync(string roleName)
         {
             return await _dbSet.FirstOrDefaultAsync(role => role.Name == roleName);
-        }
-
-        public async Task AddRoleAsync(Role role)
-        {
-            await AddAsync(role);
         }
     }
 }

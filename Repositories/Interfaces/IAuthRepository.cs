@@ -2,10 +2,9 @@
 
 namespace SportsManagementApp.Repositories.Interfaces
 {
-    public interface IAuthRepository
+    public interface IAuthRepository: IGenericRepository<User>
     {
         Task<User?> GetUserByEmailWithRoleAsync(string email);
         Task<bool> UserExistsAsync(string email);
-        Task AddUserAsync(User user);
     }
 }

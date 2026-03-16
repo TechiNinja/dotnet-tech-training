@@ -23,7 +23,7 @@ namespace SportsManagementApp.Tests.Services
         public async Task GetRolesAsync_WhenRolesExist_ReturnsRolesList()
         {
             var expected = RolesTestData.AllRolesList();
-            _mockRepo.Setup(repo => repo.GetRolesAsync()).ReturnsAsync(expected);
+            _mockRepo.Setup(repo => repo.GetAllAsync()).ReturnsAsync(expected);
 
             var result = await _service.GetRolesAsync();
 
@@ -36,7 +36,7 @@ namespace SportsManagementApp.Tests.Services
         public async Task GetRolesAsync_WhenNoRoles_ReturnsEmptyList()
         {
             var expected = RolesTestData.EmptyRolesList();
-            _mockRepo.Setup(repo => repo.GetRolesAsync()).ReturnsAsync(expected);
+            _mockRepo.Setup(repo => repo.GetAllAsync()).ReturnsAsync(expected);
 
             var result = await _service.GetRolesAsync();
 
@@ -60,13 +60,13 @@ namespace SportsManagementApp.Tests.Services
         {
             var dto = RolesTestData.ValidCreateRoleDto();
             _mockRepo.Setup(repo => repo.GetRoleByTypeAsync("Manager")).ReturnsAsync((Role?)null);
-            _mockRepo.Setup(repo => repo.AddRoleAsync(It.IsAny<Role>())).Returns(Task.CompletedTask);
+            _mockRepo.Setup(repo => repo.AddAsync(It.IsAny<Role>())).Returns(Task.CompletedTask);
 
             var result = await _service.CreateRoleAsync(dto);
 
             Assert.NotNull(result);
             Assert.Equal("Manager", result.Name);
-            _mockRepo.Verify(repo => repo.AddRoleAsync(It.IsAny<Role>()), Times.Once);
+            _mockRepo.Verify(repo => repo.AddAsync(It.IsAny<Role>()), Times.Once);
         }
     }
 }
