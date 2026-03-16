@@ -4,6 +4,8 @@ using SportsManagementApp.Data.DTOs;
 using SportsManagementApp.Enums;
 using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services.Interfaces;
+using SportsManagementApp.StringConstants;
+using SportsManagementApp.Helper;
 
 namespace SportsManagementApp.Services.Implementations;
 
@@ -26,21 +28,21 @@ public class OperationsService : IOperationsService
         _mapper = mapper;
     }
 
-    public async Task<EventRequestResponseDto> DecideAsync(
+    public async Task<EventRequestResponseDto> ReviewEventRequestAsync(
         int requestId,
         DecideEventRequestDto dto,
         int opsUserId,
         RequestStatus status)
     {
         if (status != RequestStatus.Approved && status != RequestStatus.Rejected)
-            throw new ValidationException("Only Approved or Rejected decisions are allowed.");
+            throw new ValidationException(StringConstant.OnlyApproveOrRejectAllowed);
 
         var request = await _eventRequestRepository.GetEventRequestByIdAsync(requestId);
         if (request == null)
-            throw new NotFoundException("Event request not found.");
+            throw new NotFoundException(StringConstant.NoEventFound);
 
         if (request.Status != RequestStatus.Pending)
-            throw new ConflictException("Request already processed. Double approval or rejection is not allowed.");
+            throw new ConflictException(StringConstant.RequestProcessNotAllowed);
 
         request.Status = status;
         request.Remarks = dto.Remarks.Trim();
@@ -53,14 +55,10 @@ public class OperationsService : IOperationsService
         var message = status == RequestStatus.Approved
             ? $"Your request #{request.Id} has been approved."
             : $"Your request #{request.Id} has been rejected. Remarks: {request.Remarks}";
-
-        await _notificationService.CreateAsync(
-            userId: request.AdminId,
-            requestId: request.Id,
-            message: message,
-            type: status == RequestStatus.Approved ? NotificationType.Approved : NotificationType.Rejected,
-            audience: NotificationAudience.Admin
-        );
+            
+                await _notificationService.CreateAsync(
+    request.CreateNotification(message, status)
+);
 
         return _mapper.Map<EventRequestResponseDto>(request);
     }

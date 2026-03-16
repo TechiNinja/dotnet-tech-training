@@ -32,6 +32,12 @@ namespace SportsManagementApp.Controllers
             return Ok(await _matchService.UpdateSetAsync(id, request));
         }
 
+        [HttpPatch("{matchId:int}/sets/{setId:int}")]
+        public async Task<IActionResult> UpdateSetById(int matchId, int setId, [FromBody] MatchSetRequest request)
+        {
+            return Ok(await _matchService.UpdateSetByIdAsync(matchId, setId, request));
+        }
+
         [HttpGet("{id:int}/sets")]
         public async Task<IActionResult> GetAllSets(int id) =>
             Ok(await _matchService.GetSetsAsync(id));

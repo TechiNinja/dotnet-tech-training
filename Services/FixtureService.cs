@@ -24,10 +24,10 @@ namespace SportsManagementApp.Services
             IFixtureStrategy fixtureStrategy,
             IMapper mapper)
         {
-            _categoryRepo = categoryRepo;
-            _matchRepo = matchRepo;
+            _categoryRepo    = categoryRepo;
+            _matchRepo       = matchRepo;
             _fixtureStrategy = fixtureStrategy;
-            _mapper           = mapper;
+            _mapper          = mapper;
         }
 
         public async Task<IEnumerable<FixtureResponse>> GenerateFixturesAsync(int catId)
@@ -38,9 +38,8 @@ namespace SportsManagementApp.Services
             if (category.Matches.Any())
                 throw new ConflictException(AppConstants.FixturesAlreadyExist);
 
-            var sideIds  = ExtractSideIds(category);
-            var strategy = _fixtureStrategy;
-            var matches  = strategy.Generate(sideIds, catId);
+            var sideIds = ExtractSideIds(category);
+            var matches = _fixtureStrategy.Generate(sideIds, catId);
 
             foreach (var match in matches)
                 await _matchRepo.AddAsync(match);
@@ -48,7 +47,7 @@ namespace SportsManagementApp.Services
             await _matchRepo.SaveChangesAsync();
 
             var created = await _matchRepo.GetByCategoryAsync(catId, null);
-            return FixtureMapper.MapFixtures(created, category, _mapper);
+            return _mapper.Map<IEnumerable<FixtureResponse>>(created);
         }
 
         public async Task<IEnumerable<FixtureResponse>> GetFixturesAsync(int catId, string? status)
@@ -57,14 +56,15 @@ namespace SportsManagementApp.Services
                 !Enum.TryParse<MatchStatus>(status, true, out _))
                 throw new BadRequestException(string.Format(AppConstants.InvalidMatchStatus, status));
 
-            var category = await _categoryRepo.GetByIdWithDetailsAsync(catId)
-                ?? throw new NotFoundException(string.Format(AppConstants.CategoryNotFound, catId));
+            if (!await _categoryRepo.ExistsAsync(c => c.Id == catId))
+                throw new NotFoundException(string.Format(AppConstants.CategoryNotFound, catId));
 
             var matches = await _matchRepo.GetByCategoryAsync(catId, status);
-            return FixtureMapper.MapFixtures(matches, category, _mapper);
+            return _mapper.Map<IEnumerable<FixtureResponse>>(matches);
         }
 
-        public async Task<IEnumerable<FixtureResponse>> BulkScheduleAsync(int catId, List<MatchScheduleItem> schedules)        {
+        public async Task<IEnumerable<FixtureResponse>> BulkScheduleAsync(int catId, List<MatchScheduleItem> schedules)
+        {
             var category = await _categoryRepo.GetByIdWithDetailsAsync(catId)
                 ?? throw new NotFoundException(string.Format(AppConstants.CategoryNotFound, catId));
 
@@ -83,17 +83,16 @@ namespace SportsManagementApp.Services
                 if (await _matchRepo.HasOverlapAsync(catId, item.MatchDateTime, item.MatchId))
                     throw new ConflictException(AppConstants.ScheduleTimeOverlap);
 
-                match.MatchDateTime = item.MatchDateTime;
-                match.MatchVenue    = category.Event?.EventVenue ?? string.Empty;
-                match.TotalSets     = item.TotalSets;
-                match.UpdatedAt     = DateTime.UtcNow;
+                _mapper.Map(item, match);
+                match.MatchVenue = category.Event?.EventVenue ?? string.Empty;
+                match.UpdatedAt  = DateTime.UtcNow;
                 _matchRepo.Update(match);
             }
 
             await _matchRepo.SaveChangesAsync();
 
             var updated = await _matchRepo.GetByCategoryAsync(catId, null);
-            return FixtureMapper.MapFixtures(updated, category, _mapper);
+            return _mapper.Map<IEnumerable<FixtureResponse>>(updated);
         }
 
         public async Task DeleteFixturesAsync(int catId)

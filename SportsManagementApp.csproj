@@ -26,4 +26,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="SportsManagementApp.Tests/**/*.cs" />
+    <None Include="SportsManagementApp.Tests/**/*.cs" />
+  </ItemGroup>
 </Project>

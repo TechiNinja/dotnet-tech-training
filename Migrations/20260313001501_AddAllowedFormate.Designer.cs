@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SportsManagementApp.Data;
 
@@ -11,9 +12,11 @@ using SportsManagementApp.Data;
 namespace SportsManagementApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260313001501_AddAllowedFormate")]
+    partial class AddAllowedFormate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -40,16 +43,16 @@ namespace SportsManagementApp.Migrations
                     b.Property<DateOnly>("EndDate")
                         .HasColumnType("date");
 
-                    b.Property<int>("EventRequestId")
+                    b.Property<int?>("EventRequestId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EventRquestId")
                         .HasColumnType("int");
 
                     b.Property<string>("EventVenue")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
-
-                    b.Property<int>("MaxParticipantsCount")
-                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -71,16 +74,12 @@ namespace SportsManagementApp.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<int>("TournamentType")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EventRequestId")
-                        .IsUnique();
+                    b.HasIndex("EventRequestId");
 
                     b.HasIndex("OrganizerId");
 
@@ -110,6 +109,9 @@ namespace SportsManagementApp.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TournamentType")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -401,6 +403,10 @@ namespace SportsManagementApp.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AllowedFormats")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -518,10 +524,8 @@ namespace SportsManagementApp.Migrations
             modelBuilder.Entity("SportsManagementApp.Data.Entities.Event", b =>
                 {
                     b.HasOne("SportsManagementApp.Data.Entities.EventRequest", "EventRequest")
-                        .WithOne("Event")
-                        .HasForeignKey("SportsManagementApp.Data.Entities.Event", "EventRequestId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .WithMany()
+                        .HasForeignKey("EventRequestId");
 
                     b.HasOne("SportsManagementApp.Data.Entities.User", "Organizer")
                         .WithMany()
@@ -699,8 +703,6 @@ namespace SportsManagementApp.Migrations
 
             modelBuilder.Entity("SportsManagementApp.Data.Entities.EventRequest", b =>
                 {
-                    b.Navigation("Event");
-
                     b.Navigation("Notifications");
                 });
 

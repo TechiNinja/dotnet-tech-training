@@ -6,12 +6,13 @@ using SportsManagementApp.Helper;
 using SportsManagementApp.Data.DTOs;
 using SportsManagementApp.Enums;
 using SportsManagementApp.Services.Interfaces;
+using SportsManagementApp.Constants;
 
 namespace SportsManagementApp.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize(Roles = "Operations")]
+[Authorize(Roles = $"{RoleConstants.Operation}")]
 public class OperationController : ControllerBase
 {
     private readonly IOperationsService _operationsService;
@@ -23,14 +24,13 @@ public class OperationController : ControllerBase
 
     [HttpPut("{id:int}/{status}")]
     [ProducesResponseType(typeof(EventRequestResponseDto), StatusCodes.Status200OK)]
-    public async Task<ActionResult<EventRequestResponseDto>> DecideEventRequest(
+    public async Task<ActionResult<EventRequestResponseDto>> ReviewEventRequest(
         int id,
         [FromBody] DecideEventRequestDto dto,
         [FromRoute] RequestStatus status)
     {
         var opsId = User.GetUserId();
-
-        var updated = await _operationsService.DecideAsync(id, dto, opsId, status);
+        var updated = await _operationsService.ReviewEventRequestAsync(id, dto, opsId, status);
         return Ok(updated);
     }
 }

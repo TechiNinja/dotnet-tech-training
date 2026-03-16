@@ -7,5 +7,6 @@ namespace SportsManagementApp.Services.Interfaces
     {
         Task<SetUpdateResponse> UpdateSetAsync(int matchId, MatchSetRequest request);
         Task<IEnumerable<MatchSetResponse>> GetSetsAsync(int matchId);
+        Task<SetUpdateResponse> UpdateSetByIdAsync(int matchId, int setId, MatchSetRequest request);
     }
 }

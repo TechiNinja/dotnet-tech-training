@@ -2,9 +2,9 @@
 {
     public static class RoleConstants
     {
-        public const string Admin = "Admin";
-        public const string OpsTeam = "OpsTeam";
-        public const string Organizer = "Organizer";
-        public const string Participant = "Participant";
+        public const string Admin = "admin";
+        public const string Operation = "operations";
+        public const string Organizer = "organizer";
+        public const string Participant = "participant";
     }
 }

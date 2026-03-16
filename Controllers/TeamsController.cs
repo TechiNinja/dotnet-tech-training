@@ -26,7 +26,7 @@ namespace SportsManagementApp.Controllers
         }
 
         [HttpPost("create")]
-        [Authorize(Roles = "Organizer")]
+        [Authorize(Roles = "organizer,admin")]
         public async Task<ActionResult<List<TeamResponseDto>>> CreateTeams(CreateTeamRequestDto request)
         {
             var result = await _teamsService.CreateTeamsAsync(request);

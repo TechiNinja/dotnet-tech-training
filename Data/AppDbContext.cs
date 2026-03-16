@@ -1,5 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SportsManagementApp.Data.Entities;
+using System;
+using System.Text.Json;
+
 namespace SportsManagementApp.Data
 {
     public class AppDbContext : DbContext
@@ -85,6 +88,12 @@ namespace SportsManagementApp.Data
             modelBuilder.Entity<Event>()
                 .HasIndex(e => e.EventRequestId)
                 .IsUnique();
+            modelBuilder.Entity<Sport>()
+    .Property(s => s.AllowedFormats)
+    .HasConversion(
+        v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+        v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions?)null) ?? new List<string>()
+    );
         }
     }
 }

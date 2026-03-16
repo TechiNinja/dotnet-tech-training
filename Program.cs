@@ -30,13 +30,11 @@ builder.Services.AddControllers()
     });
 
 builder.Services.AddEndpointsApiExplorer();
-
 builder.Services.AddOpenApiDocument(config =>
 {
     config.Title       = AppConstants.SwaggerTitle;
     config.Description = AppConstants.SwaggerDescription;
     config.Version     = "v1";
-
     config.AddSecurity("JWT", new NSwag.OpenApiSecurityScheme
     {
         Type        = NSwag.OpenApiSecuritySchemeType.ApiKey,
@@ -44,14 +42,12 @@ builder.Services.AddOpenApiDocument(config =>
         In          = NSwag.OpenApiSecurityApiKeyLocation.Header,
         Description = "Enter: Bearer {your token}"
     });
-
     config.OperationProcessors.Add(
         new NSwag.Generation.Processors.Security.AspNetCoreOperationSecurityScopeProcessor("JWT")
     );
 });
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
 builder.Services.AddApplicationServices();
 builder.Services.AddFixtureServices();
 builder.Services.AddRepositories();
@@ -70,7 +66,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidAudience            = builder.Configuration["Jwt:Audience"],
             IssuerSigningKey         = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)
-            )
+            ),
         };
     });
 
@@ -79,7 +75,6 @@ builder.Services.AddAuthorization();
 var app = builder.Build();
 
 app.UseGlobalExceptionHandler();
-
 app.UseOpenApi();
 app.UseSwaggerUi(settings =>
 {
@@ -87,9 +82,8 @@ app.UseSwaggerUi(settings =>
     settings.DocumentPath = "/swagger/v1/swagger.json";
 });
 
-// app.UseHttpsRedirection();
-app.UseCors(AppConstants.ReactNativeCorsPolicy);
 app.UseRouting();
+app.UseCors(AppConstants.ReactNativeCorsPolicy);
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

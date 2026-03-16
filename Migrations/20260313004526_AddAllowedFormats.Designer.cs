@@ -12,8 +12,8 @@ using SportsManagementApp.Data;
 namespace SportsManagementApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260305051747_Initial")]
-    partial class Initial
+    [Migration("20260313004526_AddAllowedFormats")]
+    partial class AddAllowedFormats
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -280,6 +280,40 @@ namespace SportsManagementApp.Migrations
                     b.ToTable("MatchSets");
                 });
 
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Audience")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EventRequestId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventRequestId");
+
+                    b.ToTable("Notifications");
+                });
+
             modelBuilder.Entity("SportsManagementApp.Data.Entities.ParticipantRegistration", b =>
                 {
                     b.Property<int>("Id")
@@ -368,6 +402,10 @@ namespace SportsManagementApp.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AllowedFormats")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -483,40 +521,6 @@ namespace SportsManagementApp.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Entities.Notification", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Audience")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("EventRequestId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EventRequestId");
-
-                    b.ToTable("Notifications");
-                });
-
             modelBuilder.Entity("SportsManagementApp.Data.Entities.Event", b =>
                 {
                     b.HasOne("SportsManagementApp.Data.Entities.EventRequest", "EventRequest")
@@ -601,6 +605,17 @@ namespace SportsManagementApp.Migrations
                     b.Navigation("Match");
                 });
 
+            modelBuilder.Entity("SportsManagementApp.Data.Entities.Notification", b =>
+                {
+                    b.HasOne("SportsManagementApp.Data.Entities.EventRequest", "EventRequest")
+                        .WithMany("Notifications")
+                        .HasForeignKey("EventRequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EventRequest");
+                });
+
             modelBuilder.Entity("SportsManagementApp.Data.Entities.ParticipantRegistration", b =>
                 {
                     b.HasOne("SportsManagementApp.Data.Entities.EventCategory", "EventCategory")
@@ -672,17 +687,6 @@ namespace SportsManagementApp.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("SportsManagementApp.Entities.Notification", b =>
-                {
-                    b.HasOne("SportsManagementApp.Data.Entities.EventRequest", "EventRequest")
-                        .WithMany("EventRegistrations")
-                        .HasForeignKey("EventRequestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("EventRequest");
-                });
-
             modelBuilder.Entity("SportsManagementApp.Data.Entities.Event", b =>
                 {
                     b.Navigation("Categories");
@@ -699,7 +703,7 @@ namespace SportsManagementApp.Migrations
 
             modelBuilder.Entity("SportsManagementApp.Data.Entities.EventRequest", b =>
                 {
-                    b.Navigation("EventRegistrations");
+                    b.Navigation("Notifications");
                 });
 
             modelBuilder.Entity("SportsManagementApp.Data.Entities.Match", b =>

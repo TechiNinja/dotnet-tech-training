@@ -6,5 +6,6 @@ namespace SportsManagementApp.Repositories.Interfaces
     {
         Task<AdminAnalyticsDto> GetAdminAnalyticsAsync();
         Task<OrganizerAnalyticsDto> GetOrganizerAnalyticsAsync(int organizerId);
+        Task<OperationAnalyticsDto> GetOperationAnalyticsAsync();
     }
 }

@@ -7,7 +7,7 @@ namespace SportsManagementApp.Services.Interfaces
     {
         Task<EventRequestResponseDto> RaiseEventRequestAsync(CreateEventRequestDto dto, int adminId);
         Task<EventRequestResponseDto> GetByIdForAdminAsync(int id, int adminId);
-        Task<IEnumerable<EventRequestResponseDto>> SearchEventRequestsAsync(EventRequestFilterDto filter);
+        Task<IEnumerable<EventRequestResponseDto>> GetAllEventRequestsAsync(EventRequestFilterDto filter);
         Task<EventRequestResponseDto> EditEventRequestAsync(int id, EditEventRequestDto dto, int adminId);
         Task<EventRequestResponseDto> WithdrawEventRequestAsync(int id, int adminId);
     }

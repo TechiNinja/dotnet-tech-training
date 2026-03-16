@@ -61,23 +61,9 @@ namespace SportsManagementApp.Services
                 throw new UnprocessableEntityException(
                     string.Format(AppConstants.EventRequestNotApproved, eventRequest.Status));
 
-            bool alreadyCreated = await _eventRepo.ExistsByRequestIdAsync(requestId);
-
-            return new EventRequestPreFillResponse
-            {
-                Id                    = eventRequest.Id,
-                SportName             = eventRequest.Sport?.Name ?? string.Empty,
-                Gender                = eventRequest.Gender.ToString(),
-                Format                = eventRequest.Format.ToString(),
-                RequestedVenue        = eventRequest.RequestedVenue,
-                StartDate             = eventRequest.StartDate,
-                EndDate               = eventRequest.EndDate,
-                Status                = eventRequest.Status.ToString(),
-                IsEventAlreadyCreated = alreadyCreated,
-                Name                  = eventRequest.EventName,
-                Description           = null,
-                RegistrationDeadline  = null
-            };
+            var response = _mapper.Map<EventRequestPreFillResponse>(eventRequest);
+            response.IsEventAlreadyCreated = await _eventRepo.ExistsByRequestIdAsync(requestId);
+            return response;
         }
 
         public async Task<EventResponse> CreateEventFromRequestAsync(CreateEventRequest request)
@@ -92,8 +78,19 @@ namespace SportsManagementApp.Services
                 throw new ConflictException(
                     string.Format(AppConstants.EventAlreadyExists, request.EventRequestId));
 
-            var newEvent = BuildEvent(request, eventRequest);
-            newEvent.Categories = EventCategoryFactory.Generate(eventRequest.Gender, eventRequest.Format);
+            var newEvent = _mapper.Map<Event>(request);
+            newEvent.SportId        = eventRequest.SportId;
+            newEvent.StartDate      = eventRequest.StartDate;
+            newEvent.EndDate        = eventRequest.EndDate;
+            newEvent.EventVenue     = eventRequest.RequestedVenue;
+            newEvent.OrganizerId    = eventRequest.AdminId;
+            newEvent.Status         = EventStatus.Open;
+            newEvent.TournamentType = TournamentType.Knockout;
+            newEvent.CreatedAt      = DateTime.UtcNow;
+            newEvent.Name           = !string.IsNullOrWhiteSpace(request.Name)
+                                        ? request.Name
+                                        : eventRequest.EventName;
+            newEvent.Categories     = EventCategoryFactory.Generate(eventRequest.Gender, eventRequest.Format);
 
             await _eventRepo.AddAsync(newEvent);
             await _eventRepo.SaveChangesAsync();
@@ -116,38 +113,22 @@ namespace SportsManagementApp.Services
                 entity.Status    = EventStatus.Cancelled;
                 entity.UpdatedAt = DateTime.UtcNow;
             }
-            else if (action == "publish")
-            {
-                if (entity.Status != EventStatus.Upcoming)
-                    throw new BadRequestException("Only Upcoming events can be published.");
-                entity.Status    = EventStatus.Open;
-                entity.UpdatedAt = DateTime.UtcNow;
-            }
             else if (action == "update")
             {
-                if (request.Name != null)
-                    entity.Name = request.Name.Trim();
-
-                if (request.Description != null)
-                    entity.Description = request.Description.Trim();
-
-                if (request.MaxParticipantsCount.HasValue)
-                    entity.MaxParticipantsCount = request.MaxParticipantsCount.Value;
+                _mapper.Map(request, entity);
+                entity.UpdatedAt = DateTime.UtcNow;
 
                 if (request.RegistrationDeadline.HasValue)
                 {
                     if (request.RegistrationDeadline.Value >= entity.StartDate)
                         throw new BadRequestException(AppConstants.RegistrationDeadlineInvalid);
-                    entity.RegistrationDeadline = request.RegistrationDeadline.Value;
                     if (entity.Status == EventStatus.Cancelled)
                         entity.Status = EventStatus.Open;
                 }
-
-                entity.UpdatedAt = DateTime.UtcNow;
             }
             else
             {
-                throw new BadRequestException($"Invalid action '{request.Action}'. Use 'update', 'publish' or 'cancel'.");
+                throw new BadRequestException($"Invalid action '{request.Action}'. Use 'update' or 'cancel'.");
             }
 
             _eventRepo.Update(entity);
@@ -211,22 +192,5 @@ namespace SportsManagementApp.Services
                 throw new UnprocessableEntityException(
                     string.Format(AppConstants.UserNotOrganizer, organizer.FullName));
         }
-
-        private static Event BuildEvent(CreateEventRequest request, EventRequest eventRequest) => new()
-        {
-            EventRequestId       = request.EventRequestId,
-            Name                 = !string.IsNullOrWhiteSpace(request.Name) ? request.Name : eventRequest.EventName,
-            SportId              = eventRequest.SportId,
-            StartDate            = eventRequest.StartDate,
-            EndDate              = eventRequest.EndDate,
-            EventVenue           = eventRequest.RequestedVenue,
-            RegistrationDeadline = request.RegistrationDeadline,
-            MaxParticipantsCount = request.MaxParticipantsCount,
-            Description          = request.Description,
-            Status               = EventStatus.Upcoming,
-            OrganizerId          = eventRequest.AdminId,
-            TournamentType       = TournamentType.Knockout,
-            CreatedAt            = DateTime.UtcNow
-        };
     }
 }

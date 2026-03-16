@@ -5,7 +5,7 @@ namespace SportsManagementApp.Services.Interfaces
 {
     public interface IOperationsService
     {
-        Task<EventRequestResponseDto> DecideAsync(
+        Task<EventRequestResponseDto> ReviewEventRequestAsync(
             int requestId,
             DecideEventRequestDto dto,
             int opsUserId,

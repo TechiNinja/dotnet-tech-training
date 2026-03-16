@@ -2,12 +2,12 @@ using AutoMapper;
 using SportsManagementApp.Exceptions;
 using SportsManagementApp.Data.DTOs;
 using SportsManagementApp.Data.Entities;
+using SportsManagementApp.Constants;
 using SportsManagementApp.Data.Filters;
 using SportsManagementApp.Enums;
-using SportsManagementApp.Helper;
-using SportsManagementApp.Constants;
 using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services.Interfaces;
+using SportsManagementApp.Helper;
 using SportsManagementApp.StringConstants;
 
 namespace SportsManagementApp.Services.Implementations;
@@ -33,11 +33,12 @@ public class EventRequestService : IEventRequestService
 
     public async Task<EventRequestResponseDto> RaiseEventRequestAsync(CreateEventRequestDto dto, int adminId)
     {
-        ValidateDates(dto.StartDate, dto.EndDate);
+        if (dto.StartDate > dto.EndDate)
+            throw new ValidationException(StringConstant.DateCompare);
 
         var sportExists = await _sportRepository.ExistsAsync(sport => sport.Id == dto.SportId);
         if (!sportExists)
-            throw new ValidationException("Selected sport does not exist.");
+            throw new ValidationException(StringConstant.SportNotFound);
 
         var exists = await _eventRequestRepository.ExistsAsync(e =>
             e.SportId == dto.SportId &&
@@ -60,13 +61,11 @@ public class EventRequestService : IEventRequestService
         if (createdRequest == null)
             throw new NotFoundException(StringConstant.NoRequestFound);
 
+        var message = $"New event request #{request.Id} is pending for review.";    
+
         await _notificationService.CreateAsync(
-            userId: null,
-            requestId: request.Id,
-            message: $"New event request #{request.Id} is pending for review.",
-            type: NotificationType.NewRequest,
-            audience: NotificationAudience.Ops
-        );
+        request.CreateNotification(message, RequestStatus.Pending)
+);
 
         return createdRequest;
     }
@@ -79,30 +78,18 @@ public class EventRequestService : IEventRequestService
             throw new NotFoundException(StringConstant.NoRequestFound);
 
         if (request.AdminId != adminId)
-            throw new ForbiddenException("You can only access your own event requests.");
+            throw new ForbiddenException(StringConstant.NoRequestAccess);
 
         return request;
     }
-
-    public async Task<IEnumerable<EventRequestResponseDto>> SearchEventRequestsAsync(EventRequestFilterDto filter)
+    public async Task<IEnumerable<EventRequestResponseDto>> GetAllEventRequestsAsync(EventRequestFilterDto filter)
     {
         return await _eventRequestRepository.GetEventRequestsByFilterAsync(filter);
     }
 
     public async Task<EventRequestResponseDto> EditEventRequestAsync(int id, EditEventRequestDto dto, int adminId)
     {
-        ValidateDates(dto.StartDate, dto.EndDate);
-
-        var request = await _eventRequestRepository.GetEventRequestByIdAsync(id);
-
-        if (request == null)
-            throw new NotFoundException(StringConstant.NoRequestFound);
-
-        if (request.AdminId != adminId)
-            throw new ForbiddenException("You can only edit your own event requests.");
-
-        if (request.Status != RequestStatus.Pending)
-            throw new ConflictException(StringConstant.EventRequestModifyNotAllowed);
+        var request = await GetOwnedPendingRequestOrThrowAsync(id, adminId, StringConstant.OnlyEditOwnRequest);
 
         _mapper.Map(dto, request);
         request.UpdatedDate = DateTime.UtcNow;
@@ -115,16 +102,7 @@ public class EventRequestService : IEventRequestService
 
     public async Task<EventRequestResponseDto> WithdrawEventRequestAsync(int id, int adminId)
     {
-        var request = await _eventRequestRepository.GetEventRequestByIdAsync(id);
-
-        if (request == null)
-            throw new NotFoundException(StringConstant.NoRequestFound);
-
-        if (request.AdminId != adminId)
-            throw new ForbiddenException("You can only withdraw your own event requests.");
-
-        if (request.Status != RequestStatus.Pending)
-            throw new ConflictException(StringConstant.EventRequestWithdrawalNotAllowed);
+        var request = await GetOwnedPendingRequestOrThrowAsync(id, adminId, StringConstant.OnlyWithdrawOwnRequest);
 
         request.Status = RequestStatus.Withdrawn;
         request.UpdatedDate = DateTime.UtcNow;
@@ -135,10 +113,20 @@ public class EventRequestService : IEventRequestService
         return _mapper.Map<EventRequestResponseDto>(request);
     }
 
-    private static void ValidateDates(DateOnly start, DateOnly end)
+    private async Task<EventRequest> GetOwnedPendingRequestOrThrowAsync(int id, int adminId, string forbiddenMessage)
     {
-        if (start > end)
-            throw new ValidationException(StringConstant.DateCompare);
+        var request = await _eventRequestRepository.GetEventRequestByIdAsync(id);
+
+        if (request == null)
+            throw new NotFoundException(StringConstant.NoRequestFound);
+
+        if (request.AdminId != adminId)
+            throw new ForbiddenException(forbiddenMessage);
+
+        if (request.Status != RequestStatus.Pending)
+            throw new ConflictException(StringConstant.EventRequestModifyNotAllowed);
+
+        return request;
     }
 
 }

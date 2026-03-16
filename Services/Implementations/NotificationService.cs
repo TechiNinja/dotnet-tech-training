@@ -1,7 +1,10 @@
+using AutoMapper;
 using Microsoft.AspNetCore.SignalR;
-using SportsManagementApp.Exceptions;
+using SportsManagementApp.StringConstants;
+using SportsManagementApp.Data.DTOs;
 using SportsManagementApp.Data.Entities;
 using SportsManagementApp.Enums;
+using SportsManagementApp.Exceptions;
 using SportsManagementApp.Hubs;
 using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services.Interfaces;
@@ -12,43 +15,36 @@ public class NotificationService : INotificationService
 {
     private readonly INotificationRepository _notificationRepository;
     private readonly IHubContext<NotificationHub> _hubContext;
+    private readonly IMapper _mapper;
 
     public NotificationService(
         INotificationRepository notificationRepository,
-        IHubContext<NotificationHub> hubContext)
+        IHubContext<NotificationHub> hubContext,
+        IMapper mapper)
     {
         _notificationRepository = notificationRepository;
         _hubContext = hubContext;
+        _mapper = mapper;
     }
 
-    public async Task<Notification> CreateAsync(
-        int? userId,
-        int requestId,
-        string message,
-        NotificationType type,
-        NotificationAudience audience)
+    public async Task<Notification> CreateAsync(CreateNotificationDto dto)
     {
-        if (requestId <= 0)
-            throw new ValidationException("Invalid requestId.");
+        if (dto.EventRequestId <= 0)
+            throw new ValidationException(StringConstant.InvalidId);
 
-        if (string.IsNullOrWhiteSpace(message))
-            throw new ValidationException("Message is required.");
+        if (string.IsNullOrWhiteSpace(dto.Message))
+            throw new ValidationException(StringConstant.MessageRequired);
 
-        if (audience == NotificationAudience.Admin && (!userId.HasValue || userId.Value <= 0))
-            throw new ValidationException("UserId is required for Admin notifications.");
+        if (dto.Audience == NotificationAudience.Admin &&
+            (!dto.UserId.HasValue || dto.UserId.Value <= 0))
+            throw new ValidationException(StringConstant.IdRequired);
 
-        if (audience == NotificationAudience.Ops)
-            userId = null;
+        if (dto.Audience == NotificationAudience.Ops)
+            dto.UserId = null;
 
-        var notification = new Notification
-        {
-            UserId = userId,
-            Audience = audience,
-            EventRequestId = requestId,
-            Message = message.Trim(),
-            Type = type,
-            CreatedAt = DateTime.UtcNow
-        };
+        dto.Message = dto.Message.Trim();
+
+        var notification = _mapper.Map<Notification>(dto);
 
         await _notificationRepository.AddAsync(notification);
         await _notificationRepository.SaveChangesAsync();
@@ -64,29 +60,29 @@ public class NotificationService : INotificationService
             createdAt = notification.CreatedAt
         };
 
-        const string clientEventName = "notification:new";
-
-        if (audience == NotificationAudience.Ops)
+        if (notification.Audience == NotificationAudience.Ops)
         {
             await _hubContext.Clients.Group("ops")
-                .SendAsync(clientEventName, payload);
+                .SendAsync(StringConstant.NewNotificationEvent, payload);
         }
         else
         {
-            await _hubContext.Clients.Group($"admin:{userId!.Value}")
-                .SendAsync(clientEventName, payload);
+            await _hubContext.Clients.Group($"admin:{notification.UserId!.Value}")
+                .SendAsync(StringConstant.NewNotificationEvent, payload);
         }
 
         return notification;
     }
 
-    public Task<List<Notification>> GetOpsAsync()
-        => _notificationRepository.GetOpsAsync();
+    public async Task<List<Notification>> GetOpsAsync()
+    {
+        return await _notificationRepository.GetOpsAsync();
+    }
 
     public async Task<List<Notification>> GetAdminAsync(int adminId)
     {
         if (adminId <= 0)
-            throw new ValidationException("Invalid adminId.");
+            throw new ValidationException(StringConstant.InvalidId);
 
         return await _notificationRepository.GetAdminAsync(adminId);
     }
