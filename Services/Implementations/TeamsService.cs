@@ -63,11 +63,12 @@ namespace SportsManagementApp.Services.Implementations
                 };
 
                 await _teamsRepository.AddAsync(team);
-                await _teamsRepository.SaveChangesAsync();
 
                 result.Add(_mapper.Map<TeamResponseDto>(team));
                 teamNumber++;
             }
+
+            await _teamsRepository.SaveChangesAsync();
 
             return result;
         }

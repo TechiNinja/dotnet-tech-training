@@ -40,8 +40,7 @@ namespace SportsManagementApp.Services.Implementations
 
         public async Task<UserResponseDto?> GetUserByIdAsync(int userId)
         {
-            var user = await _userRepository.GetUserDtoByIdAsync(userId, UserProjectionBuilder.Build());
-            return _mapper.Map<UserResponseDto?>(user);
+            return await _userRepository.GetUserDtoByIdAsync(userId, UserProjectionBuilder.Build());
         }
 
         public async Task<UserResponseDto> CreateUserAsync(CreateUserDto createUser)
@@ -60,6 +59,7 @@ namespace SportsManagementApp.Services.Implementations
             user.PasswordHash = _passwordHasher.HashPassword(user, createUser.Password);
 
             await _userRepository.AddAsync(user);
+            await _userRepository.SaveChangesAsync();
             var savedUser = await _userRepository.GetUserDtoByIdAsync(user.Id, UserProjectionBuilder.Build());
             return savedUser!;
         }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FluentAssertions;
 using Moq;
 using SportsManagementApp.Data.DTOs.UserManagement;
 using SportsManagementApp.Data.Entities;
@@ -45,14 +46,10 @@ namespace SportsManagementApp.Tests.Services
         [Fact]
         public async Task GetUserByIdAsync_WhenUserExists_ReturnsMappedDto()
         {
-            var user = UserTestData.UserHimani();
             var expected = UserTestData.UserHimaniResponse();
 
-            _mockRepo.Setup(repo => repo.GetByIdAsync(4)).ReturnsAsync(user);
-
-            _mockMapper
-                .Setup(mapper => mapper.Map<UserResponseDto>(It.IsAny<User>()))
-                .Returns(expected);
+            _mockRepo.Setup(repo => repo.GetUserDtoByIdAsync(4, It.IsAny<Expression<Func<User, UserResponseDto>>>()))
+                .ReturnsAsync(expected);
 
             var result = await _service.GetUserByIdAsync(4);
 
@@ -63,8 +60,8 @@ namespace SportsManagementApp.Tests.Services
         [Fact]
         public async Task GetUserByIdAsync_WhenUserNotFound_ReturnsNull()
         {
-            _mockRepo.Setup(repo => repo.GetByIdAsync(99))
-                .ReturnsAsync((User?)null);
+            _mockRepo.Setup(repo => repo.GetUserDtoByIdAsync(99, It.IsAny<Expression<Func<User, UserResponseDto>>>()))
+                .ReturnsAsync((UserResponseDto?)null);
 
             var result = await _service.GetUserByIdAsync(99);
 
@@ -106,6 +103,7 @@ namespace SportsManagementApp.Tests.Services
 
             _mockMapper.Setup(mapper => mapper.Map<User>(dto)).Returns(mappedUser);
             _mockRepo.Setup(repo => repo.AddAsync(mappedUser)).Returns(Task.CompletedTask);
+            _mockRepo.Setup(repo => repo.SaveChangesAsync()).ReturnsAsync(1);
             _mockRepo.Setup(repo => repo.GetUserDtoByIdAsync(
                 mappedUser.Id,
                 It.IsAny<Expression<Func<User, UserResponseDto>>>()))
@@ -116,6 +114,7 @@ namespace SportsManagementApp.Tests.Services
             Assert.NotNull(result);
             Assert.Equal("himesh@test.com", result.Email);
             _mockRepo.Verify(repo => repo.AddAsync(mappedUser), Times.Once);
+            _mockRepo.Verify(repo => repo.SaveChangesAsync(), Times.Once);
         }
 
         [Fact]
@@ -138,6 +137,7 @@ namespace SportsManagementApp.Tests.Services
             _mockRepo.Setup(repo => repo.GetByIdAsync(2)).ReturnsAsync(user);
             _mockMapper.Setup(mapper => mapper.Map(dto, user));
             _mockRepo.Setup(repo => repo.UpdateAsync(user)).Returns(Task.CompletedTask);
+            _mockRepo.Setup(repo => repo.SaveChangesAsync()).ReturnsAsync(1);
             _mockRepo.Setup(repo => repo.GetUserDtoByIdAsync(
                 user.Id,
                 It.IsAny<Expression<Func<User, UserResponseDto>>>()))
@@ -148,10 +148,11 @@ namespace SportsManagementApp.Tests.Services
             Assert.NotNull(result);
             Assert.NotEqual("oldhash", user.PasswordHash);
             _mockRepo.Verify(repo => repo.UpdateAsync(user), Times.Once);
+            _mockRepo.Verify(repo => repo.SaveChangesAsync(), Times.Once);
         }
 
         [Fact]
-        public async Task UpdateUserAsync_WhenPasswordNotProvided_DoesNotChangePasswordHash()
+        public async Task UpdatedUserAsync_WhenPasswordNotProvided_DoesNotChangePasswordHash()
         {
             var user = UserTestData.UserNavneetWithOldHash();
             var dto = UserTestData.UpdateNavneetWithoutPassword();
@@ -160,6 +161,7 @@ namespace SportsManagementApp.Tests.Services
             _mockRepo.Setup(repo => repo.GetByIdAsync(5)).ReturnsAsync(user);
             _mockMapper.Setup(mapper => mapper.Map(dto, user));
             _mockRepo.Setup(repo => repo.UpdateAsync(user)).Returns(Task.CompletedTask);
+            _mockRepo.Setup(repo => repo.SaveChangesAsync()).ReturnsAsync(1);
             _mockRepo.Setup(repo => repo.GetUserDtoByIdAsync(
                 user.Id,
                 It.IsAny<Expression<Func<User, UserResponseDto>>>()))
@@ -170,6 +172,7 @@ namespace SportsManagementApp.Tests.Services
             Assert.NotNull(result);
             Assert.Equal("oldhash", user.PasswordHash);
             _mockRepo.Verify(repo => repo.UpdateAsync(user), Times.Once);
+            _mockRepo.Verify(repo => repo.SaveChangesAsync(), Times.Once);
         }
 
         [Fact]
@@ -182,6 +185,7 @@ namespace SportsManagementApp.Tests.Services
             _mockRepo.Setup(repo => repo.GetByIdAsync(6)).ReturnsAsync(user);
             _mockMapper.Setup(mapper => mapper.Map(dto, user));
             _mockRepo.Setup(repo => repo.UpdateAsync(user)).Returns(Task.CompletedTask);
+            _mockRepo.Setup(repo => repo.SaveChangesAsync()).ReturnsAsync(1);
             _mockRepo.Setup(repo => repo.GetUserDtoByIdAsync(
                 user.Id,
                 It.IsAny<Expression<Func<User, UserResponseDto>>>()))
@@ -191,6 +195,7 @@ namespace SportsManagementApp.Tests.Services
 
             Assert.Equal("Vaishak S", result!.FullName);
             Assert.False(result.IsActive);
+            _mockRepo.Verify(repo => repo.SaveChangesAsync(), Times.Once);
         }
     }
 }

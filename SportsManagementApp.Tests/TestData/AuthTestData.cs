@@ -55,7 +55,7 @@ namespace SportsManagementApp.Tests.TestData
             Password = "Test@1234"
         };
 
-        public static RegisterRequestDto ValidRegisterRequest() => new()
+        public static RegisterRequestDto ValidRgisterRequest() => new()
         {
             FullName = "Piyush",
             Email = "piyush@test.com",

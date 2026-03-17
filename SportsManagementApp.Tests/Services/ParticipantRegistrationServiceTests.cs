@@ -6,7 +6,10 @@ using SportsManagementApp.Tests.TestData;
 using Moq;
 using AutoMapper;
 using SportsManagementApp.Data.DTOs.Participant;
-using Xunit;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Timers;
 
 namespace SportsManagementApp.Tests.Services
 {

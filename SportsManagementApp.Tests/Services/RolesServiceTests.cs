@@ -4,7 +4,10 @@ using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services.Implementations;
 using SportsManagementApp.Tests.TestData;
 using Moq;
-using Xunit;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Timers;
 
 namespace SportsManagementApp.Tests.Services
 {
@@ -61,12 +64,14 @@ namespace SportsManagementApp.Tests.Services
             var dto = RolesTestData.ValidCreateRoleDto();
             _mockRepo.Setup(repo => repo.GetRoleByTypeAsync("Manager")).ReturnsAsync((Role?)null);
             _mockRepo.Setup(repo => repo.AddAsync(It.IsAny<Role>())).Returns(Task.CompletedTask);
+            _mockRepo.Setup(repo => repo.SaveChangesAsync()).ReturnsAsync(1);
 
             var result = await _service.CreateRoleAsync(dto);
 
             Assert.NotNull(result);
             Assert.Equal("Manager", result.Name);
             _mockRepo.Verify(repo => repo.AddAsync(It.IsAny<Role>()), Times.Once);
+            _mockRepo.Verify(repo => repo.SaveChangesAsync(), Times.Once);
         }
     }
 }

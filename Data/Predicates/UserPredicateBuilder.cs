@@ -1,4 +1,5 @@
-﻿using SportsManagementApp.Data.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using SportsManagementApp.Data.Entities;
 using SportsManagementApp.Data.Filters;
 using System.Linq.Expressions;
 
@@ -12,8 +13,8 @@ namespace SportsManagementApp.Data.Predicates
                 (!filter.IsActive.HasValue || user.IsActive == filter.IsActive.Value) &&
                 (!filter.RoleId.HasValue || user.RoleId == filter.RoleId.Value) &&
                 (string.IsNullOrEmpty(filter.SearchTerm) ||
-                user.FullName.ToLower().Contains(filter.SearchTerm.ToLower()) ||
-                user.Email.ToLower().Contains(filter.SearchTerm.ToLower()));
+                EF.Functions.Like(user.FullName, $"%{filter.SearchTerm}%") ||
+                EF.Functions.Like(user.Email, $"%{filter.SearchTerm}%"));
         }
     }
 }

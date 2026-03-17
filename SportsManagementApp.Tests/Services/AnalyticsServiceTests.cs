@@ -1,10 +1,13 @@
 ﻿using Moq;
-using Xunit;
 using SportsManagementApp.Data.DTOs.Analytics;
 using SportsManagementApp.Exceptions;
 using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services.Implementations;
 using SportsManagementApp.Tests.TestData;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Timers;
 
 namespace SportsManagementApp.Tests.Services
 {

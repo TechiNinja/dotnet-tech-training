@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Identity;
 using Moq;
-using Xunit;
 using SportsManagementApp.Data.Entities;
 using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services.Implementations;
@@ -13,6 +12,7 @@ using SportsManagementApp.Tests.TestData;
 using SportsManagementApp.Exceptions;
 using SportsManagementApp.Data.DTOs.Auth;
 using SportsManagementApp.Constants;
+using FluentAssertions;
 
 namespace SportsManagementApp.Tests.Services
 {
@@ -138,7 +138,7 @@ namespace SportsManagementApp.Tests.Services
         [Fact]
         public async Task RegisterAsync_WhenValidInput_CreatesUserAndReturnsTokenResponse()
         {
-            var request = AuthTestData.ValidRegisterRequest();
+            var request = AuthTestData.ValidRgisterRequest();
             var participantRole = AuthTestData.ParticipantRole();
             var mappedUser = AuthTestData.MappedUserForRegister(participantRole);
             var responseDto = AuthTestData.LoginResponseForPiyush();
@@ -148,6 +148,7 @@ namespace SportsManagementApp.Tests.Services
                 .ReturnsAsync(participantRole);
             _mockMapper.Setup(mapper => mapper.Map<User>(request)).Returns(mappedUser);
             _mockAuthRepo.Setup(repo => repo.AddAsync(It.IsAny<User>())).Returns(Task.CompletedTask);
+            _mockAuthRepo.Setup(repo => repo.SaveChangesAsync()).ReturnsAsync(1);
             _mockMapper.Setup(mapper => mapper.Map<LoginResponseDto>((It.IsAny<User>()))).Returns(responseDto);
 
             var result = await _service.RegisterAsync(request);
@@ -156,6 +157,7 @@ namespace SportsManagementApp.Tests.Services
             Assert.Equal("piyush@test.com", result.Email);
             Assert.False(string.IsNullOrEmpty(result.Token));
             _mockAuthRepo.Verify(repo => repo.AddAsync(It.IsAny<User>()), Times.Once);
+            _mockAuthRepo.Verify(repo => repo.SaveChangesAsync(), Times.Once);
         }
     }
 }
