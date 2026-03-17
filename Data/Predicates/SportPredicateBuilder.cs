@@ -12,4 +12,4 @@ namespace SportsManagementApp.Data.Predicates
             return sport => string.IsNullOrEmpty(filter.Name) || EF.Functions.Like(sport.Name, $"%{filter.Name}%");
         }
     }
-}
+}   

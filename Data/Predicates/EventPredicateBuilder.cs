@@ -1,20 +1,27 @@
 using SportsManagementApp.Data.Entities;
 using SportsManagementApp.Data.Filters;
+using SportsManagementApp.Exceptions;
+using SportsManagementApp.Constants;
 using SportsManagementApp.Enums;
 using System.Linq.Expressions;
 
-namespace SportsManagementApp.Data.Predicates
+public static class EventPredicateBuilder
 {
-    public static class EventPredicateBuilder
+    public static Expression<Func<Event, bool>> Build(EventFilterDto filter)
     {
-        public static Expression<Func<Event, bool>> Build(EventFilterDto filter)
-        {
-            Enum.TryParse<EventStatus>(filter.Status, true, out var parsedStatus);
+        EventStatus? parsedStatus = null;
 
-            return e =>
-                (string.IsNullOrWhiteSpace(filter.Status) || e.Status == parsedStatus) &&
-                (string.IsNullOrWhiteSpace(filter.Name)   || e.Name.Contains(filter.Name)) &&
-                (!filter.SportId.HasValue                 || e.SportId == filter.SportId.Value);
+        if (!string.IsNullOrWhiteSpace(filter.Status))
+        {
+            if (!Enum.TryParse<EventStatus>(filter.Status, true, out var status))
+                throw new BadRequestException(
+                    string.Format(StringConstant.InvalidEventStatus, filter.Status));
+            parsedStatus = status;
         }
+
+        return e =>
+            (parsedStatus == null || e.Status == parsedStatus.Value) &&
+            (string.IsNullOrWhiteSpace(filter.Name) || e.Name.Contains(filter.Name)) &&
+            (!filter.SportId.HasValue || e.SportId == filter.SportId.Value);
     }
 }

@@ -23,7 +23,6 @@ public class StringConstant
     public const string sportsIdGreaterThanZero = "SportId must be greater than 0.";
     public const string InternalServerError = "An unexpected error occurred";
     public const string UnhandledException = "An unhandled exception occurred";
-    public const int OrganizerRoleId = 2;
     public const int ScheduleOverlapMinutes = 60;
     public const string ReactNativeCorsPolicy = "ReactNativePolicy";
     public const string SwaggerTitle = "Sports Management API";
@@ -81,4 +80,6 @@ public class StringConstant
     public const string UnauthorizedAccess = "Unauthorized access.";
     public const string Unauthorized = "Unauthorized.";
     public const string UnhandledExceptionLog = "Unhandled exception on {Method} {Path}";
+    public const string ActionCancel = "cancel";
+    public const string ActionUpdate = "update";
 }
