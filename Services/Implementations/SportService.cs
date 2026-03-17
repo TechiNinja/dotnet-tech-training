@@ -1,9 +1,4 @@
-<<<<<<< HEAD
-﻿﻿using SportsManagementApp.Data.DTOs.SportManagement;
-=======
-﻿using AutoMapper;
-using SportsManagementApp.Data.DTOs.SportManagement;
->>>>>>> e327725 (Optimization of the codebase done)
+﻿﻿﻿using SportsManagementApp.Data.DTOs.SportManagement;
 using SportsManagementApp.Data.Entities;
 using SportsManagementApp.Data.Filters;
 using SportsManagementApp.Data.Predicates;
@@ -31,20 +26,13 @@ namespace SportsManagementApp.Services.Implementations
         throw new BadRequestException("Sport Name is required");
     }
 
-<<<<<<< HEAD
     var exists = await _sportRepository.SportExistsAsync(createSport.Name.Trim());
-=======
-            var trimmedName = createSport.Name.Trim();
-
-            var exists = await _sportRepository.SportExistsAsync(trimmedName);
->>>>>>> e327725 (Optimization of the codebase done)
 
     if (exists)
     {
         throw new ConflictException("Sport already exists");
     }
 
-<<<<<<< HEAD
     return await _sportRepository.CreateSportAsync(
         createSport.Name.Trim(),
         createSport.AllowedFormats ?? new List<string>()
@@ -62,31 +50,6 @@ namespace SportsManagementApp.Services.Implementations
         AllowedFormats = s.AllowedFormats ?? new List<string>()
     }).ToList();
 }
-=======
-            var sport = _mapper.Map<Sport>(createSport);
-            sport.Name = trimmedName;
-            sport.CreatedAt = DateTime.UtcNow;
-
-            await _sportRepository.AddAsync(sport);
-            await _sportRepository.SaveChangesAsync();
-
-            return sport;
-        }
-
-        public async Task<List<SportResponseDto>> GetSportsAsync(SportFilterDto filter)
-        {
-            var predicate = SportPredicateBuilder.Build(filter);
-
-            return await _sportRepository.GetAllAsync(
-                predicate: predicate,
-                projection: sport => new SportResponseDto
-                {
-                    Id = sport.Id,
-                    Name = sport.Name
-                }
-            );
-        }
->>>>>>> e327725 (Optimization of the codebase done)
 
         public async Task<Sport> UpdateSportAsync(int id, UpdateSportDto updateSport)
         {

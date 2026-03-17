@@ -49,11 +49,7 @@ public class OperationsService : IOperationsService
         request.UpdatedDate = DateTime.UtcNow;
 
         await _operationsRepository.UpdateAsync(request);
-<<<<<<< HEAD
-        // await _operationsRepository.SaveChangesAsync();
-=======
         await _operationsRepository.SaveChangesAsync();
->>>>>>> 3589b78 (Resolve the PR comments and only the specific file for review)
 
         var message = dto.Status == RequestStatus.Approved
             ? $"Your request #{request.Id} has been approved."
