@@ -8,7 +8,12 @@ public class EventRequestMapping : Profile
     public EventRequestMapping()
     {
         CreateMap<EventRequest, EventRequestResponseDto>()
-            .ForMember(dest => dest.SportsName, opt => opt.MapFrom(src => src.Sport.Name));
+    .ForMember(dest => dest.SportsName,
+               opt => opt.MapFrom(src => src.Sport != null ? src.Sport.Name : "Unknown"))
+    .ForMember(dest => dest.OperationsReviewerName,
+               opt => opt.MapFrom(src => src.OperationsReviewer != null ? src.OperationsReviewer.FullName : "Not assigned"))
+    .ForMember(dest => dest.AdminName,
+               opt => opt.MapFrom(src => src.Admin != null ? src.Admin.FullName : "Unknown"));
 
         CreateMap<CreateEventRequestDto, EventRequest>()
             .ForMember(dest => dest.EventName,
