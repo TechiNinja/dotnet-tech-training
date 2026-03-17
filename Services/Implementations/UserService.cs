@@ -40,7 +40,8 @@ namespace SportsManagementApp.Services.Implementations
 
         public async Task<UserResponseDto?> GetUserByIdAsync(int userId)
         {
-            return await _userRepository.GetUserDtoByIdAsync(userId, UserProjectionBuilder.Build());
+            var user = await _userRepository.GetByIdAsync(userId);
+            return user == null ? null : _mapper.Map<UserResponseDto>(user);
         }
 
         public async Task<UserResponseDto> CreateUserAsync(CreateUserDto createUser)
@@ -60,8 +61,8 @@ namespace SportsManagementApp.Services.Implementations
 
             await _userRepository.AddAsync(user);
             await _userRepository.SaveChangesAsync();
-            var savedUser = await _userRepository.GetUserDtoByIdAsync(user.Id, UserProjectionBuilder.Build());
-            return savedUser!;
+            var savedUser = await _userRepository.GetByIdAsync(user.Id);
+            return _mapper.Map<UserResponseDto>(savedUser!);
         }
 
         public async Task<UserResponseDto?> UpdateUserAsync(int userId, UpdateUserDto updateUser)
@@ -80,8 +81,8 @@ namespace SportsManagementApp.Services.Implementations
             await _userRepository.UpdateAsync(user);
             await _userRepository.SaveChangesAsync();
 
-            var updatedUserDto = await _userRepository.GetUserDtoByIdAsync(user.Id, UserProjectionBuilder.Build());
-            return updatedUserDto!;
+            var updatedUser = await _userRepository.GetByIdAsync(user.Id);
+            return _mapper.Map<UserResponseDto>(updatedUser!);
         }
     }
 }

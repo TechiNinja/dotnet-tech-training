@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using SportsManagementApp.Data.DTOs.TeamManagement;
 using SportsManagementApp.Data.Entities;
 using SportsManagementApp.Data.Filters;
@@ -12,11 +12,11 @@ namespace SportsManagementApp.Services.Implementations
 {
     public class TeamsService : ITeamsService
     {
-        private readonly ITeamsRepository _teamsRepository;
+        private readonly IGenericRepository<Team> _teamsRepository;
         private readonly IParticipantRegistrationRepository _participantRepository;
         private readonly IMapper _mapper;
 
-        public TeamsService(ITeamsRepository teamsRepository, IParticipantRegistrationRepository participantRepository, IMapper mapper)
+        public TeamsService(IGenericRepository<Team> teamsRepository, IParticipantRegistrationRepository participantRepository, IMapper mapper)
         {
             _teamsRepository = teamsRepository;
             _participantRepository = participantRepository;
@@ -25,7 +25,7 @@ namespace SportsManagementApp.Services.Implementations
 
         public async Task<List<TeamResponseDto>> GetTeamsAsync(TeamFilterDto filter)
         {
-            return await _teamsRepository.GetTeamsByFilterAsync(
+            return await _teamsRepository.GetAllAsync(
                 TeamPredicateBuilder.Build(filter),
                 TeamProjectionBuilder.Build()
             );

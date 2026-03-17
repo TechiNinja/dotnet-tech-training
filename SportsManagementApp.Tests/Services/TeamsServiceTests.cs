@@ -13,14 +13,14 @@ namespace SportsManagementApp.Tests.Services
 {
     public class TeamsServiceTests
     {
-        private readonly Mock<ITeamsRepository> _mockTeamsRepo;
+        private readonly Mock<IGenericRepository<Team>> _mockTeamsRepo;
         private readonly Mock<IParticipantRegistrationRepository> _mockParticipantRegistrationRepo;
         private readonly Mock<IMapper> _mockMapper;
         private readonly TeamsService _service;
 
         public TeamsServiceTests()
         {
-            _mockTeamsRepo = new Mock<ITeamsRepository>();
+            _mockTeamsRepo = new Mock<IGenericRepository<Team>>();
             _mockParticipantRegistrationRepo = new Mock<IParticipantRegistrationRepository>();
             _mockMapper = new Mock<IMapper>();
             _service = new TeamsService(
@@ -34,7 +34,7 @@ namespace SportsManagementApp.Tests.Services
         public async Task GetTeamsAsync_ReturnsTeamsList()
         {
             var expected = TeamTestData.TeamResponseList();
-            _mockTeamsRepo.Setup(repo => repo.GetTeamsByFilterAsync(
+            _mockTeamsRepo.Setup(repo => repo.GetAllAsync(
                 It.IsAny<Expression<Func<Team, bool>>>(),
                 It.IsAny<Expression<Func<Team, TeamResponseDto>>>()))
                 .ReturnsAsync(expected);

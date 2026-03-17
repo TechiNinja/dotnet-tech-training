@@ -13,7 +13,6 @@ namespace SportsManagementApp.Extensions
             services.AddScoped<ISportRepository, SportRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ISchedulesRepository, SchedulesRepository>();
-            services.AddScoped<ITeamsRepository, TeamsRepository>();
             services.AddScoped<IEventsRepository, EventsRepository>();
             services.AddScoped<IParticipantRegistrationRepository, ParticipantRegistrationRepository>();
             services.AddScoped<IEventRequestRepository, EventRequestRepository>();

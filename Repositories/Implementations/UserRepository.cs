@@ -1,9 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SportsManagementApp.Data;
-using SportsManagementApp.Data.DTOs.UserManagement;
 using SportsManagementApp.Data.Entities;
 using SportsManagementApp.Repositories.Interfaces;
-using System.Linq.Expressions;
 
 namespace SportsManagementApp.Repositories.Implementations
 {
@@ -16,14 +14,6 @@ namespace SportsManagementApp.Repositories.Implementations
             return await _dbSet
                 .Include(user => user.Role)
                 .ToListAsync();
-        }
-
-        public async Task<UserResponseDto?> GetUserDtoByIdAsync(int userId, Expression<Func<User, UserResponseDto>> projection)
-        {
-            return await _dbSet
-                .Where(user => user.Id == userId)
-                .Select(projection)
-                .FirstOrDefaultAsync();
         }
     }
 }
