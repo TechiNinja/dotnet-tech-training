@@ -65,5 +65,7 @@ namespace SportsManagementApp.Repositories.Implementations
         {
             await _dbSet.AddRangeAsync(entities);
         }
+        public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>> predicate) => 
+            await _dbSet.AsNoTracking().Where(predicate).ToListAsync();
     }
 }
