@@ -2,9 +2,6 @@
 using SportsManagementApp.Services.Implementations;
 using AutoMapper;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using SportsManagementApp.Tests.TestData;
 using System.Linq.Expressions;
 using SportsManagementApp.Data.Entities;

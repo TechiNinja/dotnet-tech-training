@@ -1,18 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Identity;
 using Moq;
 using SportsManagementApp.Data.Entities;
 using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services.Implementations;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using SportsManagementApp.Tests.TestData;
 using SportsManagementApp.Exceptions;
 using SportsManagementApp.Data.DTOs.Auth;
 using SportsManagementApp.Constants;
-using FluentAssertions;
 
 namespace SportsManagementApp.Tests.Services
 {
@@ -138,7 +133,7 @@ namespace SportsManagementApp.Tests.Services
         [Fact]
         public async Task RegisterAsync_WhenValidInput_CreatesUserAndReturnsTokenResponse()
         {
-            var request = AuthTestData.ValidRgisterRequest();
+            var request = AuthTestData.ValidRegisterRequest();
             var participantRole = AuthTestData.ParticipantRole();
             var mappedUser = AuthTestData.MappedUserForRegister(participantRole);
             var responseDto = AuthTestData.LoginResponseForPiyush();

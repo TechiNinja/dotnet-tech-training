@@ -6,10 +6,6 @@ using SportsManagementApp.Tests.TestData;
 using Moq;
 using AutoMapper;
 using SportsManagementApp.Data.DTOs.Participant;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Timers;
 
 namespace SportsManagementApp.Tests.Services
 {
@@ -48,6 +44,7 @@ namespace SportsManagementApp.Tests.Services
                      .ReturnsAsync(false);
             _mockMapper.Setup(mapper => mapper.Map<ParticipantRegistration>(request)).Returns(mappedRegistration);
             _mockRepo.Setup(repo => repo.AddAsync(mappedRegistration)).Returns(Task.CompletedTask);
+            _mockRepo.Setup(repo => repo.SaveChangesAsync());
             _mockRepo.Setup(repo => repo.GetParticipantsByIdWithUserAsync(mappedRegistration.Id))
                      .ReturnsAsync((ParticipantRegistration?)null);
 
@@ -68,6 +65,7 @@ namespace SportsManagementApp.Tests.Services
                      .ReturnsAsync(false);
             _mockMapper.Setup(mapper => mapper.Map<ParticipantRegistration>(request)).Returns(mappedRegistration);
             _mockRepo.Setup(repo => repo.AddAsync(mappedRegistration)).Returns(Task.CompletedTask);
+            _mockRepo.Setup(repo => repo.SaveChangesAsync());
             _mockRepo.Setup(repo => repo.GetParticipantsByIdWithUserAsync(mappedRegistration.Id))
                      .ReturnsAsync(savedRegistration);
             _mockMapper.Setup(mapper => mapper.Map<ParticipantRegistrationResponseDto>(savedRegistration))

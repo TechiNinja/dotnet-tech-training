@@ -1,8 +1,5 @@
 ﻿using SportsManagementApp.Data.DTOs.TeamManagement;
 using SportsManagementApp.Data.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SportsManagementApp.Tests.TestData
 {
