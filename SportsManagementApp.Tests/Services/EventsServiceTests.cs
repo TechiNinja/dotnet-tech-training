@@ -2,9 +2,6 @@
 using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services.Implementations;
 using SportsManagementApp.Tests.TestData;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SportsManagementApp.Tests.Services
 {
@@ -30,7 +27,7 @@ namespace SportsManagementApp.Tests.Services
 
             Assert.Equal(expected.Count, result.Count);
             Assert.Equal(expected[0].EventName, result[0].EventName);
-            Assert.Equal(8, result[0].EventId);
+            Assert.Equal(expected[0].EventId, result[0].EventId);
             _mockRepo.Verify(repo => repo.GetUserEventsAsync(EventsTestData.ValidUserId), Times.Once);
         }
 

@@ -2,9 +2,6 @@
 using SportsManagementApp.Services.Implementations;
 using SportsManagementApp.Tests.TestData;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SportsManagementApp.Tests.Services
 {

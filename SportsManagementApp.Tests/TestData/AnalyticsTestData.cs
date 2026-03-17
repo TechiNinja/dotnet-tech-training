@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using SportsManagementApp.Constants;
+﻿using SportsManagementApp.Constants;
 using SportsManagementApp.Data.DTOs.Analytics;
 
 namespace SportsManagementApp.Tests.TestData

@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using SportsManagementApp.Data.DTOs.Auth;
 using SportsManagementApp.Data.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SportsManagementApp.Tests.TestData
 {
@@ -55,7 +52,7 @@ namespace SportsManagementApp.Tests.TestData
             Password = "Test@1234"
         };
 
-        public static RegisterRequestDto ValidRgisterRequest() => new()
+        public static RegisterRequestDto ValidRegisterRequest() => new()
         {
             FullName = "Piyush",
             Email = "piyush@test.com",

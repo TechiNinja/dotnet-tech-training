@@ -1,7 +1,4 @@
 ﻿using SportsManagementApp.Data.DTOs.Participant;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SportsManagementApp.Tests.TestData
 {

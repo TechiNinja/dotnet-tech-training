@@ -4,10 +4,6 @@ using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services.Implementations;
 using SportsManagementApp.Tests.TestData;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Timers;
 
 namespace SportsManagementApp.Tests.Services
 {
