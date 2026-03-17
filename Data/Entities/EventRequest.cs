@@ -10,6 +10,7 @@ namespace SportsManagementApp.Data.Entities
         public string EventName { get; set; } = string.Empty;
         public int SportId { get; set; }
         public Sport? Sport { get; set; }
+        public Event? Event { get; set; }
         public GenderType Gender { get; set; }
         public MatchFormat Format { get; set; }
         [Required, MaxLength(100)]
@@ -25,6 +26,6 @@ namespace SportsManagementApp.Data.Entities
         public User? OperationsReviewer { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
-        public ICollection<Notification> EventRegistrations { get; set; } = new List<Notification>();
+        public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
     }
 }

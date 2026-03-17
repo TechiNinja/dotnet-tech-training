@@ -71,4 +71,9 @@
         Approved = 1,
         Rejected = 2,
     }
+    public enum NotificationAudience
+    {
+        Ops = 1,
+        Admin = 2
+    }
 }

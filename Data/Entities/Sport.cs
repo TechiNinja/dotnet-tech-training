@@ -4,6 +4,7 @@
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
+        public List<string> AllowedFormats { get; set; } = new();
         public ICollection<Event> Events { get; set; } = new List<Event>();
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
