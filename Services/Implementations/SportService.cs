@@ -7,7 +7,6 @@ using SportsManagementApp.Data.DTOs.SportManagement;
 using SportsManagementApp.Data.Entities;
 using SportsManagementApp.Data.Filters;
 using SportsManagementApp.Data.Predicates;
-using SportsManagementApp.Data.Projections;
 using SportsManagementApp.Exceptions;
 using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services.Interfaces;
@@ -76,9 +75,15 @@ namespace SportsManagementApp.Services.Implementations
 
         public async Task<List<SportResponseDto>> GetSportsAsync(SportFilterDto filter)
         {
-            return await _sportRepository.GetAllAsync(
-                SportPredicateBuilder.Build(filter),
-                SportProjectionBuilder.Build()
+            var predicate = SportPredicateBuilder.Build(filter);
+
+            return await _sportRepository.GetSportsAsyncWithFilter(
+                predicate: predicate,
+                projection: sport => new SportResponseDto
+                {
+                    Id = sport.Id,
+                    Name = sport.Name
+                }
             );
         }
 >>>>>>> e327725 (Optimization of the codebase done)

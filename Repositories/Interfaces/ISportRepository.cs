@@ -11,6 +11,9 @@ namespace SportsManagementApp.Repositories.Interfaces
         Task<List<Sport>> GetSportsAsync(Expression<Func<Sport, bool>> predicate);
         Task<Sport?> GetSportByIdAsync(int id);
         Task UpdateSportAsync(Sport sport);
+        Task<List<TResult>> GetSportsAsyncWithFilter<TResult>(
+            Expression<Func<Sport, bool>> predicate,
+            Expression<Func<Sport, TResult>> projection);
     }
 }
 

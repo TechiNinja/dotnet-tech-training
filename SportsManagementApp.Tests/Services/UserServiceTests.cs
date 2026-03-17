@@ -73,7 +73,7 @@ namespace SportsManagementApp.Tests.Services
                 new() { Id = 2, Email = "vishal@test.com" }
             };
 
-            _mockRepo.Setup(repo => repo.GetAllAsync(
+            _mockRepo.Setup(repo => repo.GetUsersAsyncWithFilter(
                 It.IsAny<Expression<Func<User, bool>>>(),
                 It.IsAny<Expression<Func<User, UserResponseDto>>>()))
                 .ReturnsAsync(existingUsers);
@@ -91,7 +91,7 @@ namespace SportsManagementApp.Tests.Services
             var mappedUser = UserTestData.MappedNewUser();
             var savedDto = UserTestData.CreatedHimeshResponse();
 
-            _mockRepo.Setup(repo => repo.GetAllAsync(
+            _mockRepo.Setup(repo => repo.GetUsersAsyncWithFilter(
                 It.IsAny<Expression<Func<User, bool>>>(),
                 It.IsAny<Expression<Func<User, UserResponseDto>>>()))
                 .ReturnsAsync(new List<UserResponseDto>());
