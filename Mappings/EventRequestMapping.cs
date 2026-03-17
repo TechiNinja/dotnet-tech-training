@@ -16,19 +16,11 @@ public class EventRequestMapping : Profile
                opt => opt.MapFrom(src => src.Admin != null ? src.Admin.FullName : "Unknown"));
 
         CreateMap<CreateEventRequestDto, EventRequest>()
-            .ForMember(dest => dest.EventName,
-                opt => opt.MapFrom(src => src.EventName.Trim()))
-            .ForMember(dest => dest.RequestedVenue,
-                    opt => opt.MapFrom(src => src.RequestedVenue.Trim()))
             .ForMember(dest => dest.CreatedDate,
                 opt => opt.MapFrom(_ => DateTime.UtcNow))
             .ForMember(dest => dest.Status,
                 opt => opt.MapFrom(_ => RequestStatus.Pending));
 
-        CreateMap<EditEventRequestDto, EventRequest>()
-            .ForMember(dest => dest.EventName,
-                opt => opt.MapFrom(src => src.EventName.Trim()))
-            .ForMember(dest => dest.RequestedVenue,
-                opt => opt.MapFrom(src => src.RequestedVenue.Trim()));
+        CreateMap<EditEventRequestDto, EventRequest>();
         }
 }

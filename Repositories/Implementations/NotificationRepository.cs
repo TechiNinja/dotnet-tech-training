@@ -1,9 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SportsManagementApp.Data;
-using SportsManagementApp.Data.DTOs;
 using SportsManagementApp.Data.Entities;
 using SportsManagementApp.Data.Predicates;
-using SportsManagementApp.Data.Projections;
 using SportsManagementApp.Enums;
 using SportsManagementApp.Repositories.Interfaces;
 
@@ -13,11 +11,10 @@ public class NotificationRepository : GenericRepository<Notification>, INotifica
 {
     public NotificationRepository(AppDbContext context) : base(context) { }
 
-    public async Task<List<NotificationResponseDto>> GetOpsAsync()
+    public async Task<List<Notification>> GetOpsNotificationAsync(bool? isRead)
     {
-        var notifications = await GetAllAsync(
-            NotificationPredicateBuilder.Ops(),
-            NotificationProjectionBuilder.ToDto()
+        var notifications = await GetAllWithIncludesAsync(
+            NotificationPredicateBuilder.Ops(isRead)
         );
 
         return notifications
@@ -25,11 +22,10 @@ public class NotificationRepository : GenericRepository<Notification>, INotifica
             .ToList();
     }
 
-    public async Task<List<NotificationResponseDto>> GetAdminAsync(int adminId)
+    public async Task<List<Notification>> GetAdminNotificationAsync(int adminId, bool? isRead)
     {
-        var notifications = await GetAllAsync(
-            NotificationPredicateBuilder.Admin(adminId),
-            NotificationProjectionBuilder.ToDto()
+        var notifications = await GetAllWithIncludesAsync(
+            NotificationPredicateBuilder.Admin(adminId, isRead)
         );
 
         return notifications

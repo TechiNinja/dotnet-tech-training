@@ -4,7 +4,7 @@ using SportsManagementApp.Data.DTOs;
 using SportsManagementApp.Enums;
 using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services.Interfaces;
-using SportsManagementApp.Constants;
+using SportsManagementApp.StringConstants;
 using SportsManagementApp.Helper;
 
 namespace SportsManagementApp.Services.Implementations;
@@ -34,14 +34,14 @@ public class OperationsService : IOperationsService
         int opsUserId)
     {
         if (dto.Status != RequestStatus.Approved && dto.Status != RequestStatus.Rejected)
-            throw new ValidationException(StringConstant.onlyApproveorRejectAllowed);
+            throw new ValidationException(StringConstant.OnlyApproveOrRejectAllowed);
 
         var request = await _eventRequestRepository.GetEventRequestByIdAsync(requestId);
         if (request == null)
-            throw new NotFoundException(StringConstant.noEventFound);
+            throw new NotFoundException(StringConstant.NoEventFound);
 
         if (request.Status != RequestStatus.Pending)
-            throw new ConflictException(StringConstant.requestProcessNotAllowed);
+            throw new ConflictException(StringConstant.RequestProcessNotAllowed);
 
         request.Status = dto.Status;
         request.Remarks = dto.Remarks?.Trim() ?? string.Empty;
@@ -56,8 +56,8 @@ public class OperationsService : IOperationsService
             : $"Your request #{request.Id} has been rejected. Remarks: {request.Remarks}";
 
         await _notificationService.CreateAsync(
-request.CreateNotification(message, dto.Status, NotificationAudience.Admin)
-);
+            request.CreateNotification(message, dto.Status, NotificationAudience.Admin)
+        );
 
         return _mapper.Map<EventRequestResponseDto>(request);
     }

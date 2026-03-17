@@ -19,16 +19,18 @@ public class NotificationsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get([FromQuery] NotificationAudience audience)
+    public async Task<IActionResult> GetNotification(
+        [FromQuery] NotificationAudience audience,
+        [FromQuery] bool? isRead)
     {
         if (audience == NotificationAudience.Ops)
         {
-            var data = await _notificationService.GetOpsAsync();
+            var data = await _notificationService.GetOpsNotificationAsync(isRead);
             return Ok(data);
         }
 
         var adminId = User.GetUserId();
-        var adminData = await _notificationService.GetAdminAsync(adminId);
+        var adminData = await _notificationService.GetAdminNotificationAsync(adminId, isRead);
         return Ok(adminData);
     }
 

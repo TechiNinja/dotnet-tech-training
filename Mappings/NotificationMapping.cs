@@ -10,10 +10,9 @@ public class NotificationMapping : Profile
     {
         CreateMap<CreateNotificationDto, Notification>()
             .ForMember(dest => dest.CreatedAt,
-                       opt => opt.MapFrom(_ => DateTime.UtcNow));
+               opt => opt.MapFrom(src => DateTime.UtcNow));
 
-        CreateMap<Notification, NotificationResponseDto>()
-    .ForMember(dest => dest.Audience, opt => opt.MapFrom(src => src.Audience))
-    .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type));               
+        CreateMap<Notification, NotificationResponseDto>();
+            
     }
 }

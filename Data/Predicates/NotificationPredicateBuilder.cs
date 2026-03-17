@@ -4,20 +4,26 @@ using SportsManagementApp.Data.Filters;
 using SportsManagementApp.Enums;
 
 namespace SportsManagementApp.Data.Predicates;
+
 public static class NotificationPredicateBuilder
 {
-    public static Expression<Func<Notification,bool>> Ops()
+    public static Expression<Func<Notification, bool>> Ops(bool? isRead)
     {
-        return n => n.Audience == NotificationAudience.Ops;
+        return n =>
+            n.Audience == NotificationAudience.Ops &&
+            (!isRead.HasValue || n.IsRead == isRead.Value);
     }
 
-    public static Expression<Func<Notification,bool>> Admin(int adminId)
+    public static Expression<Func<Notification, bool>> Admin(int adminId, bool? isRead)
     {
-        return n => n.Audience == NotificationAudience.Admin
-                    && n.UserId == adminId;
+        return n =>
+            n.Audience == NotificationAudience.Admin &&
+            n.UserId == adminId &&
+            (!isRead.HasValue || n.IsRead == isRead.Value);
     }
 
-    public static Expression<Func<Notification, bool>> UnreadOps(){
+    public static Expression<Func<Notification, bool>> UnreadOps()
+    {
         return n => n.Audience == NotificationAudience.Ops && !n.IsRead;
     }
 

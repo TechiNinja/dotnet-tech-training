@@ -1,6 +1,5 @@
 using AutoMapper;
 using Microsoft.AspNetCore.SignalR;
-using SportsManagementApp.Constants;
 using SportsManagementApp.Data.DTOs;
 using SportsManagementApp.Data.Entities;
 using SportsManagementApp.Enums;
@@ -8,6 +7,7 @@ using SportsManagementApp.Exceptions;
 using SportsManagementApp.Hubs;
 using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services.Interfaces;
+using SportsManagementApp.StringConstants;
 
 namespace SportsManagementApp.Services.Implementations;
 
@@ -32,6 +32,7 @@ public class NotificationService : INotificationService
         if (adminId <= 0)
             throw new ValidationException(StringConstant.InvalidId);
     }
+
     public async Task<Notification> CreateAsync(CreateNotificationDto dto)
     {
         if (dto.EventRequestId <= 0)
@@ -64,22 +65,25 @@ public class NotificationService : INotificationService
         }
         else
         {
-            await _hubContext.Clients.Group($"admin:{notification.UserId!.Value}")
+            await _hubContext.Clients.Group($"admin:{notification.UserId}")
                 .SendAsync(StringConstant.NewNotificationEvent, payload);
         }
 
         return notification;
     }
 
-    public async Task<List<NotificationResponseDto>> GetOpsAsync()
+    public async Task<List<NotificationResponseDto>> GetOpsNotificationAsync(bool? isRead)
     {
-        return await _notificationRepository.GetOpsAsync();
+        var notifications = await _notificationRepository.GetOpsNotificationAsync(isRead);
+        return _mapper.Map<List<NotificationResponseDto>>(notifications);
     }
 
-    public async Task<List<NotificationResponseDto>> GetAdminAsync(int adminId)
+    public async Task<List<NotificationResponseDto>> GetAdminNotificationAsync(int adminId, bool? isRead)
     {
         ValidateAdminId(adminId);
-        return await _notificationRepository.GetAdminAsync(adminId);
+
+        var notifications = await _notificationRepository.GetAdminNotificationAsync(adminId, isRead);
+        return _mapper.Map<List<NotificationResponseDto>>(notifications);
     }
 
     public async Task<int> GetUnreadCountForOpsAsync()

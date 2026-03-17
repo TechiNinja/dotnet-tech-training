@@ -15,24 +15,13 @@ public class EventRequestRepository : GenericRepository<EventRequest>, IEventReq
 
     public async Task<EventRequest?> GetEventRequestByIdAsync(int id)
     {
-        return await GetByIdWithIncludesAsync(e => e.Id == id,e => e.Sport,e => e.OperationsReviewer,e => e.Admin);
-    }
-    public async Task<EventRequestResponseDto?> GetEventRequestDtoByIdAsync(int id)
-    {
-        return await _context.EventRequests
-            .AsNoTracking()
-            .Where(e => e.Id == id)
-            .Select(EventRequestProjectionBuilder.Build())
-            .FirstOrDefaultAsync();
+        return await GetByIdWithIncludesAsync(e => e.Id == id, e => e.Sport, e => e.OperationsReviewer, e => e.Admin);
     }
 
-    public async Task<List<EventRequestResponseDto>> GetEventRequestsByFilterAsync(EventRequestFilterDto filter)
+    public async Task<List<EventRequest>> GetEventRequestsByFilterAsync(EventRequestFilterDto filter)
     {
         var predicate = EventRequestPredicateBuilder.Build(filter);
 
-        return await GetAllAsync(
-            predicate,
-            EventRequestProjectionBuilder.Build()
-        );
+        return await GetAllWithIncludesAsync(predicate, e => e.Sport, e => e.Admin, e => e.OperationsReviewer);
     }
 }

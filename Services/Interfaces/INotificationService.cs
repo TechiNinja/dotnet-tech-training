@@ -6,8 +6,8 @@ namespace SportsManagementApp.Services.Interfaces;
 public interface INotificationService
 {
     Task<Notification> CreateAsync(CreateNotificationDto dto);
-    Task<List<NotificationResponseDto>> GetOpsAsync();
-    Task<List<NotificationResponseDto>> GetAdminAsync(int adminId);
+    Task<List<NotificationResponseDto>> GetOpsNotificationAsync(bool? isRead);
+    Task<List<NotificationResponseDto>> GetAdminNotificationAsync(int adminId, bool? isRead);
     Task<int> GetUnreadCountForOpsAsync();
     Task<int> GetUnreadCountForAdminAsync(int adminId);
     Task MarkOpsAsReadAsync();
