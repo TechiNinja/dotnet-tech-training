@@ -9,5 +9,4 @@ public class OperationsRepository : GenericRepository<EventRequest>, IOperations
 {
     public OperationsRepository(AppDbContext context) : base(context) { }
 
-
 }
