@@ -65,6 +65,13 @@
         Completed = 3,
         Cancelled = 4,
     }
+    public enum RoleType
+    {
+        Admin       = 1,
+        OpsTeam     = 2,
+        Organizer   = 3,
+        Participant = 4
+    }
    public enum NotificationType
     {
         Unknown = 0,

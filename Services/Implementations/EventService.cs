@@ -4,6 +4,7 @@ using SportsManagementApp.Data.Filters;
 using SportsManagementApp.DTOs.EventCreation;
 using SportsManagementApp.Enums;
 using SportsManagementApp.Exceptions;
+using SportsManagementApp.Data.Predicates;
 using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services.Interfaces;
 using SportsManagementApp.Constants;
@@ -42,7 +43,9 @@ namespace SportsManagementApp.Services
                 return new[] { _mapper.Map<EventResponseDto>(single) };
             }
 
-            return await _eventRepo.GetProjectedListAsync(filter);
+            var predicate = EventPredicateBuilder.Build(filter);
+            var events    = await _eventRepo.GetAllAsync(predicate);
+            return _mapper.Map<IEnumerable<EventResponseDto>>(events);
         }
 
         public async Task<EventResponseDto> GetByIdAsync(int eventId)
@@ -71,6 +74,9 @@ namespace SportsManagementApp.Services
             var eventRequest = await _requestRepo.GetEventRequestById(request.EventRequestId)
                 ?? throw new NotFoundException(
                     string.Format(StringConstant.EventRequestNotFound, request.EventRequestId));
+
+            if (eventRequest.Status != RequestStatus.Approved)
+                throw new UnprocessableEntityException(string.Format(StringConstant.EventRequestNotApproved, eventRequest.Status));
 
             if (request.RegistrationDeadline >= eventRequest.StartDate)
                 throw new BadRequestException(StringConstant.RegistrationDeadlineInvalid);
@@ -131,12 +137,12 @@ namespace SportsManagementApp.Services
 
             var action = request.Action.Trim().ToLower();
 
-            if (action == "cancel")
+            if (action == StringConstant.ActionCancel)
             {
                 entity.Status    = EventStatus.Cancelled;
                 entity.UpdatedAt = DateTime.UtcNow;
             }
-            else if (action == "update")
+            else if (action == StringConstant.ActionUpdate)
             {
                 _mapper.Map(request, entity);
                 entity.UpdatedAt = DateTime.UtcNow;
@@ -145,8 +151,9 @@ namespace SportsManagementApp.Services
                 {
                     if (request.RegistrationDeadline.Value >= entity.StartDate)
                         throw new BadRequestException(StringConstant.RegistrationDeadlineInvalid);
-                    if (entity.Status == EventStatus.Cancelled)
-                        entity.Status = EventStatus.Open;
+                    if (entity.Status == EventStatus.Cancelled)      
+                        throw new UnprocessableEntityException(StringConstant.EventCancelled);
+
                 }
             }
             else
@@ -173,7 +180,7 @@ namespace SportsManagementApp.Services
                 throw new UnprocessableEntityException(
                     string.Format(StringConstant.UserInactive, organizer.FullName));
 
-            if (organizer.RoleId != StringConstant.OrganizerRoleId)
+            if (organizer.RoleId != (int)RoleType.Organizer)
                 throw new UnprocessableEntityException(
                     string.Format(StringConstant.UserNotOrganizer, organizer.FullName));
 
