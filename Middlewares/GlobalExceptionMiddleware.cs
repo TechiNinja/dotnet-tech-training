@@ -35,6 +35,7 @@ namespace SportsManagementApp.Middlewares
                 BadRequestException => (HttpStatusCode.BadRequest, exception.Message),
                 ConflictException => (HttpStatusCode.Conflict, exception.Message),
                 UnauthorizedException => (HttpStatusCode.Unauthorized, exception.Message),
+                UnprocessableEntityException => (HttpStatusCode.UnprocessableEntity, exception.Message),
                 _ => (HttpStatusCode.InternalServerError, StringConstant.InternalServerError),
             };
 

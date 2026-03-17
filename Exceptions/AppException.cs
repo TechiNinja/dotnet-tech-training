@@ -12,6 +12,7 @@ namespace SportsManagementApp.Exceptions
     public class BadRequestException(string message) : AppException(message, HttpStatusCode.BadRequest) { }
 
     public class UnauthorizedException(string message) : AppException(message, HttpStatusCode.Unauthorized) { }
+    public class UnprocessableEntityException(string message) : AppException(message, HttpStatusCode.UnprocessableEntity) { }
 
     public class ConflictException(string message) : AppException(message, HttpStatusCode.Conflict) { }
 }
