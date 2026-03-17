@@ -34,12 +34,7 @@ namespace SportsManagementApp.StringConstants
         public const string InvalidId = "Invalid Id";
         public const string MessageRequired = "Message is Required";
         public const string IdRequired = "User ID Required for admin";
-        public const string SportsNotFound = "Sports Not Found"; 
-    }
-
-    public static class AppConstants
-    {
-        public const int OrganizerRoleId = 2;
+        public const string SportsNotFound = "Sports Not Found";
         public const int ScheduleOverlapMinutes = 60;
         public const string ReactNativeCorsPolicy = "ReactNativePolicy";
         public const string SwaggerTitle = "Sports Management API";
@@ -97,5 +92,7 @@ namespace SportsManagementApp.StringConstants
         public const string UnauthorizedAccess = "Unauthorized access.";
         public const string Unauthorized = "Unauthorized.";
         public const string UnhandledExceptionLog = "Unhandled exception on {Method} {Path}";
+        public const string ActionCancel = "cancel";
+        public const string ActionUpdate = "update";
     }
 }
