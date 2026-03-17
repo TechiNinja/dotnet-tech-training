@@ -72,7 +72,8 @@ namespace SportsManagementApp.Services
                 ?? throw new NotFoundException(
                     string.Format(StringConstant.EventRequestNotFound, request.EventRequestId));
 
-            ValidateEventCreation(eventRequest, request);
+            if (request.RegistrationDeadline >= eventRequest.StartDate)
+                throw new BadRequestException(StringConstant.RegistrationDeadlineInvalid);
 
             if (await _eventRepo.ExistsByRequestIdAsync(request.EventRequestId))
                 throw new ConflictException(
@@ -116,8 +117,9 @@ namespace SportsManagementApp.Services
 
             await _eventRepo.AddAsync(newEvent);
 
-            var created = await _eventRepo.GetByIdWithDetailsAsync(newEvent.Id);
-            return _mapper.Map<EventResponseDto>(created!);
+            var created = await _eventRepo.GetByIdWithDetailsAsync(newEvent.Id)
+                ?? throw new NotFoundException(string.Format(StringConstant.EventNotFound, newEvent.Id));
+            return _mapper.Map<EventResponseDto>(created);
         }
 
         public async Task<EventResponseDto> PatchEventAsync(int eventId, PatchEventRequestDto request)
@@ -167,7 +169,13 @@ namespace SportsManagementApp.Services
             var organizer = await _userRepo.GetUserEntityByIdAsync(organizerId)
                 ?? throw new NotFoundException(string.Format(StringConstant.UserNotFound, organizerId));
 
-            ValidateOrganizer(organizer);
+            if (!organizer.IsActive)
+                throw new UnprocessableEntityException(
+                    string.Format(StringConstant.UserInactive, organizer.FullName));
+
+            if (organizer.RoleId != StringConstant.OrganizerRoleId)
+                throw new UnprocessableEntityException(
+                    string.Format(StringConstant.UserNotOrganizer, organizer.FullName));
 
             entity.OrganizerId = organizer.Id;
             entity.Organizer   = organizer;
@@ -178,28 +186,12 @@ namespace SportsManagementApp.Services
             return _mapper.Map<EventResponseDto>(entity);
         }
 
-        private static void ValidateEventCreation(EventRequest eventRequest, CreateEventDto request)
-        {
-            if (request.RegistrationDeadline >= eventRequest.StartDate)
-                throw new BadRequestException(StringConstant.RegistrationDeadlineInvalid);
-        }
-
         private static void ValidateEventEditable(Event entity)
         {
             if (entity.Status == EventStatus.Completed)
                 throw new UnprocessableEntityException(StringConstant.EventCompleted);
             if (entity.Status == EventStatus.Cancelled)
                 throw new UnprocessableEntityException(StringConstant.EventCancelled);
-        }
-
-        private static void ValidateOrganizer(User organizer)
-        {
-            if (!organizer.IsActive)
-                throw new UnprocessableEntityException(
-                    string.Format(StringConstant.UserInactive, organizer.FullName));
-            if (organizer.RoleId != StringConstant.OrganizerRoleId)
-                throw new UnprocessableEntityException(
-                    string.Format(StringConstant.UserNotOrganizer, organizer.FullName));
         }
     }
 }
