@@ -29,9 +29,9 @@ public class OperationsService : IOperationsService
     }
 
     public async Task<EventRequestResponseDto> ReviewEventRequestAsync(
-        int requestId,
-        ReviewEventRequestDto dto,
-        int opsUserId)
+    int requestId,
+    ReviewEventRequestDto dto,
+    int opsUserId)
     {
         if (dto.Status != RequestStatus.Approved && dto.Status != RequestStatus.Rejected)
             throw new ValidationException(StringConstant.OnlyApproveOrRejectAllowed);
@@ -49,7 +49,7 @@ public class OperationsService : IOperationsService
         request.UpdatedDate = DateTime.UtcNow;
 
         await _operationsRepository.UpdateAsync(request);
-        await _operationsRepository.SaveChangesAsync();
+        // await _operationsRepository.SaveChangesAsync();
 
         var message = dto.Status == RequestStatus.Approved
             ? $"Your request #{request.Id} has been approved."

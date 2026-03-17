@@ -6,7 +6,7 @@ using System.Security.Claims;
 
 namespace SportsManagementApp.Controllers
 {
-    [Authorize(Roles = $"{RoleConstants.Admin},{RoleConstants.Organizer}")]
+    [Authorize(Roles = $"{RoleConstants.Admin},{RoleConstants.Organizer},{RoleConstants.Operation}")]
     [Route("api/[controller]")]
     [ApiController]
     public class AnalyticsController : ControllerBase

@@ -22,7 +22,7 @@ public class OperationController : ControllerBase
         _operationsService = operationsService;
     }
 
-    [HttpPut("{id:int}/{status}")]
+    [HttpPut("{id:int}")]
     [ProducesResponseType(typeof(EventRequestResponseDto), StatusCodes.Status200OK)]
     public async Task<ActionResult<EventRequestResponseDto>> ReviewEventRequest(
         int id,

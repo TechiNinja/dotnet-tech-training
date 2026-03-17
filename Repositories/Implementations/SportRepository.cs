@@ -16,21 +16,26 @@ namespace SportsManagementApp.Repositories.Implementations
             return await _dbSet.AnyAsync(sport => sport.Name == name);
         }
 
-        public async Task<Sport> CreateSportAsync(string name)
+        public async Task<Sport> CreateSportAsync(string name, List<string> allowedFormats)
         {
             var sport = new Sport
             {
-                Name = name.Trim(),
+                Name = name,
+                AllowedFormats = allowedFormats,
                 CreatedAt = DateTime.UtcNow
             };
 
-            await AddAsync(sport);
+            _context.Sports.Add(sport);
+            await _context.SaveChangesAsync();
+
             return sport;
         }
 
-        public async Task<List<SportResponseDto>> GetSportsAsync(Expression<Func<Sport, bool>> predicate, Expression<Func<Sport, SportResponseDto>> projection)
+        public async Task<List<Sport>> GetSportsAsync(Expression<Func<Sport, bool>> predicate)
         {
-            return await GetAllAsync(predicate, projection);
+            return await _context.Sports
+                .Where(predicate)
+                .ToListAsync();
         }
 
         public async Task<Sport?> GetSportByIdAsync(int id)
