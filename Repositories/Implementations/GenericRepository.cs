@@ -108,6 +108,5 @@ namespace SportsManagementApp.Repositories.Implementations
         {
             await _dbSet.AddRangeAsync(entities);
         }
-
     }
 }

@@ -8,7 +8,6 @@ namespace SportsManagementApp.DTOs.EventCreation
         [Required(ErrorMessage = StringConstant.EventRequestIdRequired)]
         public int EventRequestId { get; set; }
 
-        [Required]
         [MaxLength(100, ErrorMessage = StringConstant.EventNameTooLong)]
         public string Name { get; set; } = string.Empty;
 
