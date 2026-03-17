@@ -79,13 +79,13 @@ namespace SportsManagementApp.Tests.Services
                 .Returns(new Team { EventCategoryId = 8 });
             _mockMapper.Setup(mapper => mapper.Map<TeamResponseDto>(It.IsAny<object>()))
                 .Returns(new TeamResponseDto { Name = "Team 1", EventCategoryId = 8 });
-            _mockTeamsRepo.Setup(repo => repo.AddAsync(It.IsAny<Team>())).Returns(Task.CompletedTask);
+            _mockTeamsRepo.Setup(repo => repo.AddRangeAsync(It.IsAny<IEnumerable<Team>>())).Returns(Task.CompletedTask);
             _mockTeamsRepo.Setup(repo => repo.SaveChangesAsync()).ReturnsAsync(1);
 
             var result = await _service.CreateTeamsAsync(request);
 
             Assert.Single(result);
-            _mockTeamsRepo.Verify(repo => repo.AddAsync(It.IsAny<Team>()), Times.Once);
+            _mockTeamsRepo.Verify(repo => repo.AddRangeAsync(It.IsAny<IEnumerable<Team>>()), Times.Once);
             _mockTeamsRepo.Verify(repo => repo.SaveChangesAsync(), Times.Once);
         }
 
@@ -100,13 +100,13 @@ namespace SportsManagementApp.Tests.Services
                 .Returns(() => new Team { EventCategoryId = 8 });
             _mockMapper.Setup(mapper => mapper.Map<TeamResponseDto>(It.IsAny<object>()))
                 .Returns(new TeamResponseDto { EventCategoryId = 8 });
-            _mockTeamsRepo.Setup(repo => repo.AddAsync(It.IsAny<Team>())).Returns(Task.CompletedTask);
+            _mockTeamsRepo.Setup(repo => repo.AddRangeAsync(It.IsAny<IEnumerable<Team>>())).Returns(Task.CompletedTask);
             _mockTeamsRepo.Setup(repo => repo.SaveChangesAsync()).ReturnsAsync(1);
 
             var result = await _service.CreateTeamsAsync(request);
 
             Assert.Equal(2, result.Count);
-            _mockTeamsRepo.Verify(repo => repo.AddAsync(It.IsAny<Team>()), Times.Exactly(2));
+            _mockTeamsRepo.Verify(repo => repo.AddRangeAsync(It.IsAny<IEnumerable<Team>>()), Times.Once);
             _mockTeamsRepo.Verify(repo => repo.SaveChangesAsync(), Times.Once);
         }
 
@@ -121,13 +121,13 @@ namespace SportsManagementApp.Tests.Services
                 .Returns(() => new Team { EventCategoryId = 8 });
             _mockMapper.Setup(mapper => mapper.Map<TeamResponseDto>(It.IsAny<object>()))
                 .Returns(new TeamResponseDto { Name = "Team 1", EventCategoryId = 8 });
-            _mockTeamsRepo.Setup(repo => repo.AddAsync(It.IsAny<Team>())).Returns(Task.CompletedTask);
+            _mockTeamsRepo.Setup(repo => repo.AddRangeAsync(It.IsAny<IEnumerable<Team>>())).Returns(Task.CompletedTask);
             _mockTeamsRepo.Setup(repo => repo.SaveChangesAsync()).ReturnsAsync(1);
 
             var result = await _service.CreateTeamsAsync(request);
 
             Assert.Single(result);
-            _mockTeamsRepo.Verify(repo => repo.AddAsync(It.IsAny<Team>()), Times.Once);
+            _mockTeamsRepo.Verify(repo => repo.AddRangeAsync(It.IsAny<IEnumerable<Team>>()), Times.Once);
             _mockTeamsRepo.Verify(repo => repo.SaveChangesAsync(), Times.Once);
         }
     }

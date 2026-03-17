@@ -15,5 +15,15 @@ namespace SportsManagementApp.Repositories.Implementations
         {
             return await _dbSet.AnyAsync(sport => sport.Name == name);
         }
+
+        public async Task<List<TResult>> GetSportsAsyncWithFilter<TResult>(
+            Expression<Func<Sport, bool>> predicate,
+            Expression<Func<Sport, TResult>> projection)
+        {
+            return await _dbSet
+                .Where(predicate)
+                .Select(projection)
+                .ToListAsync();
+        }
     }
 }

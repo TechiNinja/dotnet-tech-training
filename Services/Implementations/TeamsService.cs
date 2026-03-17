@@ -3,7 +3,6 @@ using SportsManagementApp.Data.DTOs.TeamManagement;
 using SportsManagementApp.Data.Entities;
 using SportsManagementApp.Data.Filters;
 using SportsManagementApp.Data.Predicates;
-using SportsManagementApp.Data.Projections;
 using SportsManagementApp.Exceptions;
 using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services.Interfaces;
@@ -12,22 +11,30 @@ namespace SportsManagementApp.Services.Implementations
 {
     public class TeamsService : ITeamsService
     {
-        private readonly IGenericRepository<Team> _teamsRepository;
+        private readonly IGenericRepository<Team> _repository;
         private readonly IParticipantRegistrationRepository _participantRepository;
         private readonly IMapper _mapper;
 
-        public TeamsService(IGenericRepository<Team> teamsRepository, IParticipantRegistrationRepository participantRepository, IMapper mapper)
+        public TeamsService(IGenericRepository<Team> repository, IParticipantRegistrationRepository participantRepository, IMapper mapper)
         {
-            _teamsRepository = teamsRepository;
+            _repository = repository;
             _participantRepository = participantRepository;
             _mapper = mapper;
         }
 
         public async Task<List<TeamResponseDto>> GetTeamsAsync(TeamFilterDto filter)
         {
-            return await _teamsRepository.GetAllAsync(
-                TeamPredicateBuilder.Build(filter),
-                TeamProjectionBuilder.Build()
+            var predicate = TeamPredicateBuilder.Build(filter);
+            
+            return await _repository.GetAllAsync(
+                predicate: predicate,
+                projection: team => new TeamResponseDto
+                {
+                    Id = team.Id,
+                    Name = team.Name,
+                    EventCategoryId = team.EventCategoryId,
+                    Members = team.Members.Select(member => member.User != null ? member.User.FullName : "N/A").ToList()
+                }
             );
         }
 
@@ -51,6 +58,8 @@ namespace SportsManagementApp.Services.Implementations
             int teamNumber = 1;
             var result = new List<TeamResponseDto>();
 
+            var teamsToAdd = new List<Team>();
+
             for (int index = 0; index < registration.Count; index += 2)
             {
                 var team = _mapper.Map<Team>(request);
@@ -62,13 +71,14 @@ namespace SportsManagementApp.Services.Implementations
                     new() { UserId = registration[index + 1].UserId }
                 };
 
-                await _teamsRepository.AddAsync(team);
+                teamsToAdd.Add(team);
 
                 result.Add(_mapper.Map<TeamResponseDto>(team));
                 teamNumber++;
             }
 
-            await _teamsRepository.SaveChangesAsync();
+            await _repository.AddRangeAsync(teamsToAdd);
+            await _repository.SaveChangesAsync();
 
             return result;
         }

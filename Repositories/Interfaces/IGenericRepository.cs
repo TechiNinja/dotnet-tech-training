@@ -11,5 +11,6 @@ namespace SportsManagementApp.Repositories.Interfaces
         Task UpdateAsync(T entity);
         Task<int> SaveChangesAsync();
         Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate);
+        Task AddRangeAsync(IEnumerable<T> entities);
     }
 }
