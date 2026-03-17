@@ -53,6 +53,18 @@ namespace SportsManagementApp.Repositories.Specifications
         public Expression<Func<Match, bool>> ToExpression() => m => m.Status == _status;
     }
 
+    public sealed class MatchNotCompletedSpec : ISpecification<Match>
+    {
+        public Expression<Func<Match, bool>> ToExpression() => m => m.Status != MatchStatus.Completed;
+    }
+
+    public sealed class MatchFromDateTimeSpec : ISpecification<Match>
+    {
+        private readonly DateTime _from;
+        public MatchFromDateTimeSpec(DateTime from) => _from = from;
+        public Expression<Func<Match, bool>> ToExpression() => m => m.MatchDateTime >= _from;
+    }
+
     public sealed class MatchExcludeIdSpec : ISpecification<Match>
     {
         private readonly int _excludeId;
@@ -73,6 +85,32 @@ namespace SportsManagementApp.Repositories.Specifications
 
         public Expression<Func<Match, bool>> ToExpression() =>
             m => m.MatchDateTime >= _from && m.MatchDateTime <= _to;
+    }
+
+    public sealed class MatchByIdSpec : ISpecification<Match>
+    {
+        private readonly int _matchId;
+        public MatchByIdSpec(int matchId) => _matchId = matchId;
+        public Expression<Func<Match, bool>> ToExpression() => m => m.Id == _matchId;
+    }
+
+    public sealed class MatchByRoundAndBracketSpec : ISpecification<Match>
+    {
+        private readonly int _catId;
+        private readonly int _round;
+        private readonly int _bracketPos;
+
+        public MatchByRoundAndBracketSpec(int catId, int round, int bracketPos)
+        {
+            _catId      = catId;
+            _round      = round;
+            _bracketPos = bracketPos;
+        }
+
+        public Expression<Func<Match, bool>> ToExpression() =>
+            m => m.EventCategoryId == _catId &&
+                 m.RoundNumber     == _round &&
+                 m.BracketPosition == _bracketPos;
     }
 
     public static class SpecificationExtensions
