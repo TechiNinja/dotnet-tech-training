@@ -1,4 +1,3 @@
-using SportsManagementApp.Data.DTOs;
 using SportsManagementApp.Data.Entities;
 using SportsManagementApp.Data.Filters;
 
