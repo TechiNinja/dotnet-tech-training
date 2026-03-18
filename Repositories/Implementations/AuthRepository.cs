@@ -5,14 +5,9 @@ using SportsManagementApp.Repositories.Interfaces;
 
 namespace SportsManagementApp.Repositories.Implementations
 {
-    public class AuthRepository: IAuthRepository
+    public class AuthRepository: GenericRepository<User>, IAuthRepository
     {
-        private readonly AppDbContext _context;
-
-        public AuthRepository(AppDbContext context)
-        {
-            _context = context;
-        }
+        public AuthRepository(AppDbContext context): base(context) { }
 
         public async Task<User?> GetUserByEmailWithRoleAsync(string email)
         {
@@ -24,12 +19,6 @@ namespace SportsManagementApp.Repositories.Implementations
         public async Task<bool> UserExistsAsync(string email)
         {
             return await _context.Users.AnyAsync(user => user.Email == email);
-        }
-
-        public async Task AddUserAsync(User user)
-        {
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
         }
     }
 }

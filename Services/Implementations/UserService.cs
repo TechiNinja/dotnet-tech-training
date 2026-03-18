@@ -5,7 +5,6 @@ using SportsManagementApp.Data.DTOs.UserManagement;
 using SportsManagementApp.Data.Entities;
 using SportsManagementApp.Data.Filters;
 using SportsManagementApp.Data.Predicates;
-using SportsManagementApp.Data.Projections;
 using SportsManagementApp.Exceptions;
 using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services.Interfaces;
@@ -32,23 +31,37 @@ namespace SportsManagementApp.Services.Implementations
 
         public async Task<List<UserResponseDto>> GetUsersByFilterAsync(UserFilterDto filter)
         {
-            return await _userRepository.GetUsersByFilterAsync(
-                UserPredicateBuilder.Build(filter),
-                UserProjectionBuilder.Build()
+            var predicate = UserPredicateBuilder.Build(filter);
+
+            return await _userRepository.GetAllAsync(
+                predicate: predicate,
+                projection: user => new UserResponseDto
+                {
+                    Id = user.Id,
+                    FullName = user.FullName,
+                    Email = user.Email,
+                    RoleId = user.RoleId,
+                    RoleName = user.Role != null ? user.Role.Name : "Unknown",
+                    IsActive = user.IsActive
+                }
             );
         }
 
         public async Task<UserResponseDto?> GetUserByIdAsync(int userId)
         {
-            var user = await _userRepository.GetUserEntityByIdAsync(userId);
-            return _mapper.Map<UserResponseDto?>(user);
+            var user = await _userRepository.GetByIdAsync(userId);
+            return user == null ? null : _mapper.Map<UserResponseDto>(user);
         }
 
         public async Task<UserResponseDto> CreateUserAsync(CreateUserDto createUser)
         {
-            var existingUser = await _userRepository.GetUsersByFilterAsync(
-                UserPredicateBuilder.Build(new UserFilterDto { SearchTerm = createUser.Email }),
-                UserProjectionBuilder.Build()
+            var existingUser = await _userRepository.GetAllAsync(
+                predicate: user => user.Email.Contains(createUser.Email),
+                projection: user => new UserResponseDto
+                {
+                    Id = user.Id,
+                    Email = user.Email
+                }
             );
 
             if (existingUser.Any(user => user.Email.Equals(createUser.Email, StringComparison.OrdinalIgnoreCase)))
@@ -60,13 +73,14 @@ namespace SportsManagementApp.Services.Implementations
             user.PasswordHash = _passwordHasher.HashPassword(user, createUser.Password);
 
             await _userRepository.AddAsync(user);
-            var savedUser = await _userRepository.GetUserDtoByIdAsync(user.Id, UserProjectionBuilder.Build());
-            return savedUser!;
+            await _userRepository.SaveChangesAsync();
+            var savedUser = await _userRepository.GetByIdAsync(user.Id);
+            return _mapper.Map<UserResponseDto>(savedUser!);
         }
 
         public async Task<UserResponseDto?> UpdateUserAsync(int userId, UpdateUserDto updateUser)
         {
-            var user = await _userRepository.GetUserEntityByIdAsync(userId);
+            var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)
                 throw new NotFoundException("User not found");
 
@@ -78,9 +92,22 @@ namespace SportsManagementApp.Services.Implementations
             user.UpdatedAt = DateTime.UtcNow;
 
             await _userRepository.UpdateAsync(user);
+            await _userRepository.SaveChangesAsync();
 
-            var updatedUserDto = await _userRepository.GetUserDtoByIdAsync(user.Id, UserProjectionBuilder.Build());
-            return updatedUserDto!;
+            var result = await _userRepository.GetAllAsync(
+                predicate: u => u.Id == user.Id,
+                projection: u => new UserResponseDto
+                {
+                    Id = u.Id,
+                    FullName = u.FullName,
+                    Email = u.Email,
+                    RoleId = u.RoleId,
+                    RoleName = u.Role != null ? u.Role.Name : "Unknown",
+                    IsActive = u.IsActive
+                }
+            );
+
+            return result.FirstOrDefault();
         }
     }
 }
