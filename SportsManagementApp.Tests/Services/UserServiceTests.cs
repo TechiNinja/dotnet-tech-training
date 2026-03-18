@@ -131,8 +131,10 @@ namespace SportsManagementApp.Tests.Services
             _mockMapper.Setup(mapper => mapper.Map(dto, user));
             _mockRepo.Setup(repo => repo.UpdateAsync(user)).Returns(Task.CompletedTask);
             _mockRepo.Setup(repo => repo.SaveChangesAsync()).ReturnsAsync(1);
-            _mockRepo.Setup(repo => repo.GetByIdAsync(user.Id)).ReturnsAsync(user);
-            _mockMapper.Setup(mapper => mapper.Map<UserResponseDto>(user)).Returns(updatedDto);
+            _mockRepo.Setup(repo => repo.GetAllAsync(
+                It.IsAny<Expression<Func<User, bool>>>(),
+                It.IsAny<Expression<Func<User, UserResponseDto>>>()))
+                .ReturnsAsync(new List<UserResponseDto> { updatedDto });
 
             var result = await _service.UpdateUserAsync(2, dto);
 
@@ -153,8 +155,10 @@ namespace SportsManagementApp.Tests.Services
             _mockMapper.Setup(mapper => mapper.Map(dto, user));
             _mockRepo.Setup(repo => repo.UpdateAsync(user)).Returns(Task.CompletedTask);
             _mockRepo.Setup(repo => repo.SaveChangesAsync()).ReturnsAsync(1);
-            _mockRepo.Setup(repo => repo.GetByIdAsync(user.Id)).ReturnsAsync(user);
-            _mockMapper.Setup(mapper => mapper.Map<UserResponseDto>(user)).Returns(updatedDto);
+            _mockRepo.Setup(repo => repo.GetAllAsync(
+                It.IsAny<Expression<Func<User, bool>>>(),
+                It.IsAny<Expression<Func<User, UserResponseDto>>>()))
+                .ReturnsAsync(new List<UserResponseDto> { updatedDto });
 
             var result = await _service.UpdateUserAsync(5, dto);
 
@@ -175,8 +179,10 @@ namespace SportsManagementApp.Tests.Services
             _mockMapper.Setup(mapper => mapper.Map(dto, user));
             _mockRepo.Setup(repo => repo.UpdateAsync(user)).Returns(Task.CompletedTask);
             _mockRepo.Setup(repo => repo.SaveChangesAsync()).ReturnsAsync(1);
-            _mockRepo.Setup(repo => repo.GetByIdAsync(user.Id)).ReturnsAsync(user);
-            _mockMapper.Setup(mapper => mapper.Map<UserResponseDto>(user)).Returns(updatedDto);
+            _mockRepo.Setup(repo => repo.GetAllAsync(
+                It.IsAny<Expression<Func<User, bool>>>(),
+                It.IsAny<Expression<Func<User, UserResponseDto>>>()))
+                .ReturnsAsync(new List<UserResponseDto> { updatedDto });
 
             var result = await _service.UpdateUserAsync(6, dto);
 
