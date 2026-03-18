@@ -8,23 +8,22 @@ using SportsManagementApp.Services.Interfaces;
 
 namespace SportsManagementApp.Services
 {
-    public class CategoryService : ICategoryService
+    public class CategoryService : GenericService<EventCategory, EventCategoryResponseDto>, ICategoryService
     {
         private readonly IEventCategoryRepository _categoryRepo;
-        private readonly IMatchRepository         _matchRepo;
-        private readonly IMapper                  _mapper;
+        private readonly IMatchRepository _matchRepo;
 
         public CategoryService(
             IEventCategoryRepository categoryRepo,
-            IMatchRepository         matchRepo,
-            IMapper                  mapper)
+            IMatchRepository matchRepo,
+            IMapper mapper)
+            : base(categoryRepo, mapper)
         {
             _categoryRepo = categoryRepo;
-            _matchRepo    = matchRepo;
-            _mapper       = mapper;
+            _matchRepo = matchRepo;
         }
 
-        public async Task<EventCategoryResponseDto> GetByIdAsync(int catId)
+        public override async Task<EventCategoryResponseDto> GetByIdAsync(int catId)
         {
             var category = await _categoryRepo.GetByIdWithDetailsAsync(catId)
                 ?? throw new NotFoundException(string.Format(StringConstant.CategoryNotFound, catId));
@@ -39,7 +38,7 @@ namespace SportsManagementApp.Services
             var category = await _categoryRepo.GetByIdWithDetailsAsync(match.EventCategoryId)
                 ?? throw new NotFoundException(string.Format(StringConstant.CategoryNotFound, match.EventCategoryId));
 
-            return FixtureMapper.MapFixtures(new[] { match }, category, _mapper).First();
+            return FixtureMappingHelper.MapFixtures(new[] { match }, category, _mapper).First();
         }
     }
 }

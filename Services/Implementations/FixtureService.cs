@@ -13,25 +13,25 @@ namespace SportsManagementApp.Services
 {
     public class FixtureService : IFixtureService
     {
-        private static readonly TimeOnly DayStart    = new(8, 0);
-        private static readonly TimeOnly DayEnd      = new(17, 0);
-        private const           int      SlotMinutes = 60;
+        private static readonly TimeOnly DayStart = new(8, 0);
+        private static readonly TimeOnly DayEnd = new(17, 0);
+        private const int SlotMinutes = 60;
 
         private readonly IEventCategoryRepository _categoryRepo;
-        private readonly IMatchRepository         _matchRepo;
-        private readonly IFixtureStrategy         _fixtureStrategy;
-        private readonly IMapper                  _mapper;
+        private readonly IMatchRepository _matchRepo;
+        private readonly IFixtureStrategy _fixtureStrategy;
+        private readonly IMapper _mapper;
 
         public FixtureService(
             IEventCategoryRepository categoryRepo,
-            IMatchRepository         matchRepo,
-            IFixtureStrategy         fixtureStrategy,
-            IMapper                  mapper)
+            IMatchRepository matchRepo,
+            IFixtureStrategy fixtureStrategy,
+            IMapper mapper)
         {
-            _categoryRepo    = categoryRepo;
-            _matchRepo       = matchRepo;
+            _categoryRepo = categoryRepo;
+            _matchRepo = matchRepo;
             _fixtureStrategy = fixtureStrategy;
-            _mapper          = mapper;
+            _mapper = mapper;
         }
 
         public async Task<IEnumerable<FixtureResponseDto>> GenerateFixturesAsync(int catId)
@@ -50,7 +50,7 @@ namespace SportsManagementApp.Services
                 await _matchRepo.AddAsync(match);
 
             var created = await _matchRepo.GetByCategoryAsync(catId, null);
-            return FixtureMapper.MapFixtures(created, category, _mapper);
+            return FixtureMappingHelper.MapFixtures(created, category, _mapper);
         }
 
         public async Task<IEnumerable<FixtureResponseDto>> GetFixturesAsync(int catId, string? status)
@@ -62,7 +62,7 @@ namespace SportsManagementApp.Services
                 ?? throw new NotFoundException(string.Format(StringConstant.CategoryNotFound, catId));
 
             var matches = await _matchRepo.GetByCategoryAsync(catId, status);
-            return FixtureMapper.MapFixtures(matches, category, _mapper);
+            return FixtureMappingHelper.MapFixtures(matches, category, _mapper);
         }
 
         public async Task<FixtureResponseDto> RescheduleAsync(int catId, RescheduleRequestDto request)
@@ -78,7 +78,7 @@ namespace SportsManagementApp.Services
                     string.Format(StringConstant.MatchAlreadyCompleted, request.MatchId));
 
             var eventStart = category.Event!.StartDate.ToDateTime(DayStart);
-            var eventEnd   = category.Event.EndDate.ToDateTime(DayEnd);
+            var eventEnd = category.Event.EndDate.ToDateTime(DayEnd);
 
             if (request.NewStartDateTime < eventStart || request.NewStartDateTime > eventEnd)
                 throw new BadRequestException(
@@ -99,13 +99,13 @@ namespace SportsManagementApp.Services
             foreach (var m in affected)
             {
                 m.MatchDateTime = m.MatchDateTime.Add(delay);
-                m.UpdatedAt     = now;
+                m.UpdatedAt = now;
             }
 
             await _matchRepo.SaveChangesAsync();
 
             var updated = await _matchRepo.GetByIdWithSetsAndResultAsync(request.MatchId);
-            return FixtureMapper.MapFixtures(new[] { updated! }, category, _mapper).First();
+            return FixtureMappingHelper.MapFixtures(new[] { updated! }, category, _mapper).First();
         }
 
         public async Task DeleteFixturesAsync(int catId)
@@ -122,12 +122,12 @@ namespace SportsManagementApp.Services
             foreach (var match in matches)
             {
                 match.MatchDateTime = slot;
-                match.MatchVenue    = evt.EventVenue;
-                slot                = AdvanceSlot(slot, evt.EndDate);
+                match.MatchVenue = evt.EventVenue;
+                slot = GetNextSlot(slot, evt.EndDate);
             }
         }
 
-        private static DateTime AdvanceSlot(DateTime current, DateOnly endDate)
+        private static DateTime GetNextSlot(DateTime current, DateOnly endDate)
         {
             var next = current.AddMinutes(SlotMinutes);
 
@@ -148,14 +148,14 @@ namespace SportsManagementApp.Services
                 if (teams.Count < 2)
                     throw new UnprocessableEntityException(
                         string.Format(StringConstant.NotEnoughTeams, teams.Count));
-                return teams.OrderBy(_ => Guid.NewGuid()).Select(t => (int?)t.Id).ToList();
+                return teams.OrderBy(_ => Random.Shared.Next()).Select(t => (int?)t.Id).ToList();
             }
 
             var participants = category.EventRegistrations.ToList();
             if (participants.Count < 2)
                 throw new UnprocessableEntityException(
                     string.Format(StringConstant.NotEnoughParticipants, participants.Count));
-            return participants.OrderBy(_ => Guid.NewGuid()).Select(p => (int?)p.UserId).ToList();
+            return participants.OrderBy(_ => Random.Shared.Next()).Select(p => (int?)p.UserId).ToList();
         }
     }
 }

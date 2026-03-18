@@ -1,10 +1,6 @@
-using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
-using IMapperConfigProvider = AutoMapper.IConfigurationProvider;
-using SportsManagementApp.Constants;
 using SportsManagementApp.Data;
 using SportsManagementApp.Data.Entities;
-using SportsManagementApp.DTOs.Fixture;
 using SportsManagementApp.Enums;
 using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Repositories.Specifications;
@@ -13,12 +9,7 @@ namespace SportsManagementApp.Repositories.Implementations
 {
     public class MatchRepository : GenericRepository<Match>, IMatchRepository
     {
-        private readonly IMapperConfigProvider _mapperConfig;
-
-        public MatchRepository(AppDbContext context, IMapperConfigProvider mapperConfig) : base(context)
-        {
-            _mapperConfig = mapperConfig;
-        }
+        public MatchRepository(AppDbContext context) : base(context) { }
 
         public async Task<Match?> GetByIdWithSetsAndResultAsync(int matchId) =>
             await _context.Matches
@@ -29,7 +20,6 @@ namespace SportsManagementApp.Repositories.Implementations
         public async Task<IEnumerable<Match>> GetByCategoryAsync(int catId, string? status)
         {
             ISpecification<Match> spec = new MatchByCategorySpec(catId);
-
             if (!string.IsNullOrWhiteSpace(status) &&
                 Enum.TryParse<MatchStatus>(status, true, out var parsedStatus))
                 spec = spec.And(new MatchByStatusSpec(parsedStatus));
@@ -44,22 +34,12 @@ namespace SportsManagementApp.Repositories.Implementations
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<MatchSetResponseDto>> GetSetsProjectedAsync(int matchId) =>
+        public async Task<List<MatchSet>> GetSetsAsync(int matchId) =>
             await _context.MatchSets
                 .AsNoTracking()
                 .Where(s => s.MatchId == matchId)
                 .OrderBy(s => s.SetNumber)
-                .ProjectTo<MatchSetResponseDto>(_mapperConfig)
                 .ToListAsync();
-
-        public async Task AddResultAsync(Result result) =>
-            await _context.Results.AddAsync(result);
-
-        public async Task UpdateSetAsync(MatchSet set)
-        {
-            _context.MatchSets.Update(set);
-            await _context.SaveChangesAsync();
-        }
 
         public async Task UpdateEventStatusAsync(int eventCategoryId, EventStatus status) =>
             await _context.Events
@@ -77,7 +57,7 @@ namespace SportsManagementApp.Repositories.Implementations
             await _context.Matches
                 .Where(new MatchByCategorySpec(eventCategoryId).ToExpression())
                 .AllAsync(m => m.Status == MatchStatus.Completed ||
-                              (m.Status == MatchStatus.Upcoming && m.SideAId == null && m.SideBId == null));
+                               (m.Status == MatchStatus.Upcoming && m.SideAId == null && m.SideBId == null));
 
         public async Task<Match?> GetByRoundAndBracketAsync(int catId, int round, int bracketPos) =>
             await _context.Matches

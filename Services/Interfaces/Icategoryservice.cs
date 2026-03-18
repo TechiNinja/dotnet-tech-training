@@ -1,11 +1,9 @@
-using SportsManagementApp.Data.Entities;
 using SportsManagementApp.DTOs.Fixture;
 
 namespace SportsManagementApp.Services.Interfaces
 {
-    public interface ICategoryService
+    public interface ICategoryService : IGenericService<EventCategoryResponseDto>
     {
-        Task<EventCategoryResponseDto>  GetByIdAsync(int catId);
         Task<FixtureResponseDto> GetMatchByIdAsync(int matchId);
     }
 }

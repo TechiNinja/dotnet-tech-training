@@ -9,12 +9,12 @@ namespace SportsManagementApp.Services.Strategies
 
         public List<Match> Generate(List<int?> sideIds, int categoryId)
         {
-            var matches     = new List<Match>();
+            var matches = new List<Match>();
             int matchNumber = 1;
 
             var teams = sideIds
                 .Where(id => id.HasValue)
-                .OrderBy(_ => Guid.NewGuid())
+                .OrderBy(_ => Random.Shared.Next())
                 .Select(id => id!.Value)
                 .ToList();
 
@@ -30,10 +30,10 @@ namespace SportsManagementApp.Services.Strategies
 
         private static void BuildEvenRound(
             List<Match> matches,
-            List<int>   teams,
-            int         categoryId,
-            int         roundNumber,
-            ref int     matchNumber)
+            List<int> teams,
+            int categoryId,
+            int roundNumber,
+            ref int matchNumber)
         {
             int pairs = teams.Count / 2;
 
@@ -48,14 +48,14 @@ namespace SportsManagementApp.Services.Strategies
 
         private static void BuildOddRound(
             List<Match> matches,
-            List<int>   teams,
-            int         categoryId,
-            int         roundNumber,
-            ref int     matchNumber)
+            List<int> teams,
+            int categoryId,
+            int roundNumber,
+            ref int matchNumber)
         {
             int byeTeamId = teams[0];
             var remaining = teams.Skip(1).ToList();
-            int pairs     = remaining.Count / 2;
+            int pairs = remaining.Count / 2;
 
             for (int i = 0; i < pairs; i++)
             {
@@ -89,10 +89,10 @@ namespace SportsManagementApp.Services.Strategies
 
         private static void BuildPlaceholderRounds(
             List<Match> matches,
-            int         slotCount,
-            int         categoryId,
-            int         roundNumber,
-            ref int     matchNumber)
+            int slotCount,
+            int categoryId,
+            int roundNumber,
+            ref int matchNumber)
         {
             if (slotCount <= 1) return;
 
@@ -114,10 +114,10 @@ namespace SportsManagementApp.Services.Strategies
 
         private static void BuildPlaceholderOddRounds(
             List<Match> matches,
-            int         slotCount,
-            int         categoryId,
-            int         roundNumber,
-            ref int     matchNumber)
+            int slotCount,
+            int categoryId,
+            int roundNumber,
+            ref int matchNumber)
         {
             int pairs = (slotCount - 1) / 2;
 
@@ -153,10 +153,10 @@ namespace SportsManagementApp.Services.Strategies
 
         private static void EmitSemiFinalBlock(
             List<Match> matches,
-            int?        byeTeamId,
-            int         categoryId,
-            int         semiFinalRound,
-            ref int     matchNumber)
+            int? byeTeamId,
+            int categoryId,
+            int semiFinalRound,
+            ref int matchNumber)
         {
             matches.Add(NewMatch(categoryId, null, null, semiFinalRound, matchNumber, 0));
             matchNumber++;
@@ -169,23 +169,23 @@ namespace SportsManagementApp.Services.Strategies
         }
 
         private static Match NewMatch(
-            int  categoryId,
+            int categoryId,
             int? sideA,
             int? sideB,
-            int  roundNumber,
-            int  matchNumber,
-            int  bracketPosition) => new()
+            int roundNumber,
+            int matchNumber,
+            int bracketPosition) => new()
         {
             EventCategoryId = categoryId,
-            SideAId         = sideA,
-            SideBId         = sideB,
-            RoundNumber     = roundNumber,
-            MatchNumber     = matchNumber,
+            SideAId = sideA,
+            SideBId = sideB,
+            RoundNumber = roundNumber,
+            MatchNumber = matchNumber,
             BracketPosition = bracketPosition,
-            Status          = MatchStatus.Upcoming,
-            MatchVenue      = string.Empty,
-            MatchDateTime   = default,
-            CreatedAt       = DateTime.UtcNow
+            Status = MatchStatus.Upcoming,
+            MatchVenue = string.Empty,
+            MatchDateTime = default,
+            CreatedAt = DateTime.UtcNow
         };
     }
 }
