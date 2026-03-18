@@ -77,7 +77,7 @@ namespace SportsManagementApp.Services.Implementations
         {
             var predicate = SportPredicateBuilder.Build(filter);
 
-            return await _sportRepository.GetSportsAsyncWithFilter(
+            return await _sportRepository.GetAllAsync(
                 predicate: predicate,
                 projection: sport => new SportResponseDto
                 {

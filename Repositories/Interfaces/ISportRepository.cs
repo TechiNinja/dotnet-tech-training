@@ -1,6 +1,4 @@
-﻿using SportsManagementApp.Data.DTOs.SportManagement;
-using SportsManagementApp.Data.Entities;
-using System.Linq.Expressions;
+﻿using SportsManagementApp.Data.Entities;
 
 namespace SportsManagementApp.Repositories.Interfaces
 {

@@ -33,7 +33,7 @@ namespace SportsManagementApp.Services.Implementations
         {
             var predicate = UserPredicateBuilder.Build(filter);
 
-            return await _userRepository.GetUsersAsyncWithFilter(
+            return await _userRepository.GetAllAsync(
                 predicate: predicate,
                 projection: user => new UserResponseDto
                 {
@@ -55,7 +55,7 @@ namespace SportsManagementApp.Services.Implementations
 
         public async Task<UserResponseDto> CreateUserAsync(CreateUserDto createUser)
         {
-            var existingUser = await _userRepository.GetUsersAsyncWithFilter(
+            var existingUser = await _userRepository.GetAllAsync(
                 predicate: user => user.Email.Contains(createUser.Email),
                 projection: user => new UserResponseDto
                 {
@@ -94,8 +94,20 @@ namespace SportsManagementApp.Services.Implementations
             await _userRepository.UpdateAsync(user);
             await _userRepository.SaveChangesAsync();
 
-            var updatedUser = await _userRepository.GetByIdAsync(user.Id);
-            return _mapper.Map<UserResponseDto>(updatedUser!);
+            var result = await _userRepository.GetAllAsync(
+                predicate: u => u.Id == user.Id,
+                projection: u => new UserResponseDto
+                {
+                    Id = u.Id,
+                    FullName = u.FullName,
+                    Email = u.Email,
+                    RoleId = u.RoleId,
+                    RoleName = u.Role != null ? u.Role.Name : "Unknown",
+                    IsActive = u.IsActive
+                }
+            );
+
+            return result.FirstOrDefault();
         }
     }
 }
