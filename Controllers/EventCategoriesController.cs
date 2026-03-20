@@ -11,18 +11,18 @@ namespace SportsManagementApp.Controllers
     [Route("api/eventCategories")]
     public class EventCategoriesController : ControllerBase
     {
-        private readonly ICategoryService _categoryService;
+        private readonly IEventCategoryService _eventCategoryService;
         private readonly IFixtureService  _fixtureService;
 
-        public EventCategoriesController(ICategoryService categoryService, IFixtureService fixtureService)
+        public EventCategoriesController(IEventCategoryService eventCategoryService, IFixtureService fixtureService)
         {
-            _categoryService = categoryService;
+            _eventCategoryService = eventCategoryService;
             _fixtureService  = fixtureService;
         }
 
         [HttpGet("{categoryId:int}")]
         public async Task<IActionResult> GetCategory(int categoryId) =>
-            Ok(await _categoryService.GetByIdAsync<EventCategoryResponseDto>(categoryId));
+            Ok(await _eventCategoryService.GetByIdAsync<EventCategoryResponseDto>(categoryId));
 
         [HttpGet("{categoryId:int}/fixtures")]
         public async Task<IActionResult> GetFixtures(int categoryId, [FromQuery] string? status = null) =>

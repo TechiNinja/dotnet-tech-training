@@ -12,17 +12,17 @@ namespace SportsManagementApp.Controllers
     public class MatchesController : ControllerBase
     {
         private readonly IMatchService _matchService;
-        private readonly ICategoryService _categoryService;
+        private readonly IEventCategoryService _eventCategoryService;
 
-        public MatchesController(IMatchService matchService, ICategoryService categoryService)
+        public MatchesController(IMatchService matchService, IEventCategoryService eventCategoryService)
         {
             _matchService = matchService;
-            _categoryService = categoryService;
+            _eventCategoryService = eventCategoryService;
         }
 
         [HttpGet("{matchId:int}")]
         public async Task<IActionResult> GetMatchById(int matchId) =>
-            Ok(await _categoryService.GetMatchByIdAsync(matchId));
+            Ok(await _eventCategoryService.GetMatchByIdAsync(matchId));
 
         [HttpGet("{matchId:int}/sets")]
         public async Task<IActionResult> GetAllSets(int matchId) =>
