@@ -11,7 +11,7 @@ using SportsManagementApp.Services.Interfaces;
 
 namespace SportsManagementApp.Services
 {
-    public class EventService : GenericService<Event, EventResponseDto>, IEventService
+    public class EventService : GenericService<Event>, IEventService
     {
         private readonly IEventRepository _eventRepo;
         private readonly IEventRequestRepository _requestRepo;
@@ -29,11 +29,11 @@ namespace SportsManagementApp.Services
             _userRepo = userRepo;
         }
 
-        public override async Task<EventResponseDto> GetByIdAsync(int eventId)
+        public override async Task<TDto> GetByIdAsync<TDto>(int id)
         {
-            var entity = await _eventRepo.GetByIdWithDetailsAsync(eventId)
-                ?? throw new NotFoundException(string.Format(StringConstant.EventNotFound, eventId));
-            return _mapper.Map<EventResponseDto>(entity);
+            var entity = await _eventRepo.GetByIdWithDetailsAsync(id)
+                ?? throw new NotFoundException(string.Format(StringConstant.EventNotFound, id));
+            return _mapper.Map<TDto>(entity);
         }
 
         public async Task<IEnumerable<EventResponseDto>> GetAllAsync(EventFilterDto filter)
@@ -100,8 +100,8 @@ namespace SportsManagementApp.Services
                 MaxParticipantsCount = request.MaxParticipantsCount,
                 RegistrationDeadline = request.RegistrationDeadline,
                 Name = !string.IsNullOrWhiteSpace(request.Name)
-                    ? request.Name
-                    : eventRequest.EventName,
+                                           ? request.Name
+                                           : eventRequest.EventName,
                 SportId = eventRequest.SportId,
                 StartDate = eventRequest.StartDate,
                 EndDate = eventRequest.EndDate,

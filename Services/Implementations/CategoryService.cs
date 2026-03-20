@@ -1,6 +1,7 @@
 using AutoMapper;
 using SportsManagementApp.Constants;
 using SportsManagementApp.Data.Entities;
+using SportsManagementApp.DTOs.EventCreation;
 using SportsManagementApp.DTOs.Fixture;
 using SportsManagementApp.Exceptions;
 using SportsManagementApp.Repositories.Interfaces;
@@ -8,7 +9,7 @@ using SportsManagementApp.Services.Interfaces;
 
 namespace SportsManagementApp.Services
 {
-    public class CategoryService : GenericService<EventCategory, EventCategoryResponseDto>, ICategoryService
+    public class CategoryService : GenericService<EventCategory>, ICategoryService
     {
         private readonly IEventCategoryRepository _categoryRepo;
         private readonly IMatchRepository _matchRepo;
@@ -23,11 +24,11 @@ namespace SportsManagementApp.Services
             _matchRepo = matchRepo;
         }
 
-        public override async Task<EventCategoryResponseDto> GetByIdAsync(int catId)
+        public override async Task<TDto> GetByIdAsync<TDto>(int id)
         {
-            var category = await _categoryRepo.GetByIdWithDetailsAsync(catId)
-                ?? throw new NotFoundException(string.Format(StringConstant.CategoryNotFound, catId));
-            return _mapper.Map<EventCategoryResponseDto>(category);
+            var category = await _categoryRepo.GetByIdWithDetailsAsync(id)
+                ?? throw new NotFoundException(string.Format(StringConstant.CategoryNotFound, id));
+            return _mapper.Map<TDto>(category);
         }
 
         public async Task<FixtureResponseDto> GetMatchByIdAsync(int matchId)

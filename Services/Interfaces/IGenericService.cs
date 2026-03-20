@@ -1,8 +1,8 @@
 namespace SportsManagementApp.Services.Interfaces
 {
-    public interface IGenericService<TResponseDto>
+    public interface IGenericService<TEntity> where TEntity : class
     {
-        Task<TResponseDto> GetByIdAsync(int id);
-        Task<IEnumerable<TResponseDto>> GetAllAsync();
+        Task<TDto> GetByIdAsync<TDto>(int id);
+        Task<IEnumerable<TDto>> GetAllAsync<TDto>();
     }
 }

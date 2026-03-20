@@ -11,12 +11,12 @@ namespace SportsManagementApp.Controllers
     [Route("api/matches")]
     public class MatchesController : ControllerBase
     {
-        private readonly IMatchService    _matchService;
+        private readonly IMatchService _matchService;
         private readonly ICategoryService _categoryService;
 
         public MatchesController(IMatchService matchService, ICategoryService categoryService)
         {
-            _matchService    = matchService;
+            _matchService = matchService;
             _categoryService = categoryService;
         }
 
@@ -27,6 +27,11 @@ namespace SportsManagementApp.Controllers
         [HttpGet("{matchId:int}/sets")]
         public async Task<IActionResult> GetAllSets(int matchId) =>
             Ok(await _matchService.GetSetsAsync(matchId));
+
+        [Authorize(Roles = $"{RoleConstants.Admin},{RoleConstants.Organizer}")]
+        [HttpPatch("{matchId:int}/reschedule")]
+        public async Task<IActionResult> Reschedule(int matchId, [FromBody] RescheduleRequestDto request) =>
+            Ok(await _matchService.RescheduleAsync(matchId, request));
 
         [Authorize(Roles = $"{RoleConstants.Admin},{RoleConstants.Organizer}")]
         [HttpPatch("{matchId:int}/sets")]

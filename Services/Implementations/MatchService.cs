@@ -11,21 +11,70 @@ namespace SportsManagementApp.Services
 {
     public class MatchService : IMatchService
     {
+        private static readonly TimeOnly DayStart = new(8, 0);
+        private static readonly TimeOnly DayEnd = new(17, 0);
+
         private readonly IMatchRepository _matchRepo;
+        private readonly IEventCategoryRepository _categoryRepo;
         private readonly IGenericRepository<Result> _resultRepo;
         private readonly IGenericRepository<MatchSet> _setRepo;
         private readonly IMapper _mapper;
 
         public MatchService(
             IMatchRepository matchRepo,
+            IEventCategoryRepository categoryRepo,
             IGenericRepository<Result> resultRepo,
             IGenericRepository<MatchSet> setRepo,
             IMapper mapper)
         {
             _matchRepo = matchRepo;
+            _categoryRepo = categoryRepo;
             _resultRepo = resultRepo;
             _setRepo = setRepo;
             _mapper = mapper;
+        }
+
+        public async Task<FixtureResponseDto> RescheduleAsync(int matchId, RescheduleRequestDto request)
+        {
+            var match = await _matchRepo.GetByIdWithSetsAndResultAsync(matchId)
+                ?? throw new NotFoundException(string.Format(StringConstant.MatchNotFound, matchId));
+
+            var category = await _categoryRepo.GetByIdWithDetailsAsync(match.EventCategoryId)
+                ?? throw new NotFoundException(string.Format(StringConstant.CategoryNotFound, match.EventCategoryId));
+
+            if (match.Status == MatchStatus.Completed)
+                throw new UnprocessableEntityException(
+                    string.Format(StringConstant.MatchAlreadyCompleted, matchId));
+
+            var eventStart = category.Event!.StartDate.ToDateTime(DayStart);
+            var eventEnd = category.Event.EndDate.ToDateTime(DayEnd);
+
+            if (request.NewStartDateTime < eventStart || request.NewStartDateTime > eventEnd)
+                throw new BadRequestException(
+                    string.Format(StringConstant.RescheduleOutsideEventDates,
+                        category.Event.StartDate, category.Event.EndDate));
+
+            var delay = request.NewStartDateTime - match.MatchDateTime;
+
+            var affected = category.Matches
+                .Where(m => m.Status != MatchStatus.Completed && m.MatchDateTime >= match.MatchDateTime)
+                .OrderBy(m => m.MatchDateTime)
+                .ToList();
+
+            if (affected.Last().MatchDateTime.Add(delay) > eventEnd)
+                throw new BadRequestException(StringConstant.ReschedulePushesMatchesBeyondEventEnd);
+
+            var now = DateTime.UtcNow;
+            foreach (var m in affected)
+            {
+                m.MatchDateTime = m.MatchDateTime.Add(delay);
+                m.UpdatedAt = now;
+            }
+
+            await _matchRepo.SaveChangesAsync();
+
+            var updated = await _matchRepo.GetByIdWithSetsAndResultAsync(matchId);
+            return FixtureMappingHelper.MapFixtures(new[] { updated! }, category, _mapper).First();
         }
 
         public async Task<SetUpdateResponseDto> UpdateSetAsync(int matchId, MatchSetRequestDto request)

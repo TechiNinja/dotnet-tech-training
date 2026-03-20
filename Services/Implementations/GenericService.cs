@@ -6,7 +6,7 @@ using SportsManagementApp.Services.Interfaces;
 
 namespace SportsManagementApp.Services
 {
-    public class GenericService<TEntity, TResponseDto> : IGenericService<TResponseDto>
+    public class GenericService<TEntity> : IGenericService<TEntity>
         where TEntity : class
     {
         protected readonly IGenericRepository<TEntity> _repository;
@@ -18,18 +18,18 @@ namespace SportsManagementApp.Services
             _mapper = mapper;
         }
 
-        public virtual async Task<TResponseDto> GetByIdAsync(int id)
+        public virtual async Task<TDto> GetByIdAsync<TDto>(int id)
         {
             var entity = await _repository.GetByIdAsync(id)
                 ?? throw new NotFoundException(
                     string.Format(StringConstant.EntityNotFound, typeof(TEntity).Name, id));
-            return _mapper.Map<TResponseDto>(entity);
+            return _mapper.Map<TDto>(entity);
         }
 
-        public virtual async Task<IEnumerable<TResponseDto>> GetAllAsync()
+        public virtual async Task<IEnumerable<TDto>> GetAllAsync<TDto>()
         {
             var entities = await _repository.GetAllAsync();
-            return _mapper.Map<IEnumerable<TResponseDto>>(entities);
+            return _mapper.Map<IEnumerable<TDto>>(entities);
         }
     }
 }

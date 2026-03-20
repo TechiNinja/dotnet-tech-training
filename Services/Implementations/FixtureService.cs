@@ -1,11 +1,10 @@
 using AutoMapper;
 using SportsManagementApp.Constants;
+using SportsManagementApp.Data.Entities;
 using SportsManagementApp.DTOs.Fixture;
 using SportsManagementApp.Enums;
 using SportsManagementApp.Exceptions;
-using SportsManagementApp.Data.Entities;
 using SportsManagementApp.Repositories.Interfaces;
-using SportsManagementApp.Repositories.Specifications;
 using SportsManagementApp.Services.Interfaces;
 using SportsManagementApp.Services.Strategies;
 
@@ -63,49 +62,6 @@ namespace SportsManagementApp.Services
 
             var matches = await _matchRepo.GetByCategoryAsync(catId, status);
             return FixtureMappingHelper.MapFixtures(matches, category, _mapper);
-        }
-
-        public async Task<FixtureResponseDto> RescheduleAsync(int catId, RescheduleRequestDto request)
-        {
-            var category = await _categoryRepo.GetByIdWithDetailsAsync(catId)
-                ?? throw new NotFoundException(string.Format(StringConstant.CategoryNotFound, catId));
-
-            var match = category.Matches.FirstOrDefault(m => m.Id == request.MatchId)
-                ?? throw new NotFoundException(string.Format(StringConstant.MatchNotFound, request.MatchId));
-
-            if (match.Status == MatchStatus.Completed)
-                throw new UnprocessableEntityException(
-                    string.Format(StringConstant.MatchAlreadyCompleted, request.MatchId));
-
-            var eventStart = category.Event!.StartDate.ToDateTime(DayStart);
-            var eventEnd = category.Event.EndDate.ToDateTime(DayEnd);
-
-            if (request.NewStartDateTime < eventStart || request.NewStartDateTime > eventEnd)
-                throw new BadRequestException(
-                    string.Format(StringConstant.RescheduleOutsideEventDates,
-                        category.Event.StartDate, category.Event.EndDate));
-
-            var delay = request.NewStartDateTime - match.MatchDateTime;
-
-            var affected = category.Matches
-                .Where(m => m.Status != MatchStatus.Completed && m.MatchDateTime >= match.MatchDateTime)
-                .OrderBy(m => m.MatchDateTime)
-                .ToList();
-
-            if (affected.Last().MatchDateTime.Add(delay) > eventEnd)
-                throw new BadRequestException(StringConstant.ReschedulePushesMatchesBeyondEventEnd);
-
-            var now = DateTime.UtcNow;
-            foreach (var m in affected)
-            {
-                m.MatchDateTime = m.MatchDateTime.Add(delay);
-                m.UpdatedAt = now;
-            }
-
-            await _matchRepo.SaveChangesAsync();
-
-            var updated = await _matchRepo.GetByIdWithSetsAndResultAsync(request.MatchId);
-            return FixtureMappingHelper.MapFixtures(new[] { updated! }, category, _mapper).First();
         }
 
         public async Task DeleteFixturesAsync(int catId)

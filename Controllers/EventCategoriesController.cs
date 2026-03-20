@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SportsManagementApp.Constants;
-using SportsManagementApp.DTOs.Fixture;
+using SportsManagementApp.DTOs.EventCreation;
 using SportsManagementApp.Services.Interfaces;
 
 namespace SportsManagementApp.Controllers
@@ -22,7 +22,7 @@ namespace SportsManagementApp.Controllers
 
         [HttpGet("{categoryId:int}")]
         public async Task<IActionResult> GetCategory(int categoryId) =>
-            Ok(await _categoryService.GetByIdAsync(categoryId));
+            Ok(await _categoryService.GetByIdAsync<EventCategoryResponseDto>(categoryId));
 
         [HttpGet("{categoryId:int}/fixtures")]
         public async Task<IActionResult> GetFixtures(int categoryId, [FromQuery] string? status = null) =>
@@ -40,10 +40,5 @@ namespace SportsManagementApp.Controllers
             await _fixtureService.DeleteFixturesAsync(categoryId);
             return Ok(new { message = StringConstant.FixturesDeleted });
         }
-
-        [Authorize(Roles = $"{RoleConstants.Admin},{RoleConstants.Organizer}")]
-        [HttpPatch("{categoryId:int}/fixtures/reschedule")]
-        public async Task<IActionResult> Reschedule(int categoryId, [FromBody] RescheduleRequestDto request) =>
-            Ok(await _fixtureService.RescheduleAsync(categoryId, request));
     }
 }

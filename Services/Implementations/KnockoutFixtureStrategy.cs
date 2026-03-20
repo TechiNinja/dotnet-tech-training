@@ -1,10 +1,19 @@
+using AutoMapper;
 using SportsManagementApp.Data.Entities;
+using SportsManagementApp.DTOs.Fixture;
 using SportsManagementApp.Enums;
 
 namespace SportsManagementApp.Services.Strategies
 {
     public sealed class KnockoutFixtureStrategy : IFixtureStrategy
     {
+        private readonly IMapper _mapper;
+
+        public KnockoutFixtureStrategy(IMapper mapper)
+        {
+            _mapper = mapper;
+        }
+
         public TournamentType TournamentType => TournamentType.Knockout;
 
         public List<Match> Generate(List<int?> sideIds, int categoryId)
@@ -28,7 +37,7 @@ namespace SportsManagementApp.Services.Strategies
             return matches;
         }
 
-        private static void BuildEvenRound(
+        private void BuildEvenRound(
             List<Match> matches,
             List<int> teams,
             int categoryId,
@@ -46,7 +55,7 @@ namespace SportsManagementApp.Services.Strategies
             BuildPlaceholderRounds(matches, pairs, categoryId, roundNumber + 1, ref matchNumber);
         }
 
-        private static void BuildOddRound(
+        private void BuildOddRound(
             List<Match> matches,
             List<int> teams,
             int categoryId,
@@ -87,7 +96,7 @@ namespace SportsManagementApp.Services.Strategies
             EmitSemiFinalBlock(matches, byeTeamId, categoryId, currentRound, ref matchNumber);
         }
 
-        private static void BuildPlaceholderRounds(
+        private void BuildPlaceholderRounds(
             List<Match> matches,
             int slotCount,
             int categoryId,
@@ -112,7 +121,7 @@ namespace SportsManagementApp.Services.Strategies
             BuildPlaceholderRounds(matches, pairs, categoryId, roundNumber + 1, ref matchNumber);
         }
 
-        private static void BuildPlaceholderOddRounds(
+        private void BuildPlaceholderOddRounds(
             List<Match> matches,
             int slotCount,
             int categoryId,
@@ -151,7 +160,7 @@ namespace SportsManagementApp.Services.Strategies
             EmitSemiFinalBlock(matches, null, categoryId, currentRound, ref matchNumber);
         }
 
-        private static void EmitSemiFinalBlock(
+        private void EmitSemiFinalBlock(
             List<Match> matches,
             int? byeTeamId,
             int categoryId,
@@ -168,24 +177,24 @@ namespace SportsManagementApp.Services.Strategies
             matchNumber++;
         }
 
-        private static Match NewMatch(
+        private Match NewMatch(
             int categoryId,
             int? sideA,
             int? sideB,
             int roundNumber,
             int matchNumber,
-            int bracketPosition) => new()
+            int bracketPosition)
         {
-            EventCategoryId = categoryId,
-            SideAId = sideA,
-            SideBId = sideB,
-            RoundNumber = roundNumber,
-            MatchNumber = matchNumber,
-            BracketPosition = bracketPosition,
-            Status = MatchStatus.Upcoming,
-            MatchVenue = string.Empty,
-            MatchDateTime = default,
-            CreatedAt = DateTime.UtcNow
-        };
+            var dto = new MatchCreateDto
+            {
+                EventCategoryId = categoryId,
+                SideAId = sideA,
+                SideBId = sideB,
+                RoundNumber = roundNumber,
+                MatchNumber = matchNumber,
+                BracketPosition = bracketPosition
+            };
+            return _mapper.Map<Match>(dto);
+        }
     }
 }
