@@ -66,12 +66,6 @@ public class EventRequestService : IEventRequestService
             request.CreateNotification(message, RequestStatus.Pending, NotificationAudience.Ops)
         );
 
-        var message = $"New event request #{request.Id} is pending for review.";
-
-        await _notificationService.CreateAsync(
-            request.CreateNotification(message, RequestStatus.Pending, NotificationAudience.Ops)
-        );
-
         return _mapper.Map<EventRequestResponseDto>(createdRequest);
     }
 

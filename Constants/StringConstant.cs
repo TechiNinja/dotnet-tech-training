@@ -34,6 +34,7 @@ namespace SportsManagementApp.StringConstants
         public const string InvalidId = "Invalid Id";
         public const string MessageRequired = "Message is Required";
         public const string IdRequired = "User ID Required for admin";
+        public const string SportsNotFound = "Sports Not Found"; 
     }
 
     public static class AppConstants

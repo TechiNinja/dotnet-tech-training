@@ -40,9 +40,17 @@ namespace SportsManagementApp.Repositories.Implementations
             return await _dbSet.ToListAsync();
         }
 
+        public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbSet
+                .AsNoTracking()
+                .Where(predicate)
+                .ToListAsync();
+        }
+
         public async Task<List<T>> GetAllWithIncludesAsync(
-    Expression<Func<T, bool>>? predicate = null,
-    params Expression<Func<T, object>>[] includes)
+            Expression<Func<T, bool>>? predicate = null,
+            params Expression<Func<T, object>>[] includes)
         {
             IQueryable<T> query = _dbSet;
 
@@ -58,7 +66,10 @@ namespace SportsManagementApp.Repositories.Implementations
 
             return await query.ToListAsync();
         }
-        public async Task<List<TDto>> GetAllAsync<TDto>(Expression<Func<T, bool>> predicate, Expression<Func<T, TDto>> projection)
+
+        public async Task<List<TDto>> GetAllAsync<TDto>(
+            Expression<Func<T, bool>> predicate,
+            Expression<Func<T, TDto>> projection)
         {
             return await _dbSet
                 .AsNoTracking()
@@ -69,12 +80,13 @@ namespace SportsManagementApp.Repositories.Implementations
 
         public async Task AddAsync(T entity)
         {
-            _dbSet.Add(entity);
+            await _dbSet.AddAsync(entity);
         }
 
-        public async Task UpdateAsync(T entity)
+        public Task UpdateAsync(T entity)
         {
             _dbSet.Update(entity);
+            return Task.CompletedTask;
         }
 
         public async Task<int> SaveChangesAsync()
@@ -91,13 +103,10 @@ namespace SportsManagementApp.Repositories.Implementations
         {
             return await _dbSet.CountAsync(predicate);
         }
+
         public async Task AddRangeAsync(IEnumerable<T> entities)
         {
             await _dbSet.AddRangeAsync(entities);
-        }
-        public async Task<int> CountAsync(Expression<Func<T, bool>> predicate)
-        {
-            return await _dbSet.CountAsync(predicate);
         }
     }
 }

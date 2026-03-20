@@ -4,7 +4,6 @@ using SportsManagementApp.Data.DTOs;
 using SportsManagementApp.Data.Entities;
 using SportsManagementApp.Data.Filters;
 using SportsManagementApp.Data.Predicates;
-using SportsManagementApp.Data.Projections;
 using SportsManagementApp.Repositories.Interfaces;
 
 namespace SportsManagementApp.Repositories.Implementations;
