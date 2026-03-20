@@ -34,7 +34,7 @@ namespace SportsManagementApp.Services
             _mapper = mapper;
         }
 
-        public async Task<FixtureResponseDto> RescheduleAsync(int matchId, RescheduleRequestDto request)
+        public async Task<FixtureResponseDto> RescheduleAsync(int matchId, DateTime newStartDateTime)
         {
             var match = await _matchRepo.GetByIdWithSetsAndResultAsync(matchId)
                 ?? throw new NotFoundException(string.Format(StringConstant.MatchNotFound, matchId));
@@ -49,12 +49,12 @@ namespace SportsManagementApp.Services
             var eventStart = category.Event!.StartDate.ToDateTime(DayStart);
             var eventEnd = category.Event.EndDate.ToDateTime(DayEnd);
 
-            if (request.NewStartDateTime < eventStart || request.NewStartDateTime > eventEnd)
+            if (newStartDateTime < eventStart || newStartDateTime > eventEnd)
                 throw new BadRequestException(
                     string.Format(StringConstant.RescheduleOutsideEventDates,
                         category.Event.StartDate, category.Event.EndDate));
 
-            var delay = request.NewStartDateTime - match.MatchDateTime;
+            var delay = newStartDateTime - match.MatchDateTime;
 
             var affected = category.Matches
                 .Where(m => m.Status != MatchStatus.Completed && m.MatchDateTime >= match.MatchDateTime)

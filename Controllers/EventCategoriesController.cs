@@ -8,7 +8,7 @@ namespace SportsManagementApp.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("api/categories")]
+    [Route("api/eventCategories")]
     public class EventCategoriesController : ControllerBase
     {
         private readonly ICategoryService _categoryService;

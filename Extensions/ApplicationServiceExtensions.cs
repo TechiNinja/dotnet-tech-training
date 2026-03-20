@@ -21,7 +21,7 @@ namespace SportsManagementApp.Extensions
             services.AddScoped<IParticipantRegistrationService, ParticipantRegistrationService>();
             services.AddScoped<IEventRequestService, EventRequestService>();
             services.AddScoped<IAnalyticsService, AnalyticsService>();
-            services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<ICategoryService, EventCategoryService>();
             services.AddScoped<IFixtureService, FixtureService>();
             services.AddScoped<IFixtureStrategy, KnockoutFixtureStrategy>();
             services.AddScoped<IMatchService, MatchService>();

@@ -9,12 +9,12 @@ using SportsManagementApp.Services.Interfaces;
 
 namespace SportsManagementApp.Services
 {
-    public class CategoryService : GenericService<EventCategory>, ICategoryService
+    public class EventCategoryService : GenericService<EventCategory>, ICategoryService
     {
         private readonly IEventCategoryRepository _categoryRepo;
         private readonly IMatchRepository _matchRepo;
 
-        public CategoryService(
+        public EventCategoryService(
             IEventCategoryRepository categoryRepo,
             IMatchRepository matchRepo,
             IMapper mapper)

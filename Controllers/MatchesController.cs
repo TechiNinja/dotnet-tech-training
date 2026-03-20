@@ -30,8 +30,8 @@ namespace SportsManagementApp.Controllers
 
         [Authorize(Roles = $"{RoleConstants.Admin},{RoleConstants.Organizer}")]
         [HttpPatch("{matchId:int}/reschedule")]
-        public async Task<IActionResult> Reschedule(int matchId, [FromBody] RescheduleRequestDto request) =>
-            Ok(await _matchService.RescheduleAsync(matchId, request));
+        public async Task<IActionResult> Reschedule(int matchId, [FromBody] DateTime newStartDateTime) =>
+            Ok(await _matchService.RescheduleAsync(matchId, newStartDateTime));
 
         [Authorize(Roles = $"{RoleConstants.Admin},{RoleConstants.Organizer}")]
         [HttpPatch("{matchId:int}/sets")]
