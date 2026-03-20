@@ -8,7 +8,7 @@ public class NotificationMapping : Profile
 {
     public NotificationMapping()
     {
-        CreateMap<CreateNotificationDto, Notification>()
+        CreateMap<BaseNotificationDto, Notification>()
             .ForMember(dest => dest.CreatedAt,
                opt => opt.MapFrom(src => DateTime.UtcNow));
 

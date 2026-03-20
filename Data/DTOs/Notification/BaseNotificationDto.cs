@@ -2,7 +2,7 @@ using SportsManagementApp.Enums;
 
 namespace SportsManagementApp.Data.DTOs;
 
-public class CreateNotificationDto
+public class BaseNotificationDto
 {
     public int? UserId { get; set; }
     public int EventRequestId { get; set; }

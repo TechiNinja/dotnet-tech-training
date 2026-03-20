@@ -21,6 +21,6 @@ public class EventRequestMapping : Profile
             .ForMember(dest => dest.Status,
                 opt => opt.MapFrom(_ => RequestStatus.Pending));
 
-        CreateMap<EditEventRequestDto, EventRequest>();
+        CreateMap<BaseEventRequestDto, EventRequest>();
         }
 }

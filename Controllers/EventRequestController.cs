@@ -23,8 +23,7 @@ public class EventRequestsController : ControllerBase
     {
         _eventRequestService = eventRequestService;
     }
-
-
+    
     [Authorize(Roles = $"{RoleConstants.Admin}")]
     [HttpPost]
     [ProducesResponseType(typeof(EventRequestResponseDto), StatusCodes.Status201Created)]
@@ -60,7 +59,7 @@ public class EventRequestsController : ControllerBase
     [Authorize(Roles = $"{RoleConstants.Admin}")]
     [HttpPut("{id:int}")]
     [ProducesResponseType(typeof(EventRequestResponseDto), StatusCodes.Status200OK)]
-    public async Task<ActionResult<EventRequestResponseDto>> EditEventRequest(int id, [FromBody] EditEventRequestDto dto)
+    public async Task<ActionResult<EventRequestResponseDto>> EditEventRequest(int id, [FromBody] BaseEventRequestDto dto)
     {
         var adminId = User.GetUserId();
         var updated = await _eventRequestService.EditEventRequestAsync(id, dto, adminId);

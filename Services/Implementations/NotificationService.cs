@@ -33,7 +33,7 @@ public class NotificationService : INotificationService
             throw new ValidationException(StringConstant.InvalidId);
     }
 
-    public async Task<Notification> CreateAsync(CreateNotificationDto dto)
+    public async Task<Notification> CreateAsync(BaseNotificationDto dto)
     {
         if (dto.EventRequestId <= 0)
             throw new ValidationException(StringConstant.InvalidId);

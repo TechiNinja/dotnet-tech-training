@@ -94,7 +94,7 @@ public class EventRequestService : IEventRequestService
         return _mapper.Map<List<EventRequestResponseDto>>(requests);
     }
 
-    public async Task<EventRequestResponseDto> EditEventRequestAsync(int id, EditEventRequestDto dto, int adminId)
+    public async Task<EventRequestResponseDto> EditEventRequestAsync(int id, BaseEventRequestDto dto, int adminId)
     {
         var request = await GetOwnedPendingRequestOrThrowAsync(id, adminId, StringConstant.OnlyEditOwnRequest);
 

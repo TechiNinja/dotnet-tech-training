@@ -2,6 +2,7 @@
 using SportsManagementApp.Data.Entities;
 using SportsManagementApp.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace SportsManagementApp.Repositories.Implementations
 {

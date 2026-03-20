@@ -4,14 +4,14 @@ using SportsManagementApp.Enums;
 
 namespace SportsManagementApp.Helper;
 
-public static class CreateNotificationHelper
+public static class NotificationHelper
 {
-    public static CreateNotificationDto CreateNotification(
+    public static BaseNotificationDto CreateNotification(
         this EventRequest request,
         string message,
         RequestStatus status,NotificationAudience audience)
     {
-        return new CreateNotificationDto
+        return new BaseNotificationDto
         {
             UserId = audience == NotificationAudience.Admin ? request.AdminId : request.OperationsReviewerId,
             EventRequestId = request.Id,

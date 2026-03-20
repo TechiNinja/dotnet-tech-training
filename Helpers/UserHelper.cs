@@ -3,7 +3,7 @@ using SportsManagementApp.Exceptions;
 
 namespace SportsManagementApp.Helper;
 
-public static class GetCurrentUser
+public static class UserHelper
 {
     public static int GetUserId(this ClaimsPrincipal user)
     {
