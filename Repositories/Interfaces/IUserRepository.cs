@@ -10,5 +10,6 @@ namespace SportsManagementApp.Repositories.Interfaces
         Task<List<TResult>> GetUsersAsyncWithFilter<TResult>(
             Expression<Func<User, bool>> predicate,
             Expression<Func<User, TResult>> projection);
+        Task<User?> GetUserEntityByIdAsync(int id);
     }
 }
