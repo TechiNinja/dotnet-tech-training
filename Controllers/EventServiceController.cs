@@ -9,11 +9,11 @@ namespace SportsManagementApp.Controllers
     [Authorize]
     [ApiController]
     [Route("api/event-management")]
-    public class EventCreateController : ControllerBase
+    public class EventServiceController : ControllerBase
     {
         private readonly IEventService _eventService;
 
-        public EventCreateController(IEventService eventService)
+        public EventServiceController(IEventService eventService)
         {
             _eventService = eventService;
         }
