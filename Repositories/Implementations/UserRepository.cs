@@ -34,5 +34,12 @@ namespace SportsManagementApp.Repositories.Implementations
                 .Select(projection)
                 .ToListAsync();
         }
+
+        public async Task<User?> GetUserEntityByIdAsync(int id)
+        {
+            return await _dbSet
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.Id == id);
+        }
     }
 }

@@ -1,33 +1,39 @@
 using AutoMapper;
+using SportsManagementApp.Constants;
 using SportsManagementApp.Data.Entities;
 using SportsManagementApp.Data.Filters;
+using SportsManagementApp.Data.Predicates;
 using SportsManagementApp.DTOs.EventCreation;
 using SportsManagementApp.Enums;
 using SportsManagementApp.Exceptions;
-using SportsManagementApp.Data.Predicates;
 using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services.Interfaces;
-using SportsManagementApp.Constants;
 
 namespace SportsManagementApp.Services
 {
-    public class EventService : IEventService
+    public class EventService : GenericService<Event>, IEventService
     {
         private readonly IEventRepository _eventRepo;
         private readonly IEventRequestRepository _requestRepo;
         private readonly IUserRepository _userRepo;
-        private readonly IMapper _mapper;
 
         public EventService(
             IEventRepository eventRepo,
             IEventRequestRepository requestRepo,
             IUserRepository userRepo,
             IMapper mapper)
+            : base(eventRepo, mapper)
         {
-            _eventRepo   = eventRepo;
+            _eventRepo = eventRepo;
             _requestRepo = requestRepo;
-            _userRepo    = userRepo;
-            _mapper      = mapper;
+            _userRepo = userRepo;
+        }
+
+        public override async Task<TDto> GetByIdAsync<TDto>(int id)
+        {
+            var entity = await _eventRepo.GetByIdWithDetailsAsync(id)
+                ?? throw new NotFoundException(string.Format(StringConstant.EventNotFound, id));
+            return _mapper.Map<TDto>(entity);
         }
 
         public async Task<IEnumerable<EventResponseDto>> GetAllAsync(EventFilterDto filter)
@@ -44,15 +50,8 @@ namespace SportsManagementApp.Services
             }
 
             var predicate = EventPredicateBuilder.Build(filter);
-            var events    = await _eventRepo.GetAllAsync(predicate);
+            var events = await _eventRepo.GetAllAsync(predicate);
             return _mapper.Map<IEnumerable<EventResponseDto>>(events);
-        }
-
-        public async Task<EventResponseDto> GetByIdAsync(int eventId)
-        {
-            var entity = await _eventRepo.GetByIdWithDetailsAsync(eventId)
-                ?? throw new NotFoundException(string.Format(StringConstant.EventNotFound, eventId));
-            return _mapper.Map<EventResponseDto>(entity);
         }
 
         public async Task<EventRequestPreFillResponseDto> GetEventRequestForPreFillAsync(int requestId)
@@ -76,7 +75,8 @@ namespace SportsManagementApp.Services
                     string.Format(StringConstant.EventRequestNotFound, request.EventRequestId));
 
             if (eventRequest.Status != RequestStatus.Approved)
-                throw new UnprocessableEntityException(string.Format(StringConstant.EventRequestNotApproved, eventRequest.Status));
+                throw new UnprocessableEntityException(
+                    string.Format(StringConstant.EventRequestNotApproved, eventRequest.Status));
 
             if (request.RegistrationDeadline >= eventRequest.StartDate)
                 throw new BadRequestException(StringConstant.RegistrationDeadlineInvalid);
@@ -85,7 +85,7 @@ namespace SportsManagementApp.Services
                 throw new ConflictException(
                     string.Format(StringConstant.EventAlreadyExists, request.EventRequestId));
 
-            var genderTypes  = eventRequest.Gender == GenderType.Both
+            var genderTypes = eventRequest.Gender == GenderType.Both
                 ? new[] { GenderType.Male, GenderType.Female }
                 : new[] { eventRequest.Gender };
 
@@ -95,27 +95,27 @@ namespace SportsManagementApp.Services
 
             var newEvent = new Event
             {
-                EventRequestId       = request.EventRequestId,
-                Description          = request.Description,
+                EventRequestId = request.EventRequestId,
+                Description = request.Description,
                 MaxParticipantsCount = request.MaxParticipantsCount,
                 RegistrationDeadline = request.RegistrationDeadline,
-                Name                 = !string.IsNullOrWhiteSpace(request.Name)
-                                        ? request.Name
-                                        : eventRequest.EventName,
-                SportId              = eventRequest.SportId,
-                StartDate            = eventRequest.StartDate,
-                EndDate              = eventRequest.EndDate,
-                EventVenue           = eventRequest.RequestedVenue,
-                OrganizerId          = eventRequest.AdminId,
-                Status               = EventStatus.Open,
-                TournamentType       = TournamentType.Knockout,
-                CreatedAt            = DateTime.UtcNow,
-                Categories           = genderTypes
+                Name = !string.IsNullOrWhiteSpace(request.Name)
+                                           ? request.Name
+                                           : eventRequest.EventName,
+                SportId = eventRequest.SportId,
+                StartDate = eventRequest.StartDate,
+                EndDate = eventRequest.EndDate,
+                EventVenue = eventRequest.RequestedVenue,
+                OrganizerId = eventRequest.AdminId,
+                Status = EventStatus.Open,
+                TournamentType = TournamentType.Knockout,
+                CreatedAt = DateTime.UtcNow,
+                Categories = genderTypes
                     .SelectMany(genderType => matchFormats.Select(matchFormat => new EventCategory
                     {
-                        Gender    = genderType,
-                        Format    = matchFormat,
-                        Status    = CategoryStatus.Active,
+                        Gender = genderType,
+                        Format = matchFormat,
+                        Status = CategoryStatus.Active,
                         CreatedAt = DateTime.UtcNow
                     }))
                     .ToList()
@@ -139,7 +139,7 @@ namespace SportsManagementApp.Services
 
             if (action == StringConstant.ActionCancel)
             {
-                entity.Status    = EventStatus.Cancelled;
+                entity.Status = EventStatus.Cancelled;
                 entity.UpdatedAt = DateTime.UtcNow;
             }
             else if (action == StringConstant.ActionUpdate)
@@ -151,9 +151,8 @@ namespace SportsManagementApp.Services
                 {
                     if (request.RegistrationDeadline.Value >= entity.StartDate)
                         throw new BadRequestException(StringConstant.RegistrationDeadlineInvalid);
-                    if (entity.Status == EventStatus.Cancelled)      
+                    if (entity.Status == EventStatus.Cancelled)
                         throw new UnprocessableEntityException(StringConstant.EventCancelled);
-
                 }
             }
             else
@@ -162,7 +161,6 @@ namespace SportsManagementApp.Services
             }
 
             await _eventRepo.UpdateAsync(entity);
-
             return _mapper.Map<EventResponseDto>(entity);
         }
 
@@ -185,11 +183,10 @@ namespace SportsManagementApp.Services
                     string.Format(StringConstant.UserNotOrganizer, organizer.FullName));
 
             entity.OrganizerId = organizer.Id;
-            entity.Organizer   = organizer;
-            entity.UpdatedAt   = DateTime.UtcNow;
+            entity.Organizer = organizer;
+            entity.UpdatedAt = DateTime.UtcNow;
 
             await _eventRepo.UpdateAsync(entity);
-
             return _mapper.Map<EventResponseDto>(entity);
         }
 

@@ -82,4 +82,11 @@ public class StringConstant
     public const string UnhandledExceptionLog = "Unhandled exception on {Method} {Path}";
     public const string ActionCancel = "cancel";
     public const string ActionUpdate = "update";
+    public const string RescheduleOutsideEventDates = "New date must be within event dates ({0} to {1}).";
+    public const string ReschedulePushesMatchesBeyondEventEnd = "Rescheduling this match pushes subsequent matches beyond the event end date.";
+    public const string NotEnoughDaysToSchedule = "Event duration is not enough to schedule all generated matches.";
+    public const string TotalSetsLocked  = "Total sets cannot be changed once a match is live or completed.";
+    public const string TotalSetsInvalid = "Total sets must be an odd number between 1 and 9.";
+    public const string PreviousRoundNotCompleted = "Previous round matches must be completed before starting this match.";
+    public const string EntityNotFound = "{0} #{1} not found.";
 }
