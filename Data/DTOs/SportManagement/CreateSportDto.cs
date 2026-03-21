@@ -1,7 +1,10 @@
-﻿namespace SportsManagementApp.Data.DTOs.SportManagement
+﻿using System.Collections.Generic;
+
+namespace SportsManagementApp.Data.DTOs.SportManagement
 {
     public class CreateSportDto
     {
         public string Name { get; set; } = string.Empty;
+        public List<string> AllowedFormats { get; set; } = new();
     }
 }

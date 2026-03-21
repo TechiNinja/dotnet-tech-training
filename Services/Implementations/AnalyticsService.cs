@@ -19,6 +19,7 @@ namespace SportsManagementApp.Services.Implementations
             return role switch
             {
                 RoleConstants.Admin => await _analyticsRepository.GetAdminAnalyticsAsync(),
+                RoleConstants.Operation => await _analyticsRepository.GetOperationAnalyticsAsync(),
                 RoleConstants.Organizer => await _analyticsRepository.GetOrganizerAnalyticsAsync(userId),
                 _ => throw new UnauthorizedException("Analytics not available for this role")
             };

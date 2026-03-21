@@ -1,4 +1,6 @@
-﻿namespace SportsManagementApp.Data.Entities
+﻿using System.Collections.Generic;
+
+namespace SportsManagementApp.Data.Entities
 {
     public class Sport
     {

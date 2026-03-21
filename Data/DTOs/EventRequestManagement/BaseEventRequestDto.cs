@@ -3,16 +3,18 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SportsManagementApp.Data.DTOs;
 
-public class EditEventRequestDto
+public class BaseEventRequestDto
 {
-    [Required, MaxLength(100)]
-    public string EventName { get; set; } = null!;
+    [Required]
+    [MaxLength(100)]
+    public string EventName { get; set; } = string.Empty;
 
-    [Required, MaxLength(100)]
-    public string RequestedVenue { get; set; } = null!;
+    [Required]
+    [MaxLength(100)]
+    public string RequestedVenue { get; set; } = string.Empty;
 
     [MaxLength(500)]
-    public string LogisticsRequirements { get; set; } = null!;
+    public string LogisticsRequirements { get; set; } = string.Empty;
 
     [Required]
     public MatchFormat Format { get; set; }
@@ -26,4 +28,3 @@ public class EditEventRequestDto
     [Required]
     public DateOnly EndDate { get; set; }
 }
-

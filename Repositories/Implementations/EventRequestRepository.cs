@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using SportsManagementApp.Data;
+using SportsManagementApp.Data.DTOs;
 using SportsManagementApp.Data.Entities;
-using SportsManagementApp.Enums;
+using SportsManagementApp.Data.Filters;
+using SportsManagementApp.Data.Predicates;
 using SportsManagementApp.Repositories.Interfaces;
 
 namespace SportsManagementApp.Repositories.Implementations;
@@ -9,27 +11,16 @@ namespace SportsManagementApp.Repositories.Implementations;
 public class EventRequestRepository : GenericRepository<EventRequest>, IEventRequestRepository
 {
     public EventRequestRepository(AppDbContext context) : base(context) { }
-    public async Task<EventRequest?> GetEventRequestById(int id)
+
+    public async Task<EventRequest?> GetEventRequestByIdAsync(int id)
     {
-        return await _context.EventRequests
-            .Include(e => e.Sport)
-            .FirstOrDefaultAsync(x => x.Id == id);
+        return await GetByIdWithIncludesAsync(e => e.Id == id, e => e.Sport, e => e.OperationsReviewer, e => e.Admin);
     }
 
-    public async Task<IEnumerable<EventRequest>> Search(int? id, RequestStatus? status)
+    public async Task<List<EventRequest>> GetEventRequestsByFilterAsync(EventRequestFilterDto filter)
     {
-        var query = _context.EventRequests
-            .Include(e => e.Sport)
-            .AsQueryable();
+        var predicate = EventRequestPredicateBuilder.Build(filter);
 
-        if (id.HasValue){
-            query = query.Where(e => e.Id == id.Value);
-        }
-
-        if (status.HasValue){
-            query = query.Where(e => e.Status == status.Value);
-        }
-
-        return await query.ToListAsync();
+        return await GetAllWithIncludesAsync(predicate, e => e.Sport, e => e.Admin, e => e.OperationsReviewer);
     }
 }

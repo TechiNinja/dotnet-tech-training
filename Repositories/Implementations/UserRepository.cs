@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using SportsManagementApp.Data;
 using SportsManagementApp.Data.Entities;
-using SportsManagementApp.Repositories.Interfaces;
 using System.Linq.Expressions;
+using SportsManagementApp.Repositories.Interfaces;
 
 namespace SportsManagementApp.Repositories.Implementations
 {

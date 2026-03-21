@@ -15,4 +15,6 @@ namespace SportsManagementApp.Exceptions
     public class UnprocessableEntityException(string message) : AppException(message, HttpStatusCode.UnprocessableEntity) { }
 
     public class ConflictException(string message) : AppException(message, HttpStatusCode.Conflict) { }
+    public class ForbiddenException(string message) : AppException(message, HttpStatusCode.Forbidden) { }
+    public class ValidationException(string message) : AppException(message, HttpStatusCode.BadRequest) { }
 }

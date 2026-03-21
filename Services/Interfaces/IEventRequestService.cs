@@ -1,11 +1,14 @@
 using SportsManagementApp.Data.DTOs;
-using SportsManagementApp.Enums;
+using SportsManagementApp.Data.Filters;
 
-namespace SportsManagementApp.Services.Interfaces;
-public interface IEventRequestService
+namespace SportsManagementApp.Services.Interfaces
 {
-    Task<EventRequestResponseDto> RaiseEventRequest(CreateEventRequestDto dto, int adminId);
-    Task<IEnumerable<EventRequestResponseDto>> SearchEventRequests(int? id, RequestStatus? status);
-    Task<EventRequestResponseDto> WithdrawEventRequest(int id);
-    Task<EventRequestResponseDto> EditEventRequest(int id ,EditEventRequestDto dto);
+    public interface IEventRequestService
+    {
+        Task<EventRequestResponseDto> RaiseEventRequestAsync(CreateEventRequestDto dto, int adminId);
+        Task<EventRequestResponseDto> GetByIdForAdminAsync(int id, int adminId);
+        Task<IEnumerable<EventRequestResponseDto>> GetAllEventRequestsAsync(EventRequestFilterDto filter);
+        Task<EventRequestResponseDto> EditEventRequestAsync(int id, BaseEventRequestDto dto, int adminId);
+        Task<EventRequestResponseDto> WithdrawEventRequestAsync(int id, int adminId);
+    }
 }
