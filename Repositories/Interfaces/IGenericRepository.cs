@@ -29,6 +29,5 @@ namespace SportsManagementApp.Repositories.Interfaces
         Task<int> CountAsync(Expression<Func<T, bool>> predicate);
         Task AddRangeAsync(IEnumerable<T> entities);
         Task<List<T>> GetAllAsync(Expression<Func<T, bool>> predicate);
-        Task AddRangeAsync(IEnumerable<T> entities);
     }
 }
