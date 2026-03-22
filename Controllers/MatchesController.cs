@@ -15,11 +15,26 @@ namespace SportsManagementApp.Controllers
         private readonly IEventCategoryService _eventCategoryService;
         private readonly IFixtureService _fixtureService;
 
-        public MatchesController(IMatchService matchService, IEventCategoryService eventCategoryService, IFixtureService fixtureService)
+        public MatchesController(
+            IMatchService matchService,
+            IEventCategoryService eventCategoryService,
+            IFixtureService fixtureService)
         {
             _matchService = matchService;
             _fixtureService = fixtureService;
             _eventCategoryService = eventCategoryService;
+        }
+
+        [HttpGet("category/{categoryId:int}/fixtures")]
+        public async Task<IActionResult> GetFixtures(int categoryId, [FromQuery] string? status = null) =>
+            Ok(await _fixtureService.GetFixturesAsync(categoryId, status));
+
+        [Authorize(Roles = $"{RoleConstants.Admin},{RoleConstants.Organizer}")]
+        [HttpDelete("category/{categoryId:int}/fixtures")]
+        public async Task<IActionResult> DeleteFixtures(int categoryId)
+        {
+            await _fixtureService.DeleteFixturesAsync(categoryId);
+            return Ok(new { message = StringConstant.FixturesDeleted });
         }
 
         [HttpGet("{matchId:int}")]
@@ -47,13 +62,5 @@ namespace SportsManagementApp.Controllers
         [HttpPatch("{matchId:int}/sets/{setId:int}")]
         public async Task<IActionResult> UpdateSetById(int matchId, int setId, [FromBody] MatchSetRequestDto request) =>
             Ok(await _matchService.UpdateSetByIdAsync(matchId, setId, request));
-
-        [Authorize(Roles = $"{RoleConstants.Admin},{RoleConstants.Organizer}")]
-        [HttpDelete("{categoryId:int}/fixtures")]
-        public async Task<IActionResult> DeleteFixtures(int categoryId)
-        {
-            await _fixtureService.DeleteFixturesAsync(categoryId);
-            return Ok(new { message = StringConstant.FixturesDeleted });
-        }
     }
 }

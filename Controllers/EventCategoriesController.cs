@@ -12,26 +12,21 @@ namespace SportsManagementApp.Controllers
     public class EventCategoriesController : ControllerBase
     {
         private readonly IEventCategoryService _eventCategoryService;
-        private readonly IFixtureService  _fixtureService;
+        private readonly IFixtureService _fixtureService;
 
         public EventCategoriesController(IEventCategoryService eventCategoryService, IFixtureService fixtureService)
         {
             _eventCategoryService = eventCategoryService;
-            _fixtureService  = fixtureService;
+            _fixtureService = fixtureService;
         }
 
         [HttpGet("{categoryId:int}")]
         public async Task<IActionResult> GetCategory(int categoryId) =>
             Ok(await _eventCategoryService.GetByIdAsync<EventCategoryResponseDto>(categoryId));
 
-        [HttpGet("{categoryId:int}/fixtures")]
-        public async Task<IActionResult> GetFixtures(int categoryId, [FromQuery] string? status = null) =>
-            Ok(await _fixtureService.GetFixturesAsync(categoryId, status));
-
         [Authorize(Roles = $"{RoleConstants.Admin},{RoleConstants.Organizer}")]
         [HttpPost("{categoryId:int}/generate-fixture")]
         public async Task<IActionResult> GenerateFixtures(int categoryId) =>
             StatusCode(201, await _fixtureService.GenerateFixturesAsync(categoryId));
-
     }
 }
