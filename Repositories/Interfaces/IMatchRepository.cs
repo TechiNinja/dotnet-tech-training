@@ -8,7 +8,6 @@ namespace SportsManagementApp.Repositories.Interfaces
         Task<Match?> GetByIdWithSetsAndResultAsync(int matchId);
         Task<IEnumerable<Match>> GetByCategoryAsync(int catId, string? status);
         Task<List<MatchSet>> GetSetsAsync(int matchId);
-        Task UpdateEventStatusAsync(int eventCategoryId, EventStatus status);
         Task DeleteAllByCategoryAsync(int catId);
         Task<bool> AllMatchesCompletedAsync(int eventCategoryId);
         Task<Match?> GetByRoundAndBracketAsync(int catId, int roundNumber, int bracketPosition);

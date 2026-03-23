@@ -11,9 +11,6 @@ namespace SportsManagementApp.Services
 {
     public class MatchService : IMatchService
     {
-        private static readonly TimeOnly DayStart = new(8, 0);
-        private static readonly TimeOnly DayEnd = new(17, 0);
-
         private readonly IMatchRepository _matchRepo;
         private readonly IEventCategoryRepository _categoryRepo;
         private readonly IGenericRepository<Result> _resultRepo;
@@ -46,8 +43,8 @@ namespace SportsManagementApp.Services
                 throw new UnprocessableEntityException(
                     string.Format(StringConstant.MatchAlreadyCompleted, matchId));
 
-            var eventStart = category.Event!.StartDate.ToDateTime(DayStart);
-            var eventEnd = category.Event.EndDate.ToDateTime(DayEnd);
+            var eventStart = category.Event!.StartDate.ToDateTime(StringConstant.DayStart);
+            var eventEnd = category.Event.EndDate.ToDateTime(StringConstant.DayEnd);
 
             if (newStartDateTime < eventStart || newStartDateTime > eventEnd)
                 throw new BadRequestException(
@@ -116,6 +113,7 @@ namespace SportsManagementApp.Services
             _mapper.Map(request, set);
             set.UpdatedAt = DateTime.UtcNow;
             await _setRepo.UpdateAsync(set);
+            await _setRepo.SaveChangesAsync();
 
             return new SetUpdateResponseDto { Set = _mapper.Map<MatchSetResponseDto>(set) };
         }
@@ -144,6 +142,7 @@ namespace SportsManagementApp.Services
             liveSet.UpdatedAt = DateTime.UtcNow;
             if (request.IsCompleted) liveSet.Status = SetStatus.Completed;
             await _setRepo.UpdateAsync(liveSet);
+            await _setRepo.SaveChangesAsync();
             return liveSet;
         }
 
@@ -167,7 +166,7 @@ namespace SportsManagementApp.Services
                 match.Status = MatchStatus.Live;
                 match.UpdatedAt = DateTime.UtcNow;
                 await _matchRepo.UpdateAsync(match);
-                await _matchRepo.UpdateEventStatusAsync(match.EventCategoryId, EventStatus.Live);
+                await _categoryRepo.UpdateEventStatusAsync(match.EventCategoryId, EventStatus.Live);
             }
 
             match.MatchSets.Add(newSet);
@@ -235,6 +234,7 @@ namespace SportsManagementApp.Services
             match.Status = MatchStatus.Completed;
             match.UpdatedAt = DateTime.UtcNow;
             await _matchRepo.UpdateAsync(match);
+            await _matchRepo.SaveChangesAsync();
 
             var allMatches = (await _matchRepo.GetByCategoryAsync(match.EventCategoryId, null)).ToList();
             int lastRound = allMatches.Max(m => m.RoundNumber);
@@ -243,16 +243,17 @@ namespace SportsManagementApp.Services
             if (IsFinal(match, lastRound)) { }
             else if (IsByeMatch(match, lastRound)) await AdvanceByeMatchWinnerAsync(match, winnerId, allMatches, lastRound);
             else if (oddBracket && match.RoundNumber == lastRound - 1 && match.BracketPosition == 0) await AdvanceSemiFinalAsync(match, winnerId, loserId, allMatches);
-            else await AdvanceRegularWinnerAsync(match, winnerId, allMatches, lastRound, oddBracket);
+            else await AdvanceRegularWinnerAsync(match, winnerId, allMatches, lastRound);
+            await _matchRepo.SaveChangesAsync();
 
             if (await _matchRepo.AllMatchesCompletedAsync(match.EventCategoryId))
-                await _matchRepo.UpdateEventStatusAsync(match.EventCategoryId, EventStatus.Completed);
+                await _categoryRepo.UpdateEventStatusAsync(match.EventCategoryId, EventStatus.Completed);
 
             var saved = await _matchRepo.GetByIdWithSetsAndResultAsync(matchId);
             return _mapper.Map<MatchResultResponseDto>(saved!.Result);
         }
 
-        private async Task AdvanceRegularWinnerAsync(Match completedMatch, int? winnerId, List<Match> allMatches, int lastRound, bool oddBracket)
+        private async Task AdvanceRegularWinnerAsync(Match completedMatch, int? winnerId, List<Match> allMatches, int lastRound)
         {
             var currentRoundMatches = allMatches
                 .Where(m => m.RoundNumber == completedMatch.RoundNumber)

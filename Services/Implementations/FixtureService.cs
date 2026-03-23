@@ -12,9 +12,6 @@ namespace SportsManagementApp.Services
 {
     public class FixtureService : IFixtureService
     {
-        private static readonly TimeOnly DayStart = new(8, 0);
-        private static readonly TimeOnly DayEnd = new(17, 0);
-        private const int SlotMinutes = 60;
 
         private readonly IEventCategoryRepository _categoryRepo;
         private readonly IMatchRepository _matchRepo;
@@ -45,8 +42,7 @@ namespace SportsManagementApp.Services
 
             AssignSlots(matches, category.Event!);
 
-            foreach (var match in matches)
-                await _matchRepo.AddAsync(match);
+            await _matchRepo.AddRangeAsync(matches);
             await _matchRepo.SaveChangesAsync();
 
             var created = await _matchRepo.GetByCategoryAsync(catId, null);
@@ -75,7 +71,7 @@ namespace SportsManagementApp.Services
 
         private static void AssignSlots(IEnumerable<Match> matches, Event evt)
         {
-            var slot = evt.StartDate.ToDateTime(DayStart);
+            var slot = evt.StartDate.ToDateTime(StringConstant.DayStart);
             foreach (var match in matches)
             {
                 match.MatchDateTime = slot;
@@ -86,10 +82,10 @@ namespace SportsManagementApp.Services
 
         private static DateTime GetNextSlot(DateTime current, DateOnly endDate)
         {
-            var next = current.AddMinutes(SlotMinutes);
+            var next = current.AddMinutes(StringConstant.SlotMinutes);
 
-            if (TimeOnly.FromDateTime(next) >= DayEnd)
-                next = next.Date.AddDays(1).Add(DayStart.ToTimeSpan());
+            if (TimeOnly.FromDateTime(next) >= StringConstant.DayEnd)
+                next = next.Date.AddDays(1).Add(StringConstant.DayStart.ToTimeSpan());
 
             if (DateOnly.FromDateTime(next) > endDate)
                 throw new UnprocessableEntityException(StringConstant.NotEnoughDaysToSchedule);
@@ -116,4 +112,3 @@ namespace SportsManagementApp.Services
         }
     }
 }
-

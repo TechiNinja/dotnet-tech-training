@@ -41,13 +41,6 @@ namespace SportsManagementApp.Repositories.Implementations
                 .OrderBy(s => s.SetNumber)
                 .ToListAsync();
 
-        public async Task UpdateEventStatusAsync(int eventCategoryId, EventStatus status) =>
-            await _context.Events
-                .Where(e => e.Categories.Any(c => c.Id == eventCategoryId))
-                .ExecuteUpdateAsync(s => s
-                    .SetProperty(e => e.Status, status)
-                    .SetProperty(e => e.UpdatedAt, DateTime.UtcNow));
-
         public async Task DeleteAllByCategoryAsync(int catId) =>
             await _context.Matches
                 .Where(new MatchByCategorySpec(catId).ToExpression())
