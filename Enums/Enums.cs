@@ -67,12 +67,12 @@
     }
     public enum RoleType
     {
-        Admin       = 1,
-        OpsTeam     = 2,
-        Organizer   = 3,
+        Admin = 1,
+        OpsTeam = 2,
+        Organizer = 3,
         Participant = 4
     }
-   public enum NotificationType
+    public enum NotificationType
     {
         Unknown = 0,
         Approved = 1,

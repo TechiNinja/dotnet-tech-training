@@ -24,10 +24,10 @@ namespace SportsManagementApp.Services
             IUserRepository userRepo,
             IMapper mapper)
         {
-            _eventRepo   = eventRepo;
+            _eventRepo = eventRepo;
             _requestRepo = requestRepo;
-            _userRepo    = userRepo;
-            _mapper      = mapper;
+            _userRepo = userRepo;
+            _mapper = mapper;
         }
 
         public async Task<IEnumerable<EventResponseDto>> GetAllAsync(EventFilterDto filter)
@@ -44,7 +44,7 @@ namespace SportsManagementApp.Services
             }
 
             var predicate = EventPredicateBuilder.Build(filter);
-            var events    = await _eventRepo.GetAllAsync(predicate);
+            var events = await _eventRepo.GetAllAsync(predicate);
             return _mapper.Map<IEnumerable<EventResponseDto>>(events);
         }
 
@@ -65,7 +65,8 @@ namespace SportsManagementApp.Services
                     string.Format(StringConstant.EventRequestNotApproved, eventRequest.Status));
 
             var response = _mapper.Map<EventRequestPreFillResponseDto>(eventRequest);
-            response.IsEventAlreadyCreated = await _eventRepo.ExistsByRequestIdAsync(requestId);
+
+            response.IsEventAlreadyCreated = await _eventRepo.ExistsAsync(e => e.EventRequestId == requestId);
             return response;
         }
 
@@ -76,16 +77,17 @@ namespace SportsManagementApp.Services
                     string.Format(StringConstant.EventRequestNotFound, request.EventRequestId));
 
             if (eventRequest.Status != RequestStatus.Approved)
-                throw new UnprocessableEntityException(string.Format(StringConstant.EventRequestNotApproved, eventRequest.Status));
+                throw new UnprocessableEntityException(
+                    string.Format(StringConstant.EventRequestNotApproved, eventRequest.Status));
 
             if (request.RegistrationDeadline >= eventRequest.StartDate)
                 throw new BadRequestException(StringConstant.RegistrationDeadlineInvalid);
 
-            if (await _eventRepo.ExistsByRequestIdAsync(request.EventRequestId))
+            if (await _eventRepo.ExistsAsync(e => e.EventRequestId == request.EventRequestId))
                 throw new ConflictException(
                     string.Format(StringConstant.EventAlreadyExists, request.EventRequestId));
 
-            var genderTypes  = eventRequest.Gender == GenderType.Both
+            var genderTypes = eventRequest.Gender == GenderType.Both
                 ? new[] { GenderType.Male, GenderType.Female }
                 : new[] { eventRequest.Gender };
 
@@ -95,33 +97,34 @@ namespace SportsManagementApp.Services
 
             var newEvent = new Event
             {
-                EventRequestId       = request.EventRequestId,
-                Description          = request.Description,
+                EventRequestId = request.EventRequestId,
+                Description = request.Description,
                 MaxParticipantsCount = request.MaxParticipantsCount,
                 RegistrationDeadline = request.RegistrationDeadline,
-                Name                 = !string.IsNullOrWhiteSpace(request.Name)
-                                        ? request.Name
-                                        : eventRequest.EventName,
-                SportId              = eventRequest.SportId,
-                StartDate            = eventRequest.StartDate,
-                EndDate              = eventRequest.EndDate,
-                EventVenue           = eventRequest.RequestedVenue,
-                OrganizerId          = eventRequest.AdminId,
-                Status               = EventStatus.Open,
-                TournamentType       = TournamentType.Knockout,
-                CreatedAt            = DateTime.UtcNow,
-                Categories           = genderTypes
+                Name = !string.IsNullOrWhiteSpace(request.Name)
+                    ? request.Name
+                    : eventRequest.EventName,
+                SportId = eventRequest.SportId,
+                StartDate = eventRequest.StartDate,
+                EndDate = eventRequest.EndDate,
+                EventVenue = eventRequest.RequestedVenue,
+                OrganizerId = eventRequest.AdminId,
+                Status = EventStatus.Open,
+                TournamentType = TournamentType.Knockout,
+                CreatedAt = DateTime.UtcNow,
+                Categories = genderTypes
                     .SelectMany(genderType => matchFormats.Select(matchFormat => new EventCategory
                     {
-                        Gender    = genderType,
-                        Format    = matchFormat,
-                        Status    = CategoryStatus.Active,
+                        Gender = genderType,
+                        Format = matchFormat,
+                        Status = CategoryStatus.Active,
                         CreatedAt = DateTime.UtcNow
                     }))
                     .ToList()
             };
 
             await _eventRepo.AddAsync(newEvent);
+            await _eventRepo.SaveChangesAsync();
 
             var created = await _eventRepo.GetByIdWithDetailsAsync(newEvent.Id)
                 ?? throw new NotFoundException(string.Format(StringConstant.EventNotFound, newEvent.Id));
@@ -139,7 +142,7 @@ namespace SportsManagementApp.Services
 
             if (action == StringConstant.ActionCancel)
             {
-                entity.Status    = EventStatus.Cancelled;
+                entity.Status = EventStatus.Cancelled;
                 entity.UpdatedAt = DateTime.UtcNow;
             }
             else if (action == StringConstant.ActionUpdate)
@@ -151,9 +154,9 @@ namespace SportsManagementApp.Services
                 {
                     if (request.RegistrationDeadline.Value >= entity.StartDate)
                         throw new BadRequestException(StringConstant.RegistrationDeadlineInvalid);
-                    if (entity.Status == EventStatus.Cancelled)      
-                        throw new UnprocessableEntityException(StringConstant.EventCancelled);
 
+                    if (entity.Status == EventStatus.Cancelled)
+                        throw new UnprocessableEntityException(StringConstant.EventCancelled);
                 }
             }
             else
@@ -162,6 +165,7 @@ namespace SportsManagementApp.Services
             }
 
             await _eventRepo.UpdateAsync(entity);
+            await _eventRepo.SaveChangesAsync();
 
             return _mapper.Map<EventResponseDto>(entity);
         }
@@ -185,10 +189,11 @@ namespace SportsManagementApp.Services
                     string.Format(StringConstant.UserNotOrganizer, organizer.FullName));
 
             entity.OrganizerId = organizer.Id;
-            entity.Organizer   = organizer;
-            entity.UpdatedAt   = DateTime.UtcNow;
+            entity.Organizer = organizer;
+            entity.UpdatedAt = DateTime.UtcNow;
 
             await _eventRepo.UpdateAsync(entity);
+            await _eventRepo.SaveChangesAsync();
 
             return _mapper.Map<EventResponseDto>(entity);
         }

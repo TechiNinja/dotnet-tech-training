@@ -17,24 +17,6 @@ namespace SportsManagementApp.Repositories.Implementations
                 .ToListAsync();
         }
 
-        public async Task<List<TResult>> GetUsersAsync<TResult>(
-            Expression<Func<User, TResult>> projection)
-        {
-            return await _dbSet
-                .Select(projection)
-                .ToListAsync();
-        }
-
-        public async Task<List<TResult>> GetUsersAsyncWithFilter<TResult>(
-            Expression<Func<User, bool>> predicate,
-            Expression<Func<User, TResult>> projection)
-        {
-            return await _dbSet
-                .Where(predicate)
-                .Select(projection)
-                .ToListAsync();
-        }
-
         public async Task<User?> GetUserEntityByIdAsync(int id)
         {
             return await _dbSet

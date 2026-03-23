@@ -17,8 +17,5 @@ namespace SportsManagementApp.Repositories.Implementations
                 .Include(e => e.EventRequest)
                 .Include(e => e.Categories)
                 .FirstOrDefaultAsync(e => e.Id == eventId);
-
-        public async Task<bool> ExistsByRequestIdAsync(int requestId) =>
-            await ExistsAsync(new EventByRequestIdSpec(requestId).ToExpression());
     }
 }
