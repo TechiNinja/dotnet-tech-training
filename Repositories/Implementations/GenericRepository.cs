@@ -37,7 +37,7 @@ namespace SportsManagementApp.Repositories.Implementations
 
         public async Task<List<T>> GetAllAsync()
         {
-            return await _dbSet.ToListAsync();
+            return await _dbSet.AsNoTracking().ToListAsync();
         }
 
         public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>> predicate)
