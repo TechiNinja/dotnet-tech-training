@@ -1,4 +1,4 @@
-﻿using SportsManagementApp.Constants;
+﻿using SportsManagementApp.StringConstants;
 using SportsManagementApp.Exceptions;
 using System.Net;
 using System.Text.Json;

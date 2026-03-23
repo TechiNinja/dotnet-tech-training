@@ -23,7 +23,7 @@ public class EventRequestsController : ControllerBase
     {
         _eventRequestService = eventRequestService;
     }
-    
+
     [Authorize(Roles = $"{RoleConstants.Admin}")]
     [HttpPost]
     [ProducesResponseType(typeof(EventRequestResponseDto), StatusCodes.Status201Created)]
@@ -74,6 +74,19 @@ public class EventRequestsController : ControllerBase
     {
         var adminId = User.GetUserId();
         var updated = await _eventRequestService.WithdrawEventRequestAsync(id, adminId);
+
+        return Ok(updated);
+    }
+
+    [Authorize(Roles = $"{RoleConstants.Operation}")]
+    [HttpPatch("{id:int}/review")]
+    [ProducesResponseType(typeof(EventRequestResponseDto), StatusCodes.Status200OK)]
+    public async Task<ActionResult<EventRequestResponseDto>> ReviewEventRequest(
+        int id,
+        [FromBody] ReviewEventRequestDto dto)
+    {
+        var opsId = User.GetUserId();
+        var updated = await _eventRequestService.ReviewEventRequestAsync(id, dto, opsId);
 
         return Ok(updated);
     }

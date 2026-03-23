@@ -129,4 +129,39 @@ public class EventRequestService : IEventRequestService
 
         return request;
     }
+
+    public async Task<EventRequestResponseDto> ReviewEventRequestAsync(
+    int id,
+    ReviewEventRequestDto dto,
+    int opsUserId)
+    {
+        if (dto.Status != RequestStatus.Approved && dto.Status != RequestStatus.Rejected)
+            throw new ValidationException(StringConstant.OnlyApproveOrRejectAllowed);
+
+        var request = await _eventRequestRepository.GetEventRequestByIdAsync(id);
+
+        if (request == null)
+            throw new NotFoundException(StringConstant.NoRequestFound);
+
+        if (request.Status != RequestStatus.Pending)
+            throw new ConflictException(StringConstant.RequestProcessNotAllowed);
+
+        request.Status = dto.Status;
+        request.Remarks = dto.Remarks?.Trim() ?? string.Empty;
+        request.OperationsReviewerId = opsUserId;
+        request.UpdatedDate = DateTime.UtcNow;
+
+        await _eventRequestRepository.UpdateAsync(request);
+        await _eventRequestRepository.SaveChangesAsync();
+
+        var message = dto.Status == RequestStatus.Approved
+            ? $"Your request #{request.Id} has been approved."
+            : $"Your request #{request.Id} has been rejected. Remarks: {request.Remarks}";
+
+        await _notificationService.CreateAsync(
+            request.CreateNotification(message, dto.Status, NotificationAudience.Admin)
+        );
+
+        return _mapper.Map<EventRequestResponseDto>(request);
+    }
 }

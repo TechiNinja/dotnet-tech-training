@@ -10,5 +10,6 @@ namespace SportsManagementApp.Services.Interfaces
         Task<IEnumerable<EventRequestResponseDto>> GetAllEventRequestsAsync(EventRequestFilterDto filter);
         Task<EventRequestResponseDto> EditEventRequestAsync(int id, BaseEventRequestDto dto, int adminId);
         Task<EventRequestResponseDto> WithdrawEventRequestAsync(int id, int adminId);
+        Task<EventRequestResponseDto> ReviewEventRequestAsync(int id, ReviewEventRequestDto dto, int opsUserId);
     }
 }
