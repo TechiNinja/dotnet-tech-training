@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SportsManagementApp.Data.Entities;
 using System;
+using System.Text.Json;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace SportsManagementApp.Data
 {
@@ -25,6 +27,41 @@ namespace SportsManagementApp.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Event>()
+    .Property(e => e.EndDate)
+    .HasConversion(
+        v => v.ToDateTime(TimeOnly.MinValue),   // DateOnly → DateTime
+        v => DateOnly.FromDateTime(v)           // DateTime → DateOnly
+    );
+
+    modelBuilder.Entity<Event>()
+    .Property(e => e.StartDate)
+    .HasConversion(
+        v => v.ToDateTime(TimeOnly.MinValue),
+        v => DateOnly.FromDateTime(v)
+    );
+
+    modelBuilder.Entity<Event>()
+    .Property(e => e.RegistrationDeadline)
+    .HasConversion(
+        v => v.ToDateTime(TimeOnly.MinValue),
+        v => DateOnly.FromDateTime(v)
+    );
+
+    modelBuilder.Entity<EventRequest>()
+    .Property(e => e.EndDate)
+    .HasConversion(
+        v => v.ToDateTime(TimeOnly.MinValue),
+        v => DateOnly.FromDateTime(v)
+    );
+
+    modelBuilder.Entity<EventRequest>()
+    .Property(e => e.StartDate)
+    .HasConversion(
+        v => v.ToDateTime(TimeOnly.MinValue),
+        v => DateOnly.FromDateTime(v)
+    );
 
             modelBuilder.Entity<TeamMember>()
                 .HasOne(member => member.User)
@@ -77,6 +114,28 @@ namespace SportsManagementApp.Data
                 .WithOne(set => set.Match)
                 .HasForeignKey(set => set.MatchId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+                modelBuilder.Entity<Event>()
+    .HasOne(e => e.Sport)
+    .WithMany()
+    .HasForeignKey(e => e.SportId)
+    .OnDelete(DeleteBehavior.Restrict);
+
+modelBuilder.Entity<Event>()
+    .HasOne(e => e.Organizer)
+    .WithMany()
+    .HasForeignKey(e => e.OrganizerId)
+    .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Event>()
+                .HasIndex(e => e.EventRequestId)
+                .IsUnique();
+            modelBuilder.Entity<Sport>()
+    .Property(s => s.AllowedFormats)
+    .HasConversion(
+        v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+        v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions?)null) ?? new List<string>()
+    );    
         }
     }
 }

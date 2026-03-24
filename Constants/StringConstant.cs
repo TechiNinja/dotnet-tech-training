@@ -1,26 +1,101 @@
-namespace SportsManagementApp.Constants;
-public class StringConstant
+namespace SportsManagementApp.StringConstants
 {
-    public const string eventCreated  = "Event request created successfully";
-    public const string noEventFound  = "No Event Found";
-    public const string eventRequestSuccess  = "Event requests fetched successfully";
-    public const string noRequestFound  = "Event request not found";
-    public const string eventUpdated  = "Event request updated successfully";
-    public const string sportsFetchSuccess  = "Sport fetched successfully";
-    public const string sportNotFound  = "Sport not found";
-    public const string sportsCreated  = "Sports Created Successfully";
-    public const string eventRequestWithdrawl  = "Event request withdrawn successfully";
-    public const string eventRequestWithdrawlNotAllowed  = "Only pending request can be withdrawl";
-    public const string eventRequestModifyNotAllowed  = "Only pending request can be Modify";
-    public const string DateRequired  = "StartDate and EndDate are required.";
-    public const string DateCompare  = "Start date cannot be greater than end date";
-    public const string MatchFormatRequired  = "MatchFormat is required.";
-    public const string GenderTypeRequired  = "GenderType is required.";
-    public const string invalidSportsId  = "Invalid Sports Id , Sports not found";
-    public const string eventExist  = "Event Already Exist";
-    public const string sportsExist = "Sports Already Exist";
-    public const string sportsNameRequired = "Sports Name Required";
-    public const string sportsIdGreaterThanZero = "SportId must be greater than 0.";
-    public const string InternalServerError = "An unexpected error occurred";
-    public const string UnhandledException = "An unhandled exception occurred";
+    public static class StringConstant
+    {
+        public const string EventCreated = "Event request created successfully";
+        public const string NoEventFound = "No Event Found";
+        public const string EventRequestSuccess = "Event requests fetched successfully";
+        public const string NoRequestFound = "Event request not found";
+        public const string EventUpdated = "Event request updated successfully";
+        public const string SportsFetchSuccess = "Sport fetched successfully";
+        public const string SportNotFound = "Sport not found";
+        public const string SportsCreated = "Sports Created Successfully";
+        public const string EventRequestWithdrawal = "Event request withdrawn successfully";
+        public const string EventRequestWithdrawalNotAllowed = "Only pending request can be withdrawn";
+        public const string EventRequestModifyNotAllowed = "Only pending request can be modified";
+        public const string DateRequired = "StartDate and EndDate are required.";
+        public const string DateCompare = "Start date cannot be greater than end date";
+        public const string MatchFormatRequired = "MatchFormat is required.";
+        public const string GenderTypeRequired = "GenderType is required.";
+        public const string InvalidSportsId = "Invalid Sports Id, Sports not found";
+        public const string EventExist = "Event Already Exist";
+        public const string SportsExist = "Sports Already Exist";
+        public const string SportsNameRequired = "Sports Name Required";
+        public const string SportsIdGreaterThanZero = "SportId must be greater than 0.";
+        public const string InternalServerError = "An unexpected error occurred";
+        public const string UnhandledException = "An unhandled exception occurred";
+        public const string NoRequestAccess = "You can only access your own event requests.";
+        public const string OnlyEditOwnRequest = "You can only edit your own event requests.";
+        public const string OnlyWithdrawOwnRequest = "You can only withdraw your own event requests.";
+        public const string OnlyApproveOrRejectAllowed = "Only Approved or Rejected decisions are allowed.";
+        public const string RequestProcessNotAllowed = "Request already processed. Double approval or rejection is not allowed.";
+        public const string NewNotificationEvent = "notification:new";
+        public const string OpsGroupName = "ops";
+        public const string InvalidId = "Invalid Id";
+        public const string MessageRequired = "Message is Required";
+        public const string IdRequired = "User ID Required for admin";
+        public const string SportsNotFound = "Sports Not Found"; 
+    }
+
+    public static class AppConstants
+    {
+        public const int OrganizerRoleId = 2;
+        public const int ScheduleOverlapMinutes = 60;
+        public const string ReactNativeCorsPolicy = "ReactNativePolicy";
+        public const string SwaggerTitle = "Sports Management API";
+        public const string SwaggerDescription = "Backend API for the Sports Management React Native app.";
+        public const string TagEvents = "Events";
+        public const string TagCategories = "Categories";
+        public const string TagMatches = "Matches";
+        public const string OrganizerAssigned = "Organizer assigned successfully.";
+        public const string FixturesGenerated = "Fixtures generated successfully.";
+        public const string FixturesDeleted = "All fixtures deleted successfully.";
+        public const string ScheduleUpdated = "Match schedule updated successfully.";
+        public const string SetScoreSubmitted = "Set score submitted successfully.";
+        public const string ResultSubmitted = "Match result submitted successfully.";
+        public const string EventRequestIdRequired = "EventRequestId is required.";
+        public const string EventNameTooLong = "Event name cannot exceed 100 characters.";
+        public const string RegistrationDeadlineRequired = "Registration deadline is required.";
+        public const string DescriptionTooLong = "Description cannot exceed 1000 characters.";
+        public const string MaxParticipantsRequired = "MaxParticipantsCount is required.";
+        public const string MaxParticipantsRange = "MaxParticipantsCount must be between 2 and 10000.";
+        public const string MatchDateTimeRequired = "MatchDateTime is required.";
+        public const string ScoreValidate = "Score must be 0 or greater.";
+        public const string RequiredValueMissing = "A required value was missing.";
+        public const string SetNotFound = "Set #{0} not found for match #{1}.";
+        public const string SetNotLive = "Set #{0} is not Live. Only Live sets can be updated.";
+        public const string SetAlreadyCompleted = "Set #{0} is already completed and cannot be modified.";
+        public const string AnotherSetAlreadyLive = "Set #{0} is already Live. Complete it before starting a new set.";
+        public const string MaxSetsReached = "Cannot add more sets. Maximum sets allowed for this match is {0}.";
+        public const string PreviousSetNotCompleted = "Set #{0} must be completed before starting set #{1}.";
+        public const string NoScoreSubmitted = "Cannot submit result. No score has been submitted for this match.";
+        public const string AllSetsNotCompleted = "Cannot submit result. Complete all sets first.";
+        public const string EventRequestNotFound = "Event request #{0} not found.";
+        public const string EventRequestNotApproved = "Event request must be Approved to create an event. Current status: {0}.";
+        public const string EventNotFound = "Event #{0} not found.";
+        public const string EventAlreadyExists = "An event for request #{0} already exists.";
+        public const string RegistrationDeadlineInvalid = "Registration deadline must be before the event start date.";
+        public const string EventCancelled = "This event has been cancelled.";
+        public const string EventCompleted = "This event is already completed.";
+        public const string InvalidMatchStatus = "'{0}' is not a valid match status. Valid values are: Upcoming, Live, Completed.";
+        public const string InvalidEventStatus = "'{0}' is not a valid event status. Valid values are: Upcoming, Live, Open, Completed, Cancelled.";
+        public const string CategoryNotFound = "Category #{0} not found.";
+        public const string CategoryScheduleLocked = "Schedule is locked for this category.";
+        public const string NotEnoughTeams = "At least 2 teams are required to generate fixtures. Current count: {0}.";
+        public const string NotEnoughParticipants = "At least 2 participants are required to generate fixtures. Current count: {0}.";
+        public const string FixturesAlreadyExist = "Fixtures already exist for this category. Delete existing fixtures first.";
+        public const string MatchNotFound = "Match #{0} not found.";
+        public const string MatchAlreadyCompleted = "Match #{0} is already completed.";
+        public const string MatchSetAlreadyExists = "Set #{0} already exists for match #{1}.";
+        public const string DrawNotAllowed = "Match is tied. Cannot announce a winner. Please conduct one more set to determine the winner.";
+        public const string MatchResultAlreadyExists = "Result already submitted for match #{0}.";
+        public const string ScheduleTimeOverlap = "A match is already scheduled within 60 minutes of the requested time.";
+        public const string UserNotFound = "User #{0} not found.";
+        public const string UserInactive = "User '{0}' is inactive and cannot be assigned as organizer.";
+        public const string UserNotOrganizer = "User '{0}' does not hold the Organizer role.";
+        public const string UnexpectedError = "An unexpected error occurred.";
+        public const string UnauthorizedAccess = "Unauthorized access.";
+        public const string Unauthorized = "Unauthorized.";
+        public const string UnhandledExceptionLog = "Unhandled exception on {Method} {Path}";
+    }
 }

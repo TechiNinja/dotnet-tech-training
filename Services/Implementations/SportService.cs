@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using SportsManagementApp.StringConstants;
 using SportsManagementApp.Data.DTOs.SportManagement;
 using SportsManagementApp.Data.Entities;
 using SportsManagementApp.Data.Filters;
@@ -24,21 +25,21 @@ namespace SportsManagementApp.Services.Implementations
         {
             if (string.IsNullOrWhiteSpace(createSport.Name))
             {
-                throw new BadRequestException("Sport Name is required");
+                throw new BadRequestException(StringConstant.SportsNameRequired);
             }
 
             var trimmedName = createSport.Name.Trim();
 
-            var exists = await _sportRepository.SportExistsAsync(trimmedName);
+            var exists = await _sportRepository.ExistsAsync(
+                sport => sport.Name.ToLower() == trimmedName.ToLower()
+            );
 
             if (exists)
             {
-                throw new ConflictException("Sport already exists");
+                throw new ConflictException(StringConstant.SportsExist);
             }
 
             var sport = _mapper.Map<Sport>(createSport);
-            sport.Name = trimmedName;
-            sport.CreatedAt = DateTime.UtcNow;
 
             await _sportRepository.AddAsync(sport);
             await _sportRepository.SaveChangesAsync();
@@ -50,44 +51,41 @@ namespace SportsManagementApp.Services.Implementations
         {
             var predicate = SportPredicateBuilder.Build(filter);
 
-            return await _sportRepository.GetAllAsync(
-                predicate: predicate,
-                projection: sport => new SportResponseDto
-                {
-                    Id = sport.Id,
-                    Name = sport.Name
-                }
-            );
+            var sports = await _sportRepository.GetAllAsync(predicate);
+
+            return _mapper.Map<List<SportResponseDto>>(sports);
         }
 
         public async Task<Sport> UpdateSportAsync(int id, UpdateSportDto updateSport)
         {
-            if (string.IsNullOrEmpty(updateSport.Name))
+            if (string.IsNullOrWhiteSpace(updateSport.Name))
             {
-                throw new BadRequestException("Sport name is required");
+                throw new BadRequestException(StringConstant.SportsNameRequired);
             }
 
             var sport = await _sportRepository.GetByIdAsync(id);
 
             if (sport == null)
             {
-                throw new NotFoundException("Sport not found");
+                throw new NotFoundException(StringConstant.SportsNotFound);
             }
 
             var trimmedName = updateSport.Name.Trim();
 
-            var exists = await _sportRepository.SportExistsAsync(trimmedName);
+            var exists = await _sportRepository.ExistsAsync(
+                s => s.Name.ToLower() == trimmedName.ToLower() && s.Id != id
+            );
 
-            if (exists && !sport.Name.Equals(updateSport.Name, StringComparison.OrdinalIgnoreCase))
+            if (exists)
             {
-                throw new ConflictException("Sport with this name already exists");
+                throw new ConflictException(StringConstant.SportsExist);
             }
 
-            sport.Name = trimmedName;
-            sport.UpdatedAt = DateTime.UtcNow;
+            _mapper.Map(updateSport, sport);
 
             await _sportRepository.UpdateAsync(sport);
             await _sportRepository.SaveChangesAsync();
+
             return sport;
         }
     }

@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Net;
+using System.Net.Cache;
+using Microsoft.EntityFrameworkCore;
 using SportsManagementApp.Data;
 using SportsManagementApp.Data.DTOs.Analytics;
 using SportsManagementApp.Enums;
@@ -48,5 +50,23 @@ namespace SportsManagementApp.Repositories.Implementations
                     match.EventCategory!.Event!.OrganizerId == organizerId)
             };
         }
+
+        public async Task<OperationAnalyticsDto> GetOperationAnalyticsAsync()
+        {
+            var today = DateTime.UtcNow.Date;
+            var tomorrow = today.AddDays(1);
+
+            return new OperationAnalyticsDto
+            {
+                TotalRequests = await _context.EventRequests.CountAsync(),
+                TotalEvents = await _context.Events.CountAsync(),
+                PendingRequests = await _context.EventRequests.CountAsync(request => request.Status == RequestStatus.Pending),
+                MatchesToday = await _context.Matches.CountAsync(match =>
+                    match.MatchDateTime == today )
+            };
+        }
     }
 }
+
+
+

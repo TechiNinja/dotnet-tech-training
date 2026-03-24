@@ -9,7 +9,7 @@ using SportsManagementApp.Services.Interfaces;
 namespace SportsManagementApp.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("api/sports")]
     [ApiController]
     public class SportController : ControllerBase
     {
