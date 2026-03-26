@@ -1,5 +1,5 @@
 using AutoMapper;
-using SportsManagementApp.Constants;
+using SportsManagementApp.StringConstants;
 using SportsManagementApp.Exceptions;
 using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services.Interfaces;

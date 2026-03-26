@@ -16,7 +16,7 @@ namespace SportsManagementApp.Repositories.Implementations
             _dbSet = context.Set<T>();
         }
 
-        public async Task<T?> GetByIdAsync(int id)
+        public virtual async Task<T?> GetByIdAsync(int id)
         {
             return await _dbSet.FindAsync(id);
         }
@@ -104,5 +104,9 @@ namespace SportsManagementApp.Repositories.Implementations
             return await _dbSet.CountAsync(predicate);
         }
 
+        public async Task AddRangeAsync(IEnumerable<T> entities)
+        {
+            await _dbSet.AddRangeAsync(entities);
+        }
     }
 }
