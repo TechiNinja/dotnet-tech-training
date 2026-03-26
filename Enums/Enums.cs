@@ -28,11 +28,10 @@
     public enum EventStatus
     {
         Unknown = 0,
-        Open = 1,
-        Upcoming = 2,
-        Live = 3,
-        Completed = 4,
-        Cancelled = 5
+        Upcoming = 1,
+        Live = 2,
+        Completed = 3,
+        Cancelled = 4
     }
 
     public enum CategoryStatus
@@ -65,7 +64,14 @@
         Completed = 3,
         Cancelled = 4,
     }
-   public enum NotificationType
+    public enum RoleType
+    {
+        Admin = 1,
+        OpsTeam = 2,
+        Organizer = 3,
+        Participant = 4
+    }
+    public enum NotificationType
     {
         Unknown = 0,
         Approved = 1,

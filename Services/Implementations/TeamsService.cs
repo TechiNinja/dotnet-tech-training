@@ -6,7 +6,6 @@ using SportsManagementApp.Data.Predicates;
 using SportsManagementApp.Exceptions;
 using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services.Interfaces;
-
 namespace SportsManagementApp.Services.Implementations
 {
     public class TeamsService : ITeamsService
@@ -25,7 +24,6 @@ namespace SportsManagementApp.Services.Implementations
         public async Task<List<TeamResponseDto>> GetTeamsAsync(TeamFilterDto filter)
         {
             var predicate = TeamPredicateBuilder.Build(filter);
-            
             return await _repository.GetAllAsync(
                 predicate: predicate,
                 projection: team => new TeamResponseDto
@@ -42,7 +40,7 @@ namespace SportsManagementApp.Services.Implementations
         {
             var registration = await _participantRepository.GetParticipantsByCategoryAsync(request.EventCategoryId);
 
-            if (registration.Count < 2)
+            if (registration.Count < 4)
                 throw new BadRequestException("Not enough participants to form teams");
 
             if (registration.Count % 2 != 0)
@@ -56,8 +54,6 @@ namespace SportsManagementApp.Services.Implementations
             }
 
             int teamNumber = 1;
-            var result = new List<TeamResponseDto>();
-
             var teamsToAdd = new List<Team>();
 
             for (int index = 0; index < registration.Count; index += 2)
@@ -70,17 +66,15 @@ namespace SportsManagementApp.Services.Implementations
                     new() { UserId = registration[index].UserId },
                     new() { UserId = registration[index + 1].UserId }
                 };
-
                 teamsToAdd.Add(team);
-
-                result.Add(_mapper.Map<TeamResponseDto>(team));
                 teamNumber++;
             }
 
             await _repository.AddRangeAsync(teamsToAdd);
             await _repository.SaveChangesAsync();
 
-            return result;
+            var filter = new TeamFilterDto { CategoryId = request.EventCategoryId };
+            return await GetTeamsAsync(filter);
         }
     }
 }

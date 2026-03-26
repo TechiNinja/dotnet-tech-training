@@ -156,7 +156,7 @@ namespace SportsManagementApp.Tests.Services
             var expected = SportTestData.SportResponseList();
 
             _mockRepo
-                .Setup(repo => repo.GetAllAsync(
+                .Setup(repo => repo.GetSportsAsyncWithFilter(
                     It.IsAny<Expression<Func<Sport, bool>>>(),
                     It.IsAny<Expression<Func<Sport, SportResponseDto>>>()))
                 .ReturnsAsync(expected);

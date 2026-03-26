@@ -34,13 +34,10 @@ namespace SportsManagementApp.StringConstants
         public const string InvalidId = "Invalid Id";
         public const string MessageRequired = "Message is Required";
         public const string IdRequired = "User ID Required for admin";
-        public const string SportsNotFound = "Sports Not Found"; 
-    }
-
-    public static class AppConstants
-    {
-        public const int OrganizerRoleId = 2;
-        public const int ScheduleOverlapMinutes = 60;
+        public const string SportsNotFound = "Sports Not Found";
+        public static readonly TimeOnly DayStart = new(8, 0);
+        public static readonly TimeOnly DayEnd = new(17, 0);
+        public const int SlotMinutes = 60;
         public const string ReactNativeCorsPolicy = "ReactNativePolicy";
         public const string SwaggerTitle = "Sports Management API";
         public const string SwaggerDescription = "Backend API for the Sports Management React Native app.";
@@ -97,5 +94,14 @@ namespace SportsManagementApp.StringConstants
         public const string UnauthorizedAccess = "Unauthorized access.";
         public const string Unauthorized = "Unauthorized.";
         public const string UnhandledExceptionLog = "Unhandled exception on {Method} {Path}";
+        public const string ActionCancel = "cancel";
+        public const string ActionUpdate = "update";
+        public const string RescheduleOutsideEventDates = "New date must be within event dates ({0} to {1}).";
+        public const string ReschedulePushesMatchesBeyondEventEnd = "Rescheduling this match pushes subsequent matches beyond the event end date.";
+        public const string NotEnoughDaysToSchedule = "Event duration is not enough to schedule all generated matches.";
+        public const string TotalSetsLocked  = "Total sets cannot be changed once a match is live or completed.";
+        public const string TotalSetsInvalid = "Total sets must be an odd number between 1 and 9.";
+        public const string PreviousRoundNotCompleted = "Previous round matches must be completed before starting this match.";
+        public const string EntityNotFound = "{0} #{1} not found.";
     }
 }

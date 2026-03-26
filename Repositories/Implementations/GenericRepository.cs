@@ -16,7 +16,7 @@ namespace SportsManagementApp.Repositories.Implementations
             _dbSet = context.Set<T>();
         }
 
-        public async Task<T?> GetByIdAsync(int id)
+        public virtual async Task<T?> GetByIdAsync(int id)
         {
             return await _dbSet.FindAsync(id);
         }
@@ -37,7 +37,7 @@ namespace SportsManagementApp.Repositories.Implementations
 
         public async Task<List<T>> GetAllAsync()
         {
-            return await _dbSet.ToListAsync();
+            return await _dbSet.AsNoTracking().ToListAsync();
         }
 
         public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>> predicate)

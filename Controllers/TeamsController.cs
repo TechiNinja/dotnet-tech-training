@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SportsManagementApp.Constants;
 using SportsManagementApp.Data.DTOs.TeamManagement;
 using SportsManagementApp.Data.Filters;
 using SportsManagementApp.Services.Interfaces;
@@ -26,8 +27,8 @@ namespace SportsManagementApp.Controllers
         }
 
         [HttpPost("create")]
-        [Authorize(Roles = "Organizer")]
-        public async Task<ActionResult<List<TeamResponseDto>>> CreateTeams(CreateTeamRequestDto request)
+        [Authorize(Roles = $"{RoleConstants.Admin},{RoleConstants.Organizer}")]
+        public async Task<ActionResult<List<TeamResponseDto>>> CreateTeams([FromBody] CreateTeamRequestDto request)
         {
             var result = await _teamsService.CreateTeamsAsync(request);
             return Ok(result);

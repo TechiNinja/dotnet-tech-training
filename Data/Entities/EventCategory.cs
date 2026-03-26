@@ -8,7 +8,6 @@ namespace SportsManagementApp.Data.Entities
         public MatchFormat Format { get; set; }
         public GenderType Gender { get; set; }
         public CategoryStatus Status { get; set; }
-        public TournamentType TournamentType { get; set; } = TournamentType.Knockout;
         public int EventId { get; set; }
         public Event? Event { get; set; }
         public DateTime CreatedAt { get; set; }
