@@ -13,7 +13,7 @@ namespace SportsManagementApp.Helpers
                 next = next.Date.AddDays(1).Add(StringConstant.DayStart.ToTimeSpan());
 
             if (DateOnly.FromDateTime(next) > endDate)
-                throw new UnprocessableEntityException(StringConstant.NotEnoughDaysToSchedule);
+                throw new BadRequestException(StringConstant.NotEnoughDaysToSchedule);
 
             return next;
         }

@@ -47,7 +47,7 @@ namespace SportsManagementApp.Services
                     string.Format(StringConstant.MatchAlreadyCompleted, matchId));
 
             var eventStart = category.Event!.StartDate.ToDateTime(StringConstant.DayStart);
-            var eventEnd   = category.Event.EndDate.ToDateTime(StringConstant.DayEnd);
+            var eventEnd = category.Event.EndDate.ToDateTime(StringConstant.DayEnd);
 
             if (newStartDateTime < eventStart || newStartDateTime > eventEnd)
                 throw new BadRequestException(
@@ -149,19 +149,8 @@ namespace SportsManagementApp.Services
             return (match, category);
         }
 
-        private static bool HasMatchWinner(Match match)
-        {
-            if (!match.MatchSets.Any()) return false;
-            if (match.MatchSets.Any(s => s.Status == SetStatus.Live)) return false;
-            if (match.TotalSets > 0 && match.MatchSets.Count(s => s.Status == SetStatus.Completed) < match.TotalSets)
-                return false;
-
-            int sideAWins = match.MatchSets.Count(s => s.Status == SetStatus.Completed && s.ScoreA > s.ScoreB);
-            int sideBWins = match.MatchSets.Count(s => s.Status == SetStatus.Completed && s.ScoreB > s.ScoreA);
-            int winsNeeded = match.TotalSets == 0 ? 1 : (match.TotalSets / 2) + 1;
-
-            return sideAWins >= winsNeeded || sideBWins >= winsNeeded;
-        }
+        private static bool HasMatchWinner(Match match) =>
+            match.MatchSets.Count(s => s.Status == SetStatus.Completed) == match.TotalSets;
 
         private static bool IsFinal(Match match, int lastRound) => match.RoundNumber == lastRound && match.BracketPosition == 0;
         private static bool IsByeMatch(Match match, int lastRound) => match.RoundNumber == lastRound && match.BracketPosition == 1;
