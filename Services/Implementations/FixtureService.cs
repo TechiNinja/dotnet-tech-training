@@ -7,6 +7,7 @@ using SportsManagementApp.Exceptions;
 using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services.Interfaces;
 using SportsManagementApp.Services.Strategies;
+using SportsManagementApp.Helpers;
 
 namespace SportsManagementApp.Services
 {
@@ -76,7 +77,7 @@ namespace SportsManagementApp.Services
             {
                 match.MatchDateTime = slot;
                 match.MatchVenue = evt.EventVenue;
-                slot = GetNextSlot(slot, evt.EndDate);
+                slot = SlotHelper.GetNextSlot(slot, evt.EndDate);
             }
         }
 

@@ -6,6 +6,7 @@ using SportsManagementApp.Enums;
 using SportsManagementApp.Exceptions;
 using SportsManagementApp.Repositories.Interfaces;
 using SportsManagementApp.Services.Interfaces;
+using SportsManagementApp.Helpers;
 
 namespace SportsManagementApp.Services
 {
@@ -46,28 +47,36 @@ namespace SportsManagementApp.Services
                     string.Format(StringConstant.MatchAlreadyCompleted, matchId));
 
             var eventStart = category.Event!.StartDate.ToDateTime(StringConstant.DayStart);
-            var eventEnd = category.Event.EndDate.ToDateTime(StringConstant.DayEnd);
+            var eventEnd   = category.Event.EndDate.ToDateTime(StringConstant.DayEnd);
 
             if (newStartDateTime < eventStart || newStartDateTime > eventEnd)
                 throw new BadRequestException(
                     string.Format(StringConstant.RescheduleOutsideEventDates,
                         category.Event.StartDate, category.Event.EndDate));
 
-            var delay = newStartDateTime - match.MatchDateTime;
+            var newTime = TimeOnly.FromDateTime(newStartDateTime);
+            if (newTime < StringConstant.DayStart || newTime >= StringConstant.DayEnd)
+                throw new BadRequestException(
+                    $"Match time must be between {StringConstant.DayStart} and {StringConstant.DayEnd}.");
 
             var affected = category.Matches
                 .Where(m => m.Status != MatchStatus.Completed && m.MatchDateTime >= match.MatchDateTime)
                 .OrderBy(m => m.MatchDateTime)
                 .ToList();
 
-            if (affected.Last().MatchDateTime.Add(delay) > eventEnd)
-                throw new BadRequestException(StringConstant.ReschedulePushesMatchesBeyondEventEnd);
-
-            var now = DateTime.UtcNow;
+            var newSlots = new List<DateTime>();
+            var slot = newStartDateTime;
             foreach (var m in affected)
             {
-                m.MatchDateTime = m.MatchDateTime.Add(delay);
-                m.UpdatedAt = now;
+                newSlots.Add(slot);
+                slot = SlotHelper.GetNextSlot(slot, category.Event.EndDate);
+            }
+
+            var now = DateTime.UtcNow;
+            for (int i = 0; i < affected.Count; i++)
+            {
+                affected[i].MatchDateTime = newSlots[i];
+                affected[i].UpdatedAt = now;
             }
 
             await _matchRepo.SaveChangesAsync();
